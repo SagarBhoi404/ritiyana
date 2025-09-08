@@ -44,6 +44,39 @@
             
             <div class="p-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    <!-- Kit Name Field -->
+                <div class="mb-6">
+                    <label for="kit_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kit Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('kit_name') border-red-500 @enderror" 
+                           id="kit_name" 
+                           name="kit_name" 
+                           value="{{ old('kit_name') }}" 
+                           required>
+                    @error('kit_name')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Slug Field -->
+                <div class="mb-6">
+                    <label for="slug" class="block text-sm font-medium text-gray-700 mb-2">
+                        Slug (URL friendly name)
+                    </label>
+                    <input type="text" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('slug') border-red-500 @enderror" 
+                           id="slug" 
+                           name="slug" 
+                           value="{{ old('slug') }}" 
+                           placeholder="Auto-generated from kit name if left empty">
+                    @error('slug')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                
                     <!-- Left Column -->
                     <div class="space-y-6">
                         <!-- Pujas Selection -->

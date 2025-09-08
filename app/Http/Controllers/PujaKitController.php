@@ -1,5 +1,5 @@
 <?php
-// app/Http/Controllers/Admin/PujaKitController.php
+
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -7,42 +7,44 @@ use App\Models\PujaKit;
 use App\Models\Puja;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PujaKitController extends Controller
 {
     public function index()
-{
-    // Ensure all relationships are loaded with null checks
-    $kits = PujaKit::with(['pujas', 'products'])
-        ->latest()
-        ->paginate(15);
-        
-    // Dynamic statistics
-    $totalKits = PujaKit::count();
-    $activeKits = PujaKit::where('is_active', true)->count();
-    $totalSales = 248650; // This would come from orders table
-    $bestSeller = PujaKit::with('products')->first();
+    {
+        $kits = PujaKit::with(['pujas', 'products'])
+            ->latest()
+            ->paginate(15);
 
-    return view('admin.puja-kits.index', compact(
-        'kits',
-        'totalKits',
-        'activeKits',
-        'totalSales',
-        'bestSeller'
-    ));
-}
+        // Dynamic statistics
+        $totalKits = PujaKit::count();
+        $activeKits = PujaKit::where('is_active', true)->count();
+        $totalSales = 248650; // This would come from orders table
+        $bestSeller = PujaKit::with('products')->first();
+
+        return view('admin.puja-kits.index', compact(
+            'kits',
+            'totalKits',
+            'activeKits',
+            'totalSales',
+            'bestSeller'
+        ));
+    }
 
     public function create()
     {
         $pujas = Puja::where('is_active', true)->get();
         $products = Product::where('is_active', true)->get();
-        
+
         return view('admin.puja-kits.create', compact('pujas', 'products'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'kit_name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:puja_kits,slug',
             'pujas' => 'required|array|min:1',
             'pujas.*' => 'exists:pujas,id',
             'products' => 'required|array|min:1',
@@ -56,6 +58,11 @@ class PujaKitController extends Controller
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
             'is_active' => 'boolean',
         ]);
+
+        // Generate slug if not provided
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['kit_name']);
+        }
 
         $validated['is_active'] = $request->boolean('is_active');
 
@@ -73,6 +80,7 @@ class PujaKitController extends Controller
                 'price' => $validated['product_prices'][$index] ?? null,
             ];
         }
+
         $pujaKit->products()->sync($productData);
 
         return redirect()->route('admin.puja-kits.index')
@@ -90,13 +98,15 @@ class PujaKitController extends Controller
         $pujaKit->load(['pujas', 'products']);
         $pujas = Puja::where('is_active', true)->get();
         $products = Product::where('is_active', true)->get();
-        
+
         return view('admin.puja-kits.edit', compact('pujaKit', 'pujas', 'products'));
     }
 
     public function update(Request $request, PujaKit $pujaKit)
     {
         $validated = $request->validate([
+            'kit_name' => 'required|string|max:255',
+            'slug' => 'nullable|string|unique:puja_kits,slug,' . $pujaKit->id,
             'pujas' => 'required|array|min:1',
             'pujas.*' => 'exists:pujas,id',
             'products' => 'required|array|min:1',
@@ -110,6 +120,11 @@ class PujaKitController extends Controller
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
             'is_active' => 'boolean',
         ]);
+
+        // Generate slug if not provided
+        if (empty($validated['slug'])) {
+            $validated['slug'] = Str::slug($validated['kit_name']);
+        }
 
         $validated['is_active'] = $request->boolean('is_active');
 
@@ -126,6 +141,7 @@ class PujaKitController extends Controller
                 'price' => $validated['product_prices'][$index] ?? null,
             ];
         }
+
         $pujaKit->products()->sync($productData);
 
         return redirect()->route('admin.puja-kits.index')
@@ -135,7 +151,6 @@ class PujaKitController extends Controller
     public function destroy(PujaKit $pujaKit)
     {
         $pujaKit->delete();
-
         return redirect()->route('admin.puja-kits.index')
             ->with('success', 'Puja Kit deleted successfully');
     }

@@ -110,7 +110,7 @@
                                     </div>
                                 @endif
                                 <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Kit #{{ $kit->id }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ $kit->kit_name  }}</div>
                                     <div class="text-sm text-gray-500">{{ Str::limit($kit->kit_description, 50) }}</div>
                                 </div>
                             </div>
@@ -147,6 +147,7 @@
                                 {{ $kit->is_active ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
+                        
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div class="flex items-center space-x-2">
                                 <a href="{{ route('admin.puja-kits.show', $kit) }}" class="text-blue-600 hover:text-blue-900">

@@ -49,8 +49,11 @@
                 <!-- Kit Info -->
                 <div class="flex-1">
                     <h2 class="text-2xl font-bold text-gray-900">
-                        {{ $firstProduct->name ?? 'Puja Kit #' . $pujaKit->id }}
+                        {{ $pujaKit->kit_name ?? 'Puja Kit #' . $pujaKit->id }}
                     </h2>
+                    <p class="text-lg text-gray-600 mb-2">
+        Slug: {{ $pujaKit->slug }}
+    </p>
                     <p class="text-lg text-gray-600 mb-2">
                         For {{ $pujaKit->pujas->pluck('name')->implode(', ') ?: 'Multiple Pujas' }}
                     </p>

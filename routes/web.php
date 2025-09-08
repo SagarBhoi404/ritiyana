@@ -114,17 +114,17 @@ Route::middleware('auth')->group(function () {
 
         // Categories routes
         // Route::view('/categories', 'admin.categories.index')->name('categories.index');
-            // Categories - Full CRUD
-    Route::resource('categories', CategoryController::class);
-    
-    // Products - Full CRUD  
-    Route::resource('products', ProductController::class);
+        // Categories - Full CRUD
+        Route::resource('categories', CategoryController::class);
 
-      // Pujas Management
-    Route::resource('pujas', PujaController::class);
-    
-    // Puja Kits Management
-    Route::resource('puja-kits', PujaKitController::class);
+        // Products - Full CRUD  
+        Route::resource('products', ProductController::class);
+
+        // Pujas Management
+        Route::resource('pujas', PujaController::class);
+
+        // Puja Kits Management
+        Route::resource('puja-kits', PujaKitController::class);
 
         // Inventory routes
         Route::view('/inventory', 'admin.inventory.index')->name('inventory.index');

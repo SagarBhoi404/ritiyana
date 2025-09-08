@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('puja_kits', function (Blueprint $table) {
-              $table->id();
+            $table->id();
+            $table->string('kit_name');
+            $table->string('slug')->unique();
             $table->foreignId('puja_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->text('kit_description')->nullable();
