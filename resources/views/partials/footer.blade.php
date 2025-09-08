@@ -1,0 +1,77 @@
+<footer class="bg-gray-900 text-white pt-12 pb-6">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <!-- Company Info -->
+            <div>
+                <h3 class="text-xl font-bold mb-4">Ritiyana</h3>
+                <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts here.</p>
+                <div class="flex gap-4">
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-lucide="facebook" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-lucide="instagram" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white">
+                        <i data-lucide="youtube" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h4 class="font-semibold mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="{{ route('home') }}" class="hover:text-white">Home</a></li>
+                    <li><a href="{{ route('all-kits') }}" class="hover:text-white">All Kits</a></li>
+                    <li><a href="{{ route('upcoming-pujas') }}" class="hover:text-white">Upcoming Pujas</a></li>
+                    <li><a href="{{ route('consult') }}" class="hover:text-white">Consult</a></li>
+                </ul>
+            </div>
+            
+            <!-- Categories -->
+            <div>
+                <h4 class="font-semibold mb-4">Categories</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:text-white">Daily Puja Kits</a></li>
+                    <li><a href="#" class="hover:text-white">Festival Kits</a></li>
+                    <li><a href="#" class="hover:text-white">Custom Kits</a></li>
+                    <li><a href="#" class="hover:text-white">Eco-friendly</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact -->
+            <div>
+                <h4 class="font-semibold mb-4">Contact</h4>
+                <div class="space-y-3 text-gray-300">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="phone" class="w-4 h-4"></i>
+                        <span>+91 98765 43210</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        <span>support@ritiyana.com</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pin" class="w-4 h-4"></i>
+                        <span>Pune, India</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-800 pt-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">© 2025 Ritiyana. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Refund Policy</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
