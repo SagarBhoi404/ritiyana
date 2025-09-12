@@ -11,7 +11,7 @@
                 <ol class="flex items-center space-x-2">
                     <li>
                         <div>
-                            <a href="{{ route('shopkeeper.dashboard') }}" class="text-gray-400 hover:text-gray-500">
+                            <a href="{{ route('vendor.dashboard') }}" class="text-gray-400 hover:text-gray-500">
                                 <i data-lucide="home" class="h-4 w-4"></i>
                             </a>
                         </div>

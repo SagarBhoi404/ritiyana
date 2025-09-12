@@ -174,6 +174,74 @@
         </div>
     </div>
 
+@if($user->hasRole('shopkeeper'))
+<div class="mt-6 p-6 bg-white border border-gray-200 rounded">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Vendor Information</h3>
+    
+    @if($user->vendorProfile)
+        <div class="space-y-3">
+            <div>
+                <strong>Business Name:</strong>
+                <span>{{ $user->vendorProfile->business_name }}</span>
+            </div>
+            
+            <div>
+                <strong>Business Type:</strong>
+                <span>{{ ucfirst($user->vendorProfile->business_type ?? 'N/A') }}</span>
+            </div>
+            
+            <div>
+                <strong>Business Address:</strong>
+                <span>{{ $user->vendorProfile->business_address ?? 'N/A' }}</span>
+            </div>
+            
+            <div>
+                <strong>Business Phone:</strong>
+                <span>{{ $user->vendorProfile->business_phone ?? 'N/A' }}</span>
+            </div>
+            
+            <div>
+                <strong>Vendor Status:</strong>
+                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                    {{ $user->vendorProfile->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                    {{ ucfirst($user->vendorProfile->status) }}
+                </span>
+            </div>
+            
+            <div>
+                <strong>Commission Rate:</strong>
+                <span>{{ $user->vendorProfile->commission_rate }}%</span>
+            </div>
+            
+            @if($user->vendorProfile->bank_name)
+            <div>
+                <strong>Bank Details:</strong>
+                <span>{{ $user->vendorProfile->bank_name }} - {{ $user->vendorProfile->account_number }}</span>
+            </div>
+            @endif
+            
+            <div>
+                <strong>Joined:</strong>
+                <span>{{ $user->vendorProfile->created_at->format('M j, Y') }}</span>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">
+                Edit Vendor Profile
+            </a>
+        </div>
+    @else
+        <div class="text-gray-500">
+            <p>Vendor profile not completed yet.</p>
+            <a href="{{ route('admin.users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900">
+                Set up vendor profile
+            </a>
+        </div>
+    @endif
+</div>
+@endif
+
     <!-- Actions -->
     <div class="mt-8 flex justify-center space-x-4">
         <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-6 py-3 bg-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">

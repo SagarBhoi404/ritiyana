@@ -251,5 +251,72 @@
             @endif
         </div>
     </div>
+
+
+    {{-- Add this vendor section after your existing kit information --}}
+@if($pujaKit->vendor_id && $pujaKit->vendor)
+<div class="mt-6 p-6 bg-white border border-gray-200 rounded-lg">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <i data-lucide="user" class="w-5 h-5 mr-2"></i>
+        Vendor Information
+    </h3>
+    
+    <div class="flex items-start space-x-4">
+        <div class="flex-shrink-0">
+            @if($pujaKit->vendor->vendorProfile && $pujaKit->vendor->vendorProfile->store_logo)
+                <img class="h-16 w-16 rounded-lg object-cover" src="{{ asset('storage/' . $pujaKit->vendor->vendorProfile->store_logo) }}" alt="">
+            @else
+                <div class="h-16 w-16 bg-indigo-100 rounded-lg flex items-center justify-center">
+                    <i data-lucide="user" class="w-8 h-8 text-indigo-600"></i>
+                </div>
+            @endif
+        </div>
+        
+        <div class="flex-1">
+            <h4 class="font-medium text-gray-900">
+                {{ $pujaKit->vendor->vendorProfile->business_name ?? ($pujaKit->vendor->first_name . ' ' . $pujaKit->vendor->last_name) }}
+            </h4>
+            <p class="text-sm text-gray-600 mb-2">{{ $pujaKit->vendor->email }}</p>
+            
+            @if($pujaKit->vendor->vendorProfile)
+                <div class="space-y-2">
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-20">Status:</span>
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                            {{ $pujaKit->vendor->vendorProfile->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                            {{ ucfirst($pujaKit->vendor->vendorProfile->status) }}
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-20">Type:</span>
+                        <span class="text-gray-900">{{ ucfirst($pujaKit->vendor->vendorProfile->business_type ?? 'Individual') }}</span>
+                    </div>
+                    
+                    @if($pujaKit->vendor->vendorProfile->business_phone)
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-20">Phone:</span>
+                        <span class="text-gray-900">{{ $pujaKit->vendor->vendorProfile->business_phone }}</span>
+                    </div>
+                    @endif
+
+                    <div class="flex items-center text-sm">
+                        <span class="text-gray-500 w-20">Commission:</span>
+                        <span class="text-gray-900">{{ $pujaKit->vendor->vendorProfile->commission_rate ?? 8 }}%</span>
+                    </div>
+                </div>
+            @endif
+            
+            <div class="mt-4">
+                <a href="{{ route('admin.vendors.show', $pujaKit->vendor) }}" 
+                   class="inline-flex items-center text-indigo-600 hover:text-indigo-700">
+                    <i data-lucide="external-link" class="w-4 h-4 mr-1"></i>
+                    View Vendor Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 </div>
 @endsection

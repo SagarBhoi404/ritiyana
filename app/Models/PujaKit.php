@@ -25,7 +25,7 @@ class PujaKit extends Model
         'is_active' => 'boolean',
     ];
 
-       // Automatically generate slug when kit_name is set
+    // Automatically generate slug when kit_name is set
     public function setKitNameAttribute($value)
     {
         $this->attributes['kit_name'] = $value;
@@ -85,5 +85,10 @@ class PujaKit extends Model
     public function getFirstProductNameAttribute()
     {
         return optional($this->products->first())->name ?? 'No Product';
+    }
+
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
     }
 }

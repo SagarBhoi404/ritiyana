@@ -10,27 +10,27 @@ use Illuminate\Validation\Rule;
 class PujaController extends Controller
 {
     public function index()
-    {
-        // Use the correct many-to-many relationship for counting
-        $pujas = Puja::withCount('pujaKits')->latest()->paginate(15);
-        
-        // Alternative: if you want to use 'kits' as the relationship name
-        // $pujas = Puja::withCount('kits')->latest()->paginate(15);
-        
-        // Dynamic statistics
-        $totalPujas = Puja::count();
-        $activePujas = Puja::where('is_active', true)->count();
-        $inactivePujas = Puja::where('is_active', false)->count();
-        $totalKits = \App\Models\PujaKit::count();
+{
+    $pujas = Puja::with(['pujaKits', 'vendor.vendorProfile']) // ← Fixed relationship loading
+        ->withCount('pujaKits as kits_count')
+        ->latest()
+        ->paginate(15);
 
-        return view('admin.pujas.index', compact(
-            'pujas',
-            'totalPujas',
-            'activePujas', 
-            'inactivePujas',
-            'totalKits'
-        ));
-    }
+    // Dynamic statistics
+    $totalPujas = Puja::count();
+    $activePujas = Puja::where('is_active', true)->count();
+    $inactivePujas = Puja::where('is_active', false)->count();
+    $totalKits = \App\Models\PujaKit::count();
+
+    return view('admin.pujas.index', compact(
+        'pujas',
+        'totalPujas',
+        'activePujas',
+        'inactivePujas',
+        'totalKits'
+    ));
+}
+
     public function create()
     {
         return view('admin.pujas.create');
@@ -65,7 +65,7 @@ class PujaController extends Controller
 
     public function show(Puja $puja)
 {
-    $puja->load(['pujaKits.products']);
+    $puja->load(['pujaKits.products', 'vendor.vendorProfile']);
     return view('admin.pujas.show', compact('puja'));
 }
 

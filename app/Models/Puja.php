@@ -10,9 +10,17 @@ class Puja extends Model
 {
     use HasFactory;
 
-     protected $fillable = [
-        'name', 'slug', 'description', 'significance', 'procedure', 
-        'image', 'auspicious_days', 'required_items', 'is_active'
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'significance',
+        'procedure',
+        'image',
+        'auspicious_days',
+        'required_items',
+        'vendor_id', 
+        'is_active'
     ];
 
     protected $casts = [
@@ -25,13 +33,12 @@ class Puja extends Model
     public function pujaKits()
     {
         return $this->belongsToMany(PujaKit::class, 'puja_kit_puja')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
-    // Keep the old method name for backward compatibility (optional)
-    public function kits()
+     public function kits()
     {
-        return $this->pujaKits();
+        return $this->belongsToMany(PujaKit::class, 'puja_puja_kit', 'puja_id', 'puja_kit_id');
     }
 
     // Mutators
@@ -51,5 +58,11 @@ class Puja extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+
+    public function vendor()
+    {
+        return $this->belongsTo(User::class, 'vendor_id');
     }
 }

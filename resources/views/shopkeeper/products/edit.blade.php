@@ -1,8 +1,7 @@
-<!-- resources/views/shopkeeper/products/create.blade.php -->
 @extends('layouts.shopkeeper')
 
-@section('title', 'Add Product')
-@section('breadcrumb', 'Products / Add Product')
+@section('title', 'Edit Product')
+@section('breadcrumb', 'Products / Edit Product')
 
 @section('content')
 <div class="px-4 sm:px-6 lg:px-8 py-8">
@@ -10,8 +9,8 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Add New Product</h1>
-                <p class="mt-2 text-sm text-gray-700">Create a new product listing for your store</p>
+                <h1 class="text-3xl font-bold text-gray-900">Edit Product</h1>
+                <p class="mt-2 text-sm text-gray-700">Update product information for your store</p>
             </div>
             <a href="{{ route('vendor.products.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200">
                 <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
@@ -19,7 +18,8 @@
             </a>
         </div>
     </div>
-  <!-- Display Validation Errors -->
+
+    <!-- Display Validation Errors -->
     @if ($errors->any())
         <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             <div class="flex">
@@ -38,8 +38,9 @@
 
     <!-- Form -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
-        <form method="POST" action="{{ route('vendor.products.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('vendor.products.update', $product) }}" enctype="multipart/form-data">
             @csrf
+            @method('PUT')
             
             <div class="p-8">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -61,7 +62,7 @@
                                     <input type="text" 
                                            name="name" 
                                            id="name" 
-                                           value="{{ old('name') }}"
+                                           value="{{ old('name', $product->name) }}"
                                            placeholder="Enter product name"
                                            required 
                                            maxlength="255"
@@ -79,7 +80,7 @@
                                     <input type="text" 
                                            name="sku" 
                                            id="sku" 
-                                           value="{{ old('sku') }}"
+                                           value="{{ old('sku', $product->sku) }}"
                                            placeholder="e.g., PD-001, IN-002"
                                            required 
                                            maxlength="255"
@@ -99,9 +100,9 @@
                                             required
                                             class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                                         <option value="">Select product type</option>
-                                        <option value="simple" {{ old('type') == 'simple' ? 'selected' : '' }}>Simple Product</option>
-                                        <option value="kit" {{ old('type') == 'kit' ? 'selected' : '' }}>Puja Kit</option>
-                                        <option value="variable" {{ old('type') == 'variable' ? 'selected' : '' }}>Variable Product</option>
+                                        <option value="simple" {{ old('type', $product->type) == 'simple' ? 'selected' : '' }}>Simple Product</option>
+                                        <option value="kit" {{ old('type', $product->type) == 'kit' ? 'selected' : '' }}>Puja Kit</option>
+                                        <option value="variable" {{ old('type', $product->type) == 'variable' ? 'selected' : '' }}>Variable Product</option>
                                     </select>
                                     @error('type')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -120,7 +121,7 @@
                                             class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" 
-                                                    {{ in_array($category->id, old('categories', [])) ? 'selected' : '' }}>
+                                                    {{ in_array($category->id, old('categories', $product->categories->pluck('id')->toArray())) ? 'selected' : '' }}>
                                                 {{ $category->name }}
                                             </option>
                                         @endforeach
@@ -149,7 +150,7 @@
                                     <input type="number" 
                                            name="price" 
                                            id="price" 
-                                           value="{{ old('price') }}"
+                                           value="{{ old('price', $product->price) }}"
                                            placeholder="0.00"
                                            min="0"
                                            step="0.01"
@@ -168,7 +169,7 @@
                                     <input type="number" 
                                            name="sale_price" 
                                            id="sale_price" 
-                                           value="{{ old('sale_price') }}"
+                                           value="{{ old('sale_price', $product->sale_price) }}"
                                            placeholder="0.00"
                                            min="0"
                                            step="0.01"
@@ -186,7 +187,7 @@
                                     <input type="number" 
                                            name="cost_price" 
                                            id="cost_price" 
-                                           value="{{ old('cost_price') }}"
+                                           value="{{ old('cost_price', $product->cost_price) }}"
                                            placeholder="0.00"
                                            min="0"
                                            step="0.01"
@@ -217,7 +218,7 @@
                                     <input type="number" 
                                            name="stock_quantity" 
                                            id="stock_quantity" 
-                                           value="{{ old('stock_quantity', 0) }}"
+                                           value="{{ old('stock_quantity', $product->stock_quantity) }}"
                                            min="0"
                                            required
                                            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
@@ -236,9 +237,9 @@
                                             required
                                             class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                                         <option value="">Select stock status</option>
-                                        <option value="in_stock" {{ old('stock_status') == 'in_stock' ? 'selected' : '' }}>In Stock</option>
-                                        <option value="out_of_stock" {{ old('stock_status') == 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
-                                        <option value="on_backorder" {{ old('stock_status') == 'on_backorder' ? 'selected' : '' }}>On Backorder</option>
+                                        <option value="in_stock" {{ old('stock_status', $product->stock_status) == 'in_stock' ? 'selected' : '' }}>In Stock</option>
+                                        <option value="out_of_stock" {{ old('stock_status', $product->stock_status) == 'out_of_stock' ? 'selected' : '' }}>Out of Stock</option>
+                                        <option value="on_backorder" {{ old('stock_status', $product->stock_status) == 'on_backorder' ? 'selected' : '' }}>On Backorder</option>
                                     </select>
                                     @error('stock_status')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -251,7 +252,7 @@
                                            name="manage_stock" 
                                            type="checkbox" 
                                            value="1"
-                                           {{ old('manage_stock', true) ? 'checked' : '' }}
+                                           {{ old('manage_stock', $product->manage_stock) ? 'checked' : '' }}
                                            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                                     <label for="manage_stock" class="ml-2 block text-sm text-gray-900">
                                         Manage stock quantity
@@ -267,10 +268,31 @@
                                 Product Images
                             </h3>
                             
+                            <!-- Current Featured Image -->
+                            @if($product->featured_image)
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Current Featured Image
+                                    </label>
+                                    <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
+                                        <img src="{{ asset('storage/' . $product->featured_image) }}" 
+                                             alt="Current featured image" 
+                                             class="h-20 w-20 rounded-lg object-cover border-2 border-gray-200">
+                                        <div class="flex-1">
+                                            <p class="text-sm text-gray-600">Current featured image</p>
+                                            <label class="inline-flex items-center mt-2">
+                                                <input type="checkbox" name="remove_featured_image" value="1" class="text-red-600">
+                                                <span class="ml-2 text-sm text-red-600">Remove current featured image</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            
                             <!-- Featured Image -->
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Featured Image
+                                    {{ $product->featured_image ? 'Replace Featured Image' : 'Featured Image' }}
                                 </label>
                                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
                                     <i data-lucide="upload" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
@@ -293,10 +315,38 @@
                                 @enderror
                             </div>
 
+                            <!-- Current Gallery Images -->
+                            @if($product->gallery_images && count($product->gallery_images) > 0)
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Current Gallery Images
+                                    </label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-lg">
+                                        @foreach($product->gallery_images as $index => $image)
+                                            <div class="relative">
+                                                <img src="{{ asset('storage/' . $image) }}" 
+                                                     alt="Gallery image {{ $index + 1 }}" 
+                                                     class="w-full h-20 rounded object-cover border-2 border-gray-200">
+                                                <label class="absolute -top-2 -right-2">
+                                                    <input type="checkbox" 
+                                                           name="remove_gallery_images[]" 
+                                                           value="{{ $index }}" 
+                                                           class="sr-only">
+                                                    <div class="bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 cursor-pointer">
+                                                        ×
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">Click × to remove images</p>
+                                </div>
+                            @endif
+
                             <!-- Gallery Images -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    Gallery Images
+                                    {{ ($product->gallery_images && count($product->gallery_images) > 0) ? 'Add More Gallery Images' : 'Gallery Images' }}
                                 </label>
                                 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
                                     <i data-lucide="images" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
@@ -328,24 +378,12 @@
                             </h3>
                             
                             <div class="space-y-3">
-                                {{-- <div class="flex items-center">
-                                    <input id="is_featured" 
-                                           name="is_featured" 
-                                           type="checkbox" 
-                                           value="1"
-                                           {{ old('is_featured') ? 'checked' : '' }}
-                                           class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
-                                    <label for="is_featured" class="ml-2 block text-sm text-gray-900">
-                                        Featured product
-                                    </label>
-                                </div> --}}
-                                
                                 <div class="flex items-center">
                                     <input id="is_active" 
                                            name="is_active" 
                                            type="checkbox" 
                                            value="1"
-                                           {{ old('is_active', true) ? 'checked' : '' }}
+                                           {{ old('is_active', $product->is_active) ? 'checked' : '' }}
                                            class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                                     <label for="is_active" class="ml-2 block text-sm text-gray-900">
                                         Product is active
@@ -374,7 +412,7 @@
                                       rows="3" 
                                       placeholder="Brief product description"
                                       maxlength="500"
-                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('short_description') }}</textarea>
+                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('short_description', $product->short_description) }}</textarea>
                             @error('short_description')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -389,7 +427,7 @@
                                       id="description" 
                                       rows="6" 
                                       placeholder="Detailed product description"
-                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('description') }}</textarea>
+                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('description', $product->description) }}</textarea>
                             @error('description')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -413,7 +451,7 @@
                             <input type="text" 
                                    name="meta_title" 
                                    id="meta_title" 
-                                   value="{{ old('meta_title') }}"
+                                   value="{{ old('meta_title', $product->meta_title) }}"
                                    placeholder="SEO optimized title for search engines"
                                    maxlength="255"
                                    class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
@@ -433,7 +471,7 @@
                                       rows="3" 
                                       placeholder="Brief description for search engine results"
                                       maxlength="500"
-                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('meta_description') }}</textarea>
+                                      class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">{{ old('meta_description', $product->meta_description) }}</textarea>
                             <p class="text-xs text-gray-500 mt-1">Recommended: 150-160 characters</p>
                             @error('meta_description')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -454,8 +492,8 @@
                             Cancel
                         </a>
                         <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                            <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
-                            Create Product
+                            <i data-lucide="save" class="w-4 h-4 mr-2"></i>
+                            Update Product
                         </button>
                     </div>
                 </div>
@@ -464,7 +502,7 @@
     </div>
 </div>
 
-<!-- JavaScript for Image Preview -->
+<!-- JavaScript for Image Preview (same as create form) -->
 <script>
 // Featured Image Preview
 function previewFeaturedImage(input) {
@@ -574,12 +612,21 @@ function removeGalleryImages() {
     preview.classList.add('hidden');
 }
 
-// Auto-generate slug from product name (optional)
-document.getElementById('name').addEventListener('input', function() {
-    const name = this.value;
-    // You can auto-generate SKU here if needed
-    // const sku = name.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').substring(0, 10).toUpperCase();
-    // document.getElementById('sku').value = sku;
+// Handle remove gallery image checkboxes
+document.addEventListener('DOMContentLoaded', function() {
+    const removeCheckboxes = document.querySelectorAll('input[name="remove_gallery_images[]"]');
+    removeCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const imgDiv = this.closest('.relative');
+            if (this.checked) {
+                imgDiv.classList.add('opacity-50');
+                imgDiv.querySelector('img').classList.add('grayscale');
+            } else {
+                imgDiv.classList.remove('opacity-50');
+                imgDiv.querySelector('img').classList.remove('grayscale');
+            }
+        });
+    });
 });
 </script>
 @endsection

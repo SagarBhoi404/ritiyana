@@ -90,6 +90,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kit</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pujas</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discount</th>
@@ -114,6 +115,38 @@
                                     <div class="text-sm text-gray-500">{{ Str::limit($kit->kit_description, 50) }}</div>
                                 </div>
                             </div>
+                        </td>
+                         {{-- NEW: Vendor Column --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @if($kit->vendor_id && $kit->vendor)
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        @if($kit->vendor->vendorProfile && $kit->vendor->vendorProfile->store_logo)
+                                            <img class="h-8 w-8 rounded-full" src="{{ asset('storage/' . $kit->vendor->vendorProfile->store_logo) }}" alt="">
+                                        @else
+                                            <div class="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                                <i data-lucide="user" class="w-4 h-4 text-indigo-600"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $kit->vendor->vendorProfile->business_name ?? ($kit->vendor->first_name . ' ' . $kit->vendor->last_name) }}
+                                        </div>
+                                        <div class="text-xs text-gray-500">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                {{ $kit->vendor->vendorProfile->status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                {{ ucfirst($kit->vendor->vendorProfile->status ?? 'Pending') }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-sm text-gray-500 italic flex items-center">
+                                    <i data-lucide="building-2" class="w-4 h-4 mr-2 text-gray-400"></i>
+                                    Platform Kit
+                                </div>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="text-sm font-medium text-gray-900">

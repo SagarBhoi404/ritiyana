@@ -13,7 +13,7 @@ class PujaKitController extends Controller
 {
     public function index()
     {
-        $kits = PujaKit::with(['pujas', 'products'])
+        $kits = PujaKit::with(['pujas', 'products', 'vendor.vendorProfile'])
             ->latest()
             ->paginate(15);
 
@@ -89,7 +89,7 @@ class PujaKitController extends Controller
 
     public function show(PujaKit $pujaKit)
     {
-        $pujaKit->load(['pujas', 'products']);
+        $pujaKit->load(['pujas', 'products', 'vendor.vendorProfile']);
         return view('admin.puja-kits.show', compact('pujaKit'));
     }
 

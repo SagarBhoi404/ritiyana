@@ -283,6 +283,8 @@
                                 </div>
                             </div>
 
+
+
                             <!-- Additional Information -->
                             <div>
                                 <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
@@ -296,6 +298,279 @@
                                 @enderror
                             </div>
                         </div>
+
+                        {{-- Enhanced Vendor Information Section with business_email field --}}
+                        <div id="vendor-fields"
+                            class="mt-8 p-6 bg-gradient-to-br from-gray-50 to-white border-2 border-dashed border-indigo-200 rounded-xl shadow-lg"
+                            style="display: none;">
+                            <!-- Header with icon -->
+                            <div class="flex items-center mb-6">
+                                <div
+                                    class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mr-3">
+                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h4 class="text-xl font-bold text-gray-900">Vendor Information</h4>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Business Name -->
+                                <div class="space-y-2">
+                                    <label for="business_name" class="block text-sm font-semibold text-gray-700">
+                                        Business Name
+                                        <span class="text-red-500 ml-1">*</span>
+                                    </label>
+                                    <input type="text" name="business_name" id="business_name"
+                                        value="{{ old('business_name') }}" placeholder="Enter your business name"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('business_name')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Business Type -->
+                                <div class="space-y-2">
+                                    <label for="business_type" class="block text-sm font-semibold text-gray-700">Business
+                                        Type</label>
+                                    <select name="business_type" id="business_type"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                        <option value="" class="text-gray-400">Select business type...</option>
+                                        <option value="individual"
+                                            {{ old('business_type') === 'individual' ? 'selected' : '' }}>👤 Individual
+                                        </option>
+                                        <option value="partnership"
+                                            {{ old('business_type') === 'partnership' ? 'selected' : '' }}>🤝 Partnership
+                                        </option>
+                                        <option value="company"
+                                            {{ old('business_type') === 'company' ? 'selected' : '' }}>🏢 Company</option>
+                                        <option value="proprietorship"
+                                            {{ old('business_type') === 'proprietorship' ? 'selected' : '' }}>🏪
+                                            Proprietorship</option>
+                                    </select>
+                                    @error('business_type')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Business Address (Full Width) -->
+                                <div class="md:col-span-2 space-y-2">
+                                    <label for="business_address"
+                                        class="block text-sm font-semibold text-gray-700">Business Address</label>
+                                    <textarea name="business_address" id="business_address" rows="3"
+                                        placeholder="Enter complete business address with city, state, and postal code"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400 resize-none">{{ old('business_address') }}</textarea>
+                                    @error('business_address')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Business Phone -->
+                                <div class="space-y-2">
+                                    <label for="business_phone" class="block text-sm font-semibold text-gray-700">Business
+                                        Phone</label>
+                                    <input type="tel" name="business_phone" id="business_phone"
+                                        value="{{ old('business_phone') }}" placeholder="+91 98765 43210"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('business_phone')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- NEW: Business Email -->
+                                <div class="space-y-2">
+                                    <label for="business_email" class="block text-sm font-semibold text-gray-700">Business
+                                        Email</label>
+                                    <input type="email" name="business_email" id="business_email"
+                                        value="{{ old('business_email') }}" placeholder="business@example.com"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('business_email')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Commission Rate -->
+                                <div class="space-y-2">
+                                    <label for="commission_rate" class="block text-sm font-semibold text-gray-700">
+                                        Commission Rate (%)
+                                        <span class="text-xs font-normal text-gray-500 ml-2">Platform fee</span>
+                                    </label>
+                                    <div class="relative">
+                                        <input type="number" name="commission_rate" id="commission_rate"
+                                            value="{{ old('commission_rate', '8.00') }}" step="0.01" min="0"
+                                            max="100" placeholder="8.00"
+                                            class="block w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                            <span class="text-gray-500 text-sm">%</span>
+                                        </div>
+                                    </div>
+                                    @error('commission_rate')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Banking Information Section Header -->
+                                <div class="md:col-span-2 mt-6 mb-4">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                                                </path>
+                                            </svg>
+                                        </div>
+                                        <h5 class="text-lg font-semibold text-gray-900">Banking Information</h5>
+                                    </div>
+                                    <div class="mt-2 h-px bg-gray-200"></div>
+                                </div>
+
+                                <!-- Bank Name -->
+                                <div class="space-y-2">
+                                    <label for="bank_name" class="block text-sm font-semibold text-gray-700">Bank
+                                        Name</label>
+                                    <input type="text" name="bank_name" id="bank_name"
+                                        value="{{ old('bank_name') }}" placeholder="e.g., State Bank of India"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('bank_name')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Account Number -->
+                                <div class="space-y-2">
+                                    <label for="account_number" class="block text-sm font-semibold text-gray-700">Account
+                                        Number</label>
+                                    <input type="text" name="account_number" id="account_number"
+                                        value="{{ old('account_number') }}" placeholder="Enter bank account number"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('account_number')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- IFSC Code -->
+                                <div class="space-y-2">
+                                    <label for="ifsc_code" class="block text-sm font-semibold text-gray-700">IFSC
+                                        Code</label>
+                                    <input type="text" name="ifsc_code" id="ifsc_code"
+                                        value="{{ old('ifsc_code') }}" placeholder="e.g., SBIN0001234"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400 uppercase"
+                                        style="text-transform: uppercase;">
+                                    @error('ifsc_code')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <!-- Account Holder Name -->
+                                <div class="space-y-2">
+                                    <label for="account_holder_name"
+                                        class="block text-sm font-semibold text-gray-700">Account Holder Name</label>
+                                    <input type="text" name="account_holder_name" id="account_holder_name"
+                                        value="{{ old('account_holder_name') }}" placeholder="As per bank records"
+                                        class="block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-200 hover:border-gray-400">
+                                    @error('account_holder_name')
+                                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                                    clip-rule="evenodd"></path>
+                                            </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Info Note -->
+                            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <svg class="w-5 h-5 text-blue-400 mt-0.5" fill="currentColor"
+                                            viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-blue-800">
+                                            <strong>Note:</strong> All vendor information will be verified by our admin team
+                                            before approval.
+                                            Please ensure all details are accurate to avoid delays in approval.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -371,5 +646,43 @@
                 previewImage(input);
             }
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.querySelector('select[name="role"]');
+            const vendorFields = document.getElementById('vendor-fields');
+
+            function toggleVendorFields() {
+                if (roleSelect && vendorFields) {
+                    if (roleSelect.value === 'shopkeeper') {
+                        vendorFields.style.display = 'block';
+                        // Add smooth animation
+                        vendorFields.style.opacity = '0';
+                        vendorFields.style.transform = 'translateY(-10px)';
+                        setTimeout(() => {
+                            vendorFields.style.transition = 'all 0.3s ease-in-out';
+                            vendorFields.style.opacity = '1';
+                            vendorFields.style.transform = 'translateY(0)';
+                        }, 10);
+                    } else {
+                        vendorFields.style.display = 'none';
+                    }
+                }
+            }
+
+            if (roleSelect) {
+                roleSelect.addEventListener('change', toggleVendorFields);
+                toggleVendorFields(); // Check initial state
+            }
+
+            // Auto-uppercase IFSC code
+            const ifscInput = document.getElementById('ifsc_code');
+            if (ifscInput) {
+                ifscInput.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+        });
     </script>
 @endsection

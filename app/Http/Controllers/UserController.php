@@ -13,7 +13,7 @@ class UserController extends Controller
     // FIXED: Uncommented and improved index method
     public function index(Request $request)
     {
-        $query = User::with('roles');
+        $query = User::with(['roles', 'vendorProfile']);
 
         // Filter by role
         if ($request->filled('role') && $request->role !== 'all') {
@@ -80,6 +80,15 @@ class UserController extends Controller
             'status' => 'nullable|string|in:active,inactive,suspended',
             'notes' => 'nullable|string|max:1000',
             'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'business_name' => 'required_if:role,shopkeeper|string|max:255',
+            'business_type' => 'nullable|in:individual,partnership,company,proprietorship',
+            'business_address' => 'nullable|string',
+            'business_phone' => 'nullable|string|max:15',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:11',
+            'account_holder_name' => 'nullable|string|max:255',
         ]);
 
         // Handle profile image upload
@@ -110,13 +119,30 @@ class UserController extends Controller
             $user->assignRole($validated['role']);
         }
 
+        // Create vendor profile if role is shopkeeper
+        if ($validated['role'] === 'shopkeeper') {
+            \App\Models\Vendor::create([
+                'user_id' => $user->id,
+                'business_name' => $validated['business_name'],
+                'business_type' => $validated['business_type'],
+                'business_address' => $validated['business_address'],
+                'business_phone' => $validated['business_phone'],
+                'commission_rate' => $validated['commission_rate'] ?? 8.00,
+                'bank_name' => $validated['bank_name'],
+                'account_number' => $validated['account_number'],
+                'ifsc_code' => $validated['ifsc_code'],
+                'account_holder_name' => $validated['account_holder_name'],
+                'status' => 'approved', // Admin creates, so auto-approve
+            ]);
+        }
+
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully');
     }
 
     public function show(User $user)
     {
-        $user->load('roles', 'addresses');
+        $user->load('roles', 'addresses', 'vendorProfile');
         return view('admin.users.show', compact('user'));
     }
 
@@ -129,6 +155,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        // Validate all fields including vendor fields
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -139,8 +166,21 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'status' => 'required|in:active,inactive,suspended',
             'role' => 'required|string|in:admin,shopkeeper,user',
+
+            // Vendor fields validation
+            'business_name' => 'nullable|string|max:255',
+            'business_type' => 'nullable|in:individual,partnership,company,proprietorship',
+            'business_address' => 'nullable|string',
+            'business_phone' => 'nullable|string|max:15',
+            'business_email' => 'nullable|email',
+            'commission_rate' => 'nullable|numeric|min:0|max:100',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:11',
+            'account_holder_name' => 'nullable|string|max:255',
         ]);
 
+        // Update user basic info
         $updateData = [
             'first_name' => $validated['first_name'],
             'last_name' => $validated['last_name'],
@@ -151,6 +191,7 @@ class UserController extends Controller
             'status' => $validated['status'],
         ];
 
+        // Update password only if provided
         if (!empty($validated['password'])) {
             $updateData['password'] = Hash::make($validated['password']);
         }
@@ -158,14 +199,42 @@ class UserController extends Controller
         $user->update($updateData);
 
         // Update role
-        if (method_exists($user, 'assignRole')) {
-            $user->roles()->detach(); // Remove old roles
-            $user->assignRole($validated['role']); // Assign new role
+        if (method_exists($user, 'roles')) {
+            $user->roles()->detach();
+            $user->roles()->attach(\App\Models\Role::where('name', $validated['role'])->first()->id);
+        }
+
+        // Update or create vendor profile if user is shopkeeper
+        if ($validated['role'] === 'shopkeeper' || $user->hasRole('shopkeeper')) {
+            $vendorData = [
+                'business_name' => $validated['business_name'],
+                'business_type' => $validated['business_type'],
+                'business_address' => $validated['business_address'],
+                'business_phone' => $validated['business_phone'],
+                'business_email' => $validated['business_email'],
+                'commission_rate' => $validated['commission_rate'] ?? 8.00,
+                'bank_name' => $validated['bank_name'],
+                'account_number' => $validated['account_number'],
+                'ifsc_code' => $validated['ifsc_code'],
+                'account_holder_name' => $validated['account_holder_name'],
+            ];
+
+            // Remove null values to avoid overwriting existing data with nulls
+            $vendorData = array_filter($vendorData, function ($value) {
+                return $value !== null && $value !== '';
+            });
+
+            // Use updateOrCreate to handle both update and create scenarios
+            $user->vendorProfile()->updateOrCreate(
+                ['user_id' => $user->id],
+                $vendorData
+            );
         }
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully');
     }
+
 
     public function destroy(User $user)
     {

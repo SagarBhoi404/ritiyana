@@ -14,12 +14,12 @@
                     <p class="mt-2 text-sm text-gray-700">Complete information about this product</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <a href="{{ route('admin.products.edit', $product) }}"
+                    <a href="{{ route('vendor.products.edit', $product) }}"
                         class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-purple-700">
                         <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
                         Edit Product
                     </a>
-                    <a href="{{ route('admin.products.index') }}"
+                    <a href="{{ route('vendor.products.index') }}"
                         class="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200">
                         <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
                         Back to Products
@@ -315,7 +315,7 @@
 
         <!-- Actions -->
         <div class="mt-8 flex justify-center space-x-4">
-            <a href="{{ route('admin.products.edit', $product) }}"
+            <a href="{{ route('vendor.products.edit', $product) }}"
                 class="inline-flex items-center px-6 py-3 bg-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                 <i data-lucide="edit" class="w-4 h-4 mr-2"></i>
                 Edit Product
@@ -342,7 +342,7 @@
         </div>
     </div>
 
-    <form id="deleteForm" action="{{ route('admin.products.destroy', $product) }}" method="POST" class="hidden">
+    <form id="deleteForm" action="{{ route('vendor.products.destroy', $product) }}" method="POST" class="hidden">
         @csrf
         @method('DELETE')
     </form>

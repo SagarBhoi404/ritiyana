@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 // use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -141,4 +144,52 @@ class User extends Authenticatable
         return asset('images/default-avatar.png');
     }
 
+
+     // ===== VENDOR RELATIONSHIPS =====
+
+    // User has one vendor profile
+    public function vendorProfile(): HasOne
+    {
+        return $this->hasOne(Vendor::class);
+    }
+
+    // User has many products (as vendor)
+    public function vendorProducts(): HasMany
+    {
+        return $this->hasMany(Product::class, 'vendor_id');
+    }
+
+    // User has many vendor orders
+    public function vendorOrders(): HasMany
+    {
+        return $this->hasMany(VendorOrder::class, 'vendor_id');
+    }
+
+    // User has many vendor payouts
+    public function vendorPayouts(): HasMany
+    {
+        return $this->hasMany(VendorPayout::class, 'vendor_id');
+    }
+
+    // User has many vendor documents
+    public function vendorDocuments(): HasMany
+    {
+        return $this->hasMany(VendorDocument::class, 'vendor_id');
+    }
+
+    // User has many vendor analytics
+    public function vendorAnalytics(): HasMany
+    {
+        return $this->hasMany(VendorAnalytics::class, 'vendor_id');
+    }
+
+
+    // ===== HELPER METHODS =====
+
+    public function isVendor(): bool
+    {
+        return $this->roles()->where('name', 'shopkeeper')->exists();
+    }
+
+ 
 }
