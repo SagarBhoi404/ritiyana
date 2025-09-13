@@ -406,7 +406,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold">Popular Products</h2>
-                <a href="{{ route('all-kits') }}" class="text-vibrant-pink font-medium hover:underline">View All</a>
+                <a href="{{ route('puja-kits.index') }}" class="text-vibrant-pink font-medium hover:underline">View All</a>
             </div>
 
             <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
@@ -513,7 +513,7 @@
             <div class="max-w-7xl mx-auto px-4">
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-2xl font-bold">Popular Puja Kits</h2>
-                    <a href="{{ route('all-kits') }}" class="text-vibrant-pink font-medium hover:underline">View
+                    <a href="{{ route('puja-kits.index') }}" class="text-vibrant-pink font-medium hover:underline">View
                         All Kits</a>
                 </div>
 

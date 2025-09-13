@@ -26,7 +26,7 @@
                 <h4 class="font-semibold mb-4">Quick Links</h4>
                 <ul class="space-y-2 text-gray-300">
                     <li><a href="{{ route('home') }}" class="hover:text-white">Home</a></li>
-                    <li><a href="{{ route('all-kits') }}" class="hover:text-white">All Kits</a></li>
+                    <li><a href="{{ route('puja-kits.index') }}" class="hover:text-white">Puja Kits</a></li>
                     <li><a href="{{ route('upcoming-pujas') }}" class="hover:text-white">Upcoming Pujas</a></li>
                     <li><a href="{{ route('consult') }}" class="hover:text-white">Consult</a></li>
                 </ul>

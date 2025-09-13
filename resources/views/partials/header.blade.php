@@ -57,9 +57,9 @@
                     <i data-lucide="home" class="w-4 h-4"></i>
                     Home
                 </a>
-                <a href="{{ route('all-kits') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
+                <a href="{{ route('puja-kits.index') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
                     <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                    All Kits
+                    Puja Kits
                 </a>
                 <a href="{{ route('upcoming-pujas') }}"
                     class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
@@ -95,12 +95,12 @@
                         </div>
                         <span class="text-xs font-medium">Home</span>
                     </a>
-                    <a href="{{ route('all-kits') }}"
+                    <a href="{{ route('puja-kits.index') }}"
                         class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
                         <div class="bg-gray-100 p-2 rounded-lg mb-1">
                             <i data-lucide="shopping-bag" class="w-4 h-4"></i>
                         </div>
-                        <span class="text-xs font-medium">Kits</span>
+                        <span class="text-xs font-medium">Puja Kits</span>
                     </a>
                     <a href="{{ route('upcoming-pujas') }}"
                         class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">

@@ -42,9 +42,9 @@ Route::redirect('/category/{category}', '/products?category={category}', 301)->n
 
 
 
-Route::get('/all-kits', function () {
-    return view('all-kits');
-})->name('all-kits');
+// Route::get('/all-kits', function () {
+//     return view('all-kits');
+// })->name('all-kits');
 
 Route::get('/upcoming-pujas', function () {
     return view('upcoming-pujas');

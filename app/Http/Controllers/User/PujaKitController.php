@@ -18,32 +18,47 @@ class PujaKitController extends Controller
             ->with(['pujas', 'products', 'vendor']);
 
         // Filter by puja type
-        if ($request->has('puja')) {
-            $query->whereHas('pujas', function($q) use ($request) {
+        if ($request->has('puja') && $request->puja) {
+            $query->whereHas('pujas', function ($q) use ($request) {
                 $q->where('slug', $request->puja);
             });
         }
 
         // Filter by search
         if ($request->has('search') && $request->search) {
-            $query->where('kit_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('pujas', function($q) use ($request) {
-                      $q->where('name', 'like', '%' . $request->search . '%');
-                  });
+            $query->where(function ($q) use ($request) {
+                $q->where('kit_name', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('pujas', function ($pujaQuery) use ($request) {
+                        $pujaQuery->where('name', 'like', '%' . $request->search . '%');
+                    });
+            });
+        }
+
+        // Filter by price range
+        if ($request->has('min_price') && $request->min_price) {
+            // Since total_price is calculated, we need to filter after loading
+            // For now, we'll use a basic approach - you can optimize this later
+        }
+        if ($request->has('max_price') && $request->max_price) {
+            // Similar approach for max price
         }
 
         // Sort kits
         $sort = $request->get('sort', 'newest');
         switch ($sort) {
             case 'price_low':
-                $query->orderBy('created_at', 'desc'); // You can add price calculation here
+                // For now, order by created date - you can add custom sorting later
+                $query->orderBy('created_at', 'asc');
                 break;
             case 'price_high':
-                $query->orderBy('created_at', 'desc'); // You can add price calculation here
+                $query->orderBy('created_at', 'desc');
                 break;
             case 'popular':
                 $query->orderBy('created_at', 'desc');
+                break;
+            case 'name':
+                $query->orderBy('kit_name', 'asc');
                 break;
             case 'newest':
             default:
@@ -51,19 +66,23 @@ class PujaKitController extends Controller
                 break;
         }
 
-        $pujaKits = $query->paginate(12);
+        $pujaKits = $query->paginate(12)->withQueryString();
 
         // Get pujas for filter sidebar
         $pujas = Puja::active()
-            ->whereHas('pujaKits', function($q) {
+            ->whereHas('pujaKits', function ($q) {
                 $q->active();
             })
-            ->withCount(['pujaKits' => function($q) {
+            ->withCount(['pujaKits' => function ($q) {
                 $q->active();
             }])
+            ->orderBy('puja_kits_count', 'desc')
             ->get();
 
-        return view('puja-kits-detail', compact('pujaKits', 'pujas'));
+        // Calculate total kits count
+        $totalKits = PujaKit::active()->count();
+
+        return view('all-kits', compact('pujaKits', 'pujas', 'totalKits'));
     }
 
     /**
@@ -79,7 +98,7 @@ class PujaKitController extends Controller
         // Load relationships
         $pujaKit->load([
             'pujas',
-            'products' => function($query) {
+            'products' => function ($query) {
                 $query->active()->approved();
             },
             'vendor'
@@ -88,7 +107,7 @@ class PujaKitController extends Controller
         // Get related kits from same pujas
         $relatedKits = PujaKit::active()
             ->where('id', '!=', $pujaKit->id)
-            ->whereHas('pujas', function($query) use ($pujaKit) {
+            ->whereHas('pujas', function ($query) use ($pujaKit) {
                 $query->whereIn('pujas.id', $pujaKit->pujas->pluck('id'));
             })
             ->with(['pujas', 'products', 'vendor'])
@@ -103,7 +122,7 @@ class PujaKitController extends Controller
         ];
 
         // Calculate savings
-        $individualTotal = $pujaKit->products->sum(function($product) {
+        $individualTotal = $pujaKit->products->sum(function ($product) {
             return ($product->pivot->price ?? $product->price) * $product->pivot->quantity;
         });
         $kitStats['total_savings'] = max(0, $individualTotal - $pujaKit->total_price);
