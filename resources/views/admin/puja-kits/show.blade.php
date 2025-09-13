@@ -32,13 +32,11 @@
             <div class="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
                 <!-- Product Image -->
                 <div class="flex-shrink-0">
-                    @php
-                        $firstProduct = $pujaKit->products->first();
-                    @endphp
-                    @if($firstProduct && $firstProduct->featured_image)
+                   
+                    @if($pujaKit->image)
                         <img class="h-48 w-48 rounded-xl object-cover border-4 border-white shadow-lg" 
-                             src="{{ asset('storage/' . $firstProduct->featured_image) }}" 
-                             alt="{{ $firstProduct->name }}">
+                             src="{{ asset('storage/' . $pujaKit->image) }}" 
+                             alt="{{ $pujaKit->kit_name }}">
                     @else
                         <div class="h-48 w-48 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
                             <i data-lucide="package" class="w-24 h-24 text-white"></i>
@@ -50,7 +48,7 @@
                 <div class="flex-1">
                     <h2 class="text-2xl font-bold text-gray-900">
                         {{ $pujaKit->kit_name ?? 'Puja Kit #' . $pujaKit->id }}
-                    </h2>
+                    </h2>z
                     <p class="text-lg text-gray-600 mb-2">
         Slug: {{ $pujaKit->slug }}
     </p>

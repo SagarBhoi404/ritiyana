@@ -39,7 +39,7 @@
 
     <!-- Form -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
-        <form method="POST" action="{{ route('admin.puja-kits.store') }}" id="kitForm">
+        <form method="POST" action="{{ route('admin.puja-kits.store') }}" id="kitForm" enctype="multipart/form-data">
             @csrf
             
             <div class="p-8">
@@ -73,6 +73,35 @@
                            value="{{ old('slug') }}" 
                            placeholder="Auto-generated from kit name if left empty">
                     @error('slug')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Image Upload Field -->
+                <div class="mb-6">
+                    <label for="image" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kit Image
+                    </label>
+                    <div class="space-y-4">
+                        <!-- Image Preview -->
+                        <div class="flex justify-center">
+                            <img id="image-preview" 
+                                 src="{{ asset('images/default-puja-kit.jpg') }}" 
+                                 alt="Kit Image Preview" 
+                                 class="w-40 h-40 object-cover rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
+                        </div>
+                        
+                        <!-- File Input -->
+                        <div>
+                            <input type="file" 
+                                   id="image" 
+                                   name="image" 
+                                   accept="image/jpeg,image/png,image/jpg,image/gif"
+                                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 @error('image') border-red-500 @enderror">
+                            <p class="text-xs text-gray-500 mt-1">Max size: 2MB. Formats: JPEG, PNG, JPG, GIF</p>
+                        </div>
+                    </div>
+                    @error('image')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -308,6 +337,26 @@
 </div>
 
 <script>
+// Image preview functionality
+document.getElementById('image').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('image-preview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('border-dashed');
+            preview.classList.add('border-solid');
+        }
+        reader.readAsDataURL(file);
+    } else {
+        preview.src = "{{ asset('images/default-puja-kit.jpg') }}";
+        preview.classList.remove('border-solid');
+        preview.classList.add('border-dashed');
+    }
+});
+
 // Toggle product options visibility
 function toggleProductOptions(checkbox, index) {
     const optionsDiv = document.getElementById(`product-options-${index}`);

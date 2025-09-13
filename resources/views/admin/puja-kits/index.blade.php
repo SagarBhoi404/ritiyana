@@ -104,7 +104,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 @if($kit->products->count() > 0 && $kit->products->first()->featured_image)
-                                    <img class="h-10 w-10 rounded object-cover" src="{{ asset('storage/' . $kit->products->first()->featured_image) }}" alt="{{ $kit->products->first()->name }}">
+                                    <img class="h-10 w-10 rounded object-cover" src="{{ asset('storage/' . $kit->image) }}" alt="{{ $kit->kit_name }}">
                                 @else
                                     <div class="h-10 w-10 bg-purple-100 rounded flex items-center justify-center">
                                         <i data-lucide="package" class="w-5 h-5 text-purple-600"></i>

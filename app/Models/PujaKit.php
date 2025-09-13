@@ -14,6 +14,7 @@ class PujaKit extends Model
         'kit_name',
         'slug',
         'kit_description',
+        'image',
         'included_items',
         'discount_percentage',
         'is_active',
@@ -91,7 +92,13 @@ class PujaKit extends Model
     {
         return $this->belongsTo(User::class, 'vendor_id');
     }
-    
 
-  
+     // Get image URL with fallback
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+        return asset('images/default-puja-kit.jpg'); // Add a default image
+    }
 }

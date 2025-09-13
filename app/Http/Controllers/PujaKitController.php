@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\PujaKit;
 use App\Models\Puja;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PujaKitController extends Controller
 {
@@ -17,10 +19,9 @@ class PujaKitController extends Controller
             ->latest()
             ->paginate(15);
 
-        // Dynamic statistics
         $totalKits = PujaKit::count();
         $activeKits = PujaKit::where('is_active', true)->count();
-        $totalSales = 248650; // This would come from orders table
+        $totalSales = 248650;
         $bestSeller = PujaKit::with('products')->first();
 
         return view('admin.puja-kits.index', compact(
@@ -36,7 +37,6 @@ class PujaKitController extends Controller
     {
         $pujas = Puja::where('is_active', true)->get();
         $products = Product::where('is_active', true)->get();
-
         return view('admin.puja-kits.create', compact('pujas', 'products'));
     }
 
@@ -45,6 +45,7 @@ class PujaKitController extends Controller
         $validated = $request->validate([
             'kit_name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:puja_kits,slug',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add image validation
             'pujas' => 'required|array|min:1',
             'pujas.*' => 'exists:pujas,id',
             'products' => 'required|array|min:1',
@@ -62,6 +63,12 @@ class PujaKitController extends Controller
         // Generate slug if not provided
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['kit_name']);
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('puja-kits', 'public');
+            $validated['image'] = $imagePath;
         }
 
         $validated['is_active'] = $request->boolean('is_active');
@@ -98,7 +105,6 @@ class PujaKitController extends Controller
         $pujaKit->load(['pujas', 'products']);
         $pujas = Puja::where('is_active', true)->get();
         $products = Product::where('is_active', true)->get();
-
         return view('admin.puja-kits.edit', compact('pujaKit', 'pujas', 'products'));
     }
 
@@ -107,6 +113,7 @@ class PujaKitController extends Controller
         $validated = $request->validate([
             'kit_name' => 'required|string|max:255',
             'slug' => 'nullable|string|unique:puja_kits,slug,' . $pujaKit->id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add image validation
             'pujas' => 'required|array|min:1',
             'pujas.*' => 'exists:pujas,id',
             'products' => 'required|array|min:1',
@@ -124,6 +131,17 @@ class PujaKitController extends Controller
         // Generate slug if not provided
         if (empty($validated['slug'])) {
             $validated['slug'] = Str::slug($validated['kit_name']);
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($pujaKit->image) {
+                Storage::disk('public')->delete($pujaKit->image);
+            }
+            
+            $imagePath = $request->file('image')->store('puja-kits', 'public');
+            $validated['image'] = $imagePath;
         }
 
         $validated['is_active'] = $request->boolean('is_active');
@@ -150,6 +168,11 @@ class PujaKitController extends Controller
 
     public function destroy(PujaKit $pujaKit)
     {
+        // Delete image if exists
+        if ($pujaKit->image) {
+            Storage::disk('public')->delete($pujaKit->image);
+        }
+
         $pujaKit->delete();
         return redirect()->route('admin.puja-kits.index')
             ->with('success', 'Puja Kit deleted successfully');
