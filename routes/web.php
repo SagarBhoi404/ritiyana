@@ -18,7 +18,7 @@ use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorAnalyticsController;
-
+use App\Http\Controllers\Vendor\VendorPujaController;
 use Illuminate\Support\Facades\Route;
 
 // ===== PUBLIC ROUTES =====
@@ -167,5 +167,10 @@ Route::middleware('auth')->group(function () {
         // Static View Routes (keep your existing ones)
         Route::view('/inventory', 'shopkeeper.inventory.index')->name('inventory.index');
         Route::view('/settings', 'shopkeeper.settings.index')->name('settings.index');
+
+
+        // Puja Management
+        Route::resource('pujas', VendorPujaController::class);
+
     });
 });

@@ -1,5 +1,5 @@
-<!-- resources/views/admin/pujas/create.blade.php -->
-@extends('layouts.admin')
+<!-- resources/views/shopkeeper/pujas/create.blade.php -->
+@extends('layouts.shopkeeper')
 
 @section('title', 'Create Puja')
 @section('breadcrumb', 'Pujas / Create')
@@ -13,7 +13,7 @@
                     <h1 class="text-3xl font-bold text-gray-900">Create New Puja</h1>
                     <p class="mt-2 text-sm text-gray-700">Add a new puja ceremony to the system</p>
                 </div>
-                <a href="{{ route('admin.pujas.index') }}"
+                <a href="{{ route('vendor.pujas.index') }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200">
                     <i data-lucide="arrow-left" class="w-4 h-4 mr-2"></i>
                     Back to Pujas
@@ -40,7 +40,7 @@
 
         <!-- Form -->
         <div class="bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <form method="POST" action="{{ route('admin.pujas.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('vendor.pujas.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="p-8">
@@ -165,6 +165,7 @@
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+
                             <!-- Required Items -->
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -183,6 +184,7 @@
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
+
 
                             <!-- Status -->
                             <div class="bg-gray-50 rounded-lg p-6">
@@ -211,7 +213,7 @@
                             <span class="text-red-500">*</span> Required fields
                         </div>
                         <div class="flex items-center space-x-4">
-                            <a href="{{ route('admin.pujas.index') }}"
+                            <a href="{{ route('vendor.pujas.index') }}"
                                 class="px-6 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                                 Cancel
                             </a>

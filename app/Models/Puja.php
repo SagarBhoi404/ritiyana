@@ -19,7 +19,7 @@ class Puja extends Model
         'image',
         'auspicious_days',
         'required_items',
-        'vendor_id', 
+        'vendor_id',
         'is_active'
     ];
 
@@ -36,7 +36,7 @@ class Puja extends Model
             ->withTimestamps();
     }
 
-     public function kits()
+    public function kits()
     {
         return $this->belongsToMany(PujaKit::class, 'puja_puja_kit', 'puja_id', 'puja_kit_id');
     }
@@ -64,5 +64,19 @@ class Puja extends Model
     public function vendor()
     {
         return $this->belongsTo(User::class, 'vendor_id');
+    }
+
+    public function getPujaNamesAttribute()
+    {
+        $pujas = $this->pujas;
+
+        if ($pujas->isEmpty()) {
+            return '';
+        }
+
+        $names = $pujas->pluck('name');
+
+        // Ensure we have an array before imploding
+        return $names->isNotEmpty() ? $names->implode(', ') : '';
     }
 }

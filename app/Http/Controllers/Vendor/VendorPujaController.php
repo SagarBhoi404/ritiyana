@@ -1,28 +1,40 @@
 <?php
-// app/Http/Controllers/PujaController.php
-namespace App\Http\Controllers;
+// app/Http/Controllers/Vendor/VendorPujaController.php
+namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Category;
 use App\Models\Puja;
+use App\Models\PujaKit;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
-class PujaController extends Controller
+class VendorPujaController extends Controller
 {
     public function index()
     {
-        $pujas = Puja::with(['pujaKits', 'vendor.vendorProfile']) // ← Fixed relationship loading
+        $pujas = Puja::where('vendor_id', auth()->id())
+            ->with(['pujaKits', 'vendor.vendorProfile'])
             ->withCount('pujaKits as kits_count')
             ->latest()
             ->paginate(15);
 
-        // Dynamic statistics
-        $totalPujas = Puja::count();
-        $activePujas = Puja::where('is_active', true)->count();
-        $inactivePujas = Puja::where('is_active', false)->count();
-        $totalKits = \App\Models\PujaKit::count();
+        // Dynamic statistics filtered by vendor
+        $totalPujas = Puja::where('vendor_id', auth()->id())->count();
+        $activePujas = Puja::where('vendor_id', auth()->id())
+            ->where('is_active', true)
+            ->count();
+        $inactivePujas = Puja::where('vendor_id', auth()->id())
+            ->where('is_active', false)
+            ->count();
 
-        return view('admin.pujas.index', compact(
+        // Fix: Use the many-to-many relationship correctly
+        $totalKits = \App\Models\PujaKit::whereHas('pujas', function ($query) {
+            $query->where('vendor_id', auth()->id());
+        })->count();
+
+        return view('shopkeeper.pujas.index', compact(
             'pujas',
             'totalPujas',
             'activePujas',
@@ -33,8 +45,9 @@ class PujaController extends Controller
 
     public function create()
     {
-        return view('admin.pujas.create');
+        return view('shopkeeper.pujas.create');
     }
+
 
     public function store(Request $request)
     {
@@ -71,23 +84,24 @@ class PujaController extends Controller
         $validated['auspicious_days'] = $validated['auspicious_days'] ?? [];
         $validated['required_items'] = $validated['required_items'] ?? [];
 
+        $validated['vendor_id'] = auth()->id();
         $validated['is_active'] = $request->boolean('is_active');
 
         Puja::create($validated);
 
-        return redirect()->route('admin.pujas.index')
+        return redirect()->route('vendor.pujas.index')
             ->with('success', 'Puja created successfully');
     }
 
     public function show(Puja $puja)
     {
         $puja->load(['pujaKits.products', 'vendor.vendorProfile']);
-        return view('admin.pujas.show', compact('puja'));
+        return view('shopkeeper.pujas.show', compact('puja'));
     }
 
-    public function edit(Puja $puja)
+     public function edit(Puja $puja)
     {
-        return view('admin.pujas.edit', compact('puja'));
+        return view('shopkeeper.pujas.edit', compact('puja'));
     }
 
     public function update(Request $request, Puja $puja)
@@ -117,7 +131,7 @@ class PujaController extends Controller
 
         $puja->update($validated);
 
-        return redirect()->route('admin.pujas.index')
+        return redirect()->route('vendor.pujas.index')
             ->with('success', 'Puja updated successfully');
     }
 
@@ -125,7 +139,7 @@ class PujaController extends Controller
     {
         // Check if puja has kits
         if ($puja->kits()->count() > 0) {
-            return redirect()->route('admin.pujas.index')
+            return redirect()->route('vendor.pujas.index')
                 ->with('error', 'Cannot delete puja with existing kits');
         }
 
@@ -136,7 +150,7 @@ class PujaController extends Controller
 
         $puja->delete();
 
-        return redirect()->route('admin.pujas.index')
+        return redirect()->route('vendor.pujas.index')
             ->with('success', 'Puja deleted successfully');
     }
 }

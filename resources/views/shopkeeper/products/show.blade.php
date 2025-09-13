@@ -1,5 +1,5 @@
-<!-- resources/views/admin/products/show.blade.php -->
-@extends('layouts.admin')
+<!-- resources/views/shopkeeper/products/show.blade.php -->
+@extends('layouts.shopkeeper')
 
 @section('title', 'Product Details')
 @section('breadcrumb', 'Products / View Product')
