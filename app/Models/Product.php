@@ -64,7 +64,7 @@ class Product extends Model
     ];
 
     // ===== EXISTING RELATIONSHIPS =====
-    
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'product_categories');
@@ -115,7 +115,7 @@ class Product extends Model
     }
 
     // ===== EXISTING SCOPES =====
-    
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -190,7 +190,7 @@ class Product extends Model
         if (!$this->is_vendor_product || !$this->vendor_id) {
             return 0;
         }
-        
+
         $rate = $this->vendor_commission_rate ?? $this->vendor?->vendorProfile?->commission_rate ?? 8.00;
         return ($this->final_price * $rate) / 100;
     }
@@ -200,7 +200,7 @@ class Product extends Model
         if (!$this->is_vendor_product || !$this->vendor_id) {
             return $this->final_price;
         }
-        
+
         return $this->final_price - $this->vendor_commission;
     }
 
@@ -246,7 +246,7 @@ class Product extends Model
     {
         $totalPrice = $this->final_price * $quantity;
         $commission = ($totalPrice * $this->getCommissionRate()) / 100;
-        
+
         return [
             'total_price' => $totalPrice,
             'commission_amount' => $commission,
@@ -275,4 +275,11 @@ class Product extends Model
             }
         });
     }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    
 }

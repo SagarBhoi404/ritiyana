@@ -7,7 +7,7 @@
             <a href="{{ url('/') }}" class="flex items-center">
                 <img src="{{ asset('images/logo.png') }}" alt="Ritiyana Logo" class="h-16 w-auto">
             </a>
-            <h1 class="text-xl font-bold text-white">Ritiyana</h1>
+            {{-- <h1 class="text-xl font-bold text-white">Ritiyana</h1> --}}
         </div>
     </div>
 
@@ -106,6 +106,35 @@
                     Kit</a>
             </div>
         </div>
+
+        <!-- Banners Management -->
+        <div x-data="{ open: {{ request()->routeIs('admin.banners*') ? 'true' : 'false' }} }">
+            <button @click="open = !open"
+                class="w-full group flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 {{ request()->routeIs('admin.banners*') ? 'bg-indigo-50 text-indigo-700' : '' }}">
+                <div class="flex items-center">
+                    <i data-lucide="image"
+                        class="mr-3 h-5 w-5 {{ request()->routeIs('admin.banners*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
+                    Banners
+                </div>
+                <i data-lucide="chevron-down" class="h-4 w-4 transition-transform duration-200"
+                    :class="open ? 'rotate-180' : ''"></i>
+            </button>
+            <div x-show="open" x-transition class="mt-2 pl-9 space-y-1">
+                <a href="{{ route('admin.banners.index') }}"
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.banners.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">All
+                    Banners</a>
+                <a href="{{ route('admin.banners.create') }}"
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.banners.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Add
+                    Banner</a>
+                {{-- <a href="{{ route('admin.top-banners.index') }}"
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.top-banners.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Top
+                    Banners</a>
+                <a href="{{ route('admin.top-banners.create') }}"
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.top-banners.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Create
+                    Top Banner</a> --}}
+            </div>
+        </div>
+
 
         <!-- Analytics -->
         <a href="{{ route('admin.analytics.index') }}"

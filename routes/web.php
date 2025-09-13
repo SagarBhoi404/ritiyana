@@ -14,6 +14,8 @@ use App\Http\Controllers\UserController;
 
 // Import Vendor Controllers
 use App\Http\Controllers\Admin\VendorController;
+use App\Http\Controllers\Banner\BannerController;
+use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorProfileController;
@@ -22,9 +24,23 @@ use App\Http\Controllers\Vendor\VendorPujaController;
 use Illuminate\Support\Facades\Route;
 
 // ===== PUBLIC ROUTES =====
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+Route::get('/', [HomeController::class, 'home'])->name('home');
+
+// Product routes
+Route::get('/product/{product:slug}', [App\Http\Controllers\User\ProductController::class, 'show'])->name('product.show');
+Route::get('/products', [App\Http\Controllers\User\ProductController::class, 'index'])->name('products.index');
+
+// Puja Kit routes
+Route::get('/puja-kit/{pujaKit:slug}', [App\Http\Controllers\User\PujaKitController::class, 'show'])->name('puja-kits.show');
+Route::get('/puja-kits', [App\Http\Controllers\User\PujaKitController::class, 'index'])->name('puja-kits.index');
+
+
+// Category routes
+Route::redirect('/category/{category}', '/products?category={category}', 301)->name('category.show');
+
+
+
+
 
 Route::get('/all-kits', function () {
     return view('all-kits');
@@ -94,6 +110,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
         Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 
+
+        Route::resource('banners', BannerController::class);
+        Route::patch('banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
+
+
         // User Management
         Route::resource('users', UserController::class);
         Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
@@ -122,7 +143,7 @@ Route::middleware('auth')->group(function () {
             Route::patch('/{vendor}/approve', [VendorController::class, 'approve'])->name('approve');
             Route::patch('/{vendor}/reject', [VendorController::class, 'reject'])->name('reject');
             Route::patch('/{vendor}/suspend', [VendorController::class, 'suspend'])->name('suspend');
-            
+
             // Vendor Product Approvals
             Route::get('/products/approvals', [VendorController::class, 'productApprovals'])->name('products.approvals');
             Route::patch('/products/{product}/approve', [VendorController::class, 'approveProduct'])->name('products.approve');
@@ -171,6 +192,5 @@ Route::middleware('auth')->group(function () {
 
         // Puja Management
         Route::resource('pujas', VendorPujaController::class);
-
     });
 });

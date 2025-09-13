@@ -4,7 +4,7 @@
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Back Button -->
         <div class="mb-6">
-            <a href="{{ route('all-kits') }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-vibrant-pink">
+            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-vibrant-pink">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 Back to Products
             </a>
@@ -15,33 +15,34 @@
             <div class="space-y-4">
                 <!-- Main Image Display -->
                 <div class="relative">
-                    <img id="mainImage" src="{{ asset('images/daily-puja-kit.jpg') }}" alt="Daily Puja Essentials Kit"
-                        class="w-full h-96 object-cover rounded-2xl">
-                    <div class="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-3 py-1 rounded-full">
-                        25% OFF
-                    </div>
+                    <img id="mainImage" 
+                         src="{{ $product->featured_image_url }}" 
+                         alt="{{ $product->name }}"
+                         class="w-full h-96 object-cover rounded-2xl">
+                    
+                    @if ($product->discount_percentage > 0)
+                        <div class="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-3 py-1 rounded-full">
+                            {{ $product->discount_percentage }}% OFF
+                        </div>
+                    @endif
+                    
+                    @if ($product->is_vendor_product)
+                        <div class="absolute top-4 right-4 bg-blue-500 text-white text-sm font-medium px-3 py-1 rounded-full">
+                            Vendor Product
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Image Thumbnails -->
                 <div class="grid grid-cols-4 gap-2">
-                    <div class="image-thumbnail cursor-pointer border-2 border-vibrant-pink rounded-lg overflow-hidden"
-                        onclick="changeMainImage('{{ asset('images/daily-puja-kit.jpg') }}', this)">
-                        <img src="{{ asset('images/daily-puja-kit.jpg') }}" alt="Main Kit" class="w-full h-20 object-cover">
-                    </div>
-                    <div class="image-thumbnail cursor-pointer border-2 border-gray-200 hover:border-vibrant-pink rounded-lg overflow-hidden"
-                        onclick="changeMainImage('{{ asset('images/puja-items-1.jpg') }}', this)">
-                        <img src="{{ asset('images/puja-items-1.jpg') }}" alt="Diya Set" class="w-full h-20 object-cover">
-                    </div>
-                    <div class="image-thumbnail cursor-pointer border-2 border-gray-200 hover:border-vibrant-pink rounded-lg overflow-hidden"
-                        onclick="changeMainImage('{{ asset('images/puja-items-2.jpg') }}', this)">
-                        <img src="{{ asset('images/puja-items-2.jpg') }}" alt="Incense & Thali"
-                            class="w-full h-20 object-cover">
-                    </div>
-                    <div class="image-thumbnail cursor-pointer border-2 border-gray-200 hover:border-vibrant-pink rounded-lg overflow-hidden"
-                        onclick="changeMainImage('{{ asset('images/puja-items-3.jpg') }}', this)">
-                        <img src="{{ asset('images/puja-items-3.jpg') }}" alt="Complete Set"
-                            class="w-full h-20 object-cover">
-                    </div>
+                    @if (isset($productImages))
+                        @foreach ($productImages as $index => $image)
+                            <div class="image-thumbnail cursor-pointer border-2 {{ $index === 0 ? 'border-vibrant-pink' : 'border-gray-200' }} hover:border-vibrant-pink rounded-lg overflow-hidden"
+                                 onclick="changeMainImage('{{ $image['url'] }}', this)">
+                                <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? $product->name }}" class="w-full h-20 object-cover">
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
 
                 <!-- Product Features -->
@@ -57,72 +58,64 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Delivered in 10 minutes
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
                             Premium quality guaranteed
                         </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Eco-friendly packaging
-                        </li>
+                        @if ($product->manage_stock && $product->stock_quantity > 0)
+                            <li class="flex items-center gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                                In Stock ({{ $product->stock_quantity }} available)
+                            </li>
+                        @endif
+                        @if ($product->is_vendor_product && $product->vendor)
+                            <li class="flex items-center gap-2">
+                                <i data-lucide="check" class="w-4 h-4 text-blue-600"></i>
+                                Sold by {{ $product->vendor->name }}
+                            </li>
+                        @endif
                     </ul>
                 </div>
-
-                <!-- Video Guide Section - Full Width -->
-                <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl p-6">
-                    <div class="text-center mb-4">
-                        <h3 class="text-lg font-bold mb-2">How to Use This Kit</h3>
-                        <p class="text-gray-600 text-sm">Watch our step-by-step guide</p>
-                    </div>
-
-                    <div class="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-md">
-                        <iframe class="absolute inset-0 w-full h-full"
-                            src="https://www.youtube.com/embed/DAYszemgPxc?si=-h1TeDBWcXpWgwn8"
-                            title="Daily Puja Kit - How to Use Guide" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
-                        </iframe>
-                    </div>
-
-                    <div class="mt-3 text-center">
-                        <p class="text-sm text-gray-600">Duration: 5:30 | Expert guidance</p>
-                    </div>
-                </div>
-
             </div>
 
             <!-- Product Details -->
             <div class="space-y-6">
                 <!-- Product Info -->
                 <div>
-                    <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Festival Celebrations</span>
-                    <h1 class="text-3xl font-bold mt-4 mb-2">Daily Puja Essentials Kit</h1>
+                    @if ($product->categories->count() > 0)
+                        <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                            {{ $product->categories->first()->name }}
+                        </span>
+                    @endif
+                    
+                    <h1 class="text-3xl font-bold mt-4 mb-2">{{ $product->name }}</h1>
+                    
                     <div class="flex items-center gap-2 mb-4">
                         <div class="flex items-center gap-1 text-yellow-500">
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
-                            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+                            @for ($i = 1; $i <= 5; $i++)
+                                <i data-lucide="star" class="w-4 h-4 {{ $i <= 4 ? 'fill-current' : '' }}"></i>
+                            @endfor
                         </div>
-                        <span class="text-gray-600">4.8 (156 reviews)</span>
+                        <span class="text-gray-600">4.8 ({{ $product->reviews->count() }} reviews)</span>
                     </div>
-                    <p class="text-gray-600 mb-6">Complete kit for your daily spiritual practice with incense, diyas, and
-                        essential items.</p>
+                    
+                    <p class="text-gray-600 mb-6">
+                        {{ $product->description ?: 'Complete kit for your daily spiritual practice with authentic items.' }}
+                    </p>
                 </div>
 
                 <!-- Pricing -->
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex items-center gap-3 mb-2">
-                        <span class="text-3xl font-bold text-vibrant-pink">₹299</span>
-                        <span class="text-xl text-gray-500 line-through">₹399</span>
-                        <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">Save ₹100</span>
+                        <span class="text-3xl font-bold text-vibrant-pink">₹{{ number_format($product->final_price, 2) }}</span>
+                        @if ($product->sale_price && $product->price > $product->sale_price)
+                            <span class="text-xl text-gray-500 line-through">₹{{ number_format($product->price, 2) }}</span>
+                            <span class="bg-green-100 text-green-800 text-sm font-medium px-2 py-1 rounded">
+                                Save ₹{{ number_format($product->price - $product->sale_price, 2) }}
+                            </span>
+                        @endif
                     </div>
                     <div class="flex items-center gap-2 text-sm text-gray-600">
                         <i data-lucide="truck" class="w-4 h-4"></i>
-                        <span>Delivery in <strong>45 minutes</strong></span>
+                        <span>Fast delivery available</span>
                     </div>
                 </div>
 
@@ -138,10 +131,13 @@
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                             </button>
                         </div>
+                        
                         <button onclick="addToCartFromDetail()"
-                            class="flex-1 bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors">
-                            Add to Cart
+                                class="flex-1 bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors {{ $product->stock_quantity == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                {{ $product->stock_quantity == 0 ? 'disabled' : '' }}>
+                            {{ $product->stock_quantity == 0 ? 'Out of Stock' : 'Add to Cart' }}
                         </button>
+                        
                         <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
                             <i data-lucide="heart" class="w-5 h-5"></i>
                         </button>
@@ -179,65 +175,61 @@
         <div class="mt-16">
             <div class="max-w-4xl">
                 <h2 class="text-2xl font-bold mb-6">Product Description</h2>
-
+                
                 <div class="prose prose-gray max-w-none">
-                    <p class="text-gray-600 mb-4">
-                        Personalize your puja kit according to your specific needs and preferences.
-                    </p>
-
                     <p class="text-gray-600 mb-6">
-                        This complete daily puja kit includes all traditional elements needed for your spiritual practice.
-                        Carefully curated by our spiritual experts, each item carries deep significance and helps create a
-                        sacred atmosphere for your prayers. The kit follows traditional Vedic practices and includes
-                        detailed instructions for the complete ritual.
+                        {{ $product->long_description ?: $product->description ?: 'This complete puja kit includes all traditional elements needed for your spiritual practice. Carefully curated by our spiritual experts, each item carries deep significance and helps create a sacred atmosphere for your prayers.' }}
                     </p>
 
-                    <h3 class="text-lg font-semibold mb-3">What's Included:</h3>
-                    <ul class="space-y-2 text-gray-600 mb-6">
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Premium brass diya set (5 pieces)
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Authentic sandalwood incense sticks
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Sacred red cloth and flowers
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Traditional puja thali
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
-                            Detailed puja instruction guide
-                        </li>
-                    </ul>
+                    @if ($product->attributes && count($product->attributes) > 0)
+                        <h3 class="text-lg font-semibold mb-3">Specifications:</h3>
+                        <ul class="space-y-2 text-gray-600 mb-6">
+                            @foreach ($product->attributes as $key => $value)
+                                <li class="flex items-center gap-2">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                                    <strong>{{ ucfirst($key) }}:</strong> {{ $value }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
 
-                    <h3 class="text-lg font-semibold mb-3">Special Features:</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-orange-50 p-4 rounded-lg">
-                            <h4 class="font-medium text-orange-800 mb-2">Removes Obstacles</h4>
-                            <p class="text-orange-700 text-sm">Brings prosperity and removes obstacles from your path</p>
+                    <!-- Categories -->
+                    @if ($product->categories->count() > 0)
+                        <h3 class="text-lg font-semibold mb-3">Categories:</h3>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            @foreach ($product->categories as $category)
+                                <a href="{{ route('category.show', $category->slug) }}" 
+                                   class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-vibrant-pink hover:text-white transition-colors">
+                                    {{ $category->name }}
+                                </a>
+                            @endforeach
                         </div>
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <h4 class="font-medium text-blue-800 mb-2">Enhances Wisdom</h4>
-                            <p class="text-blue-700 text-sm">Increases knowledge and spiritual understanding</p>
-                        </div>
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <h4 class="font-medium text-green-800 mb-2">Good Fortune</h4>
-                            <p class="text-green-700 text-sm">Attracts good luck and positive energy</p>
-                        </div>
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <h4 class="font-medium text-purple-800 mb-2">Protection</h4>
-                            <p class="text-purple-700 text-sm">Shields from negative energies and influences</p>
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
+
+        <!-- Related Products -->
+        @if ($relatedProducts->count() > 0)
+            <div class="mt-16">
+                <h2 class="text-2xl font-bold mb-6">Related Products</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    @foreach ($relatedProducts as $relatedProduct)
+                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                            <a href="{{ route('product.show', $relatedProduct->slug) }}">
+                                <img src="{{ $relatedProduct->featured_image_url }}" 
+                                     alt="{{ $relatedProduct->name }}" 
+                                     class="w-full h-32 object-cover">
+                                <div class="p-3">
+                                    <h3 class="font-medium text-sm line-clamp-2 mb-2">{{ $relatedProduct->name }}</h3>
+                                    <p class="text-vibrant-pink font-bold text-sm">₹{{ number_format($relatedProduct->final_price, 2) }}</p>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 
     <script>
@@ -250,13 +242,13 @@
 
         function addToCartFromDetail() {
             const product = {
-                id: '{{ $id ?? '1' }}',
-                name: 'Daily Puja Essentials Kit',
-                price: 299,
-                originalPrice: 399,
-                image: '{{ asset('images/daily-puja-kit.jpg') }}',
-                description: 'Complete kit for your daily spiritual practice',
-                discount: '25% OFF'
+                id: {{ $product->id }},
+                name: '{{ $product->name }}',
+                price: {{ $product->final_price }},
+                originalPrice: {{ $product->price }},
+                image: '{{ $product->featured_image_url }}',
+                description: '{{ Str::limit($product->description, 50) }}',
+                slug: '{{ $product->slug }}'
             };
 
             for (let i = 0; i < currentQuantity; i++) {
@@ -266,45 +258,25 @@
             alert(`${currentQuantity} item(s) added to cart!`);
         }
 
-        // Image gallery functionality
         function changeMainImage(imageSrc, thumbnailElement) {
-            // Update main image
             document.getElementById('mainImage').src = imageSrc;
-
-            // Update thumbnail borders
+            
             document.querySelectorAll('.image-thumbnail').forEach(thumb => {
                 thumb.classList.remove('border-vibrant-pink');
                 thumb.classList.add('border-gray-200');
             });
-
-            // Highlight selected thumbnail
+            
             thumbnailElement.classList.remove('border-gray-200');
             thumbnailElement.classList.add('border-vibrant-pink');
         }
     </script>
 
     <style>
-        .aspect-video {
-            aspect-ratio: 16 / 9;
-        }
-
         .image-thumbnail {
             transition: border-color 0.2s ease;
         }
-
         .image-thumbnail:hover {
             border-color: #8B5CF6;
-        }
-
-        @media (max-width: 768px) {
-            .aspect-video {
-                min-height: 180px;
-            }
-
-            .grid.grid-cols-4 {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 0.5rem;
-            }
         }
     </style>
 @endsection

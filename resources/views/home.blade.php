@@ -89,7 +89,7 @@
 
 
     <!-- Top Banner Slider -->
-    <section class="max-w-7xl mx-auto px-4 pt-4">
+    {{-- <section class="max-w-7xl mx-auto px-4 pt-4">
         <div class="banner-swiper relative pb-12">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
@@ -109,8 +109,38 @@
             <!-- Pagination Dots -->
             <div class="swiper-pagination"></div>
         </div>
-    </section>
+    </section> --}}
 
+
+    <!-- Top Banner Slider -->
+    <section class="max-w-7xl mx-auto px-4 pt-4">
+        <div class="banner-swiper relative pb-12">
+            <div class="swiper-wrapper">
+                @forelse($banners as $banner)
+                    <div class="swiper-slide">
+                        @if ($banner->hasLink())
+                            <a href="{{ $banner->link_url }}" target="_blank" rel="noopener noreferrer">
+                                <img src="{{ $banner->image_url }}" alt="{{ $banner->alt_text }}"
+                                    class="w-full h-auto rounded-2xl shadow-sm object-cover banner-image">
+                            </a>
+                        @else
+                            <img src="{{ $banner->image_url }}" alt="{{ $banner->alt_text }}"
+                                class="w-full h-auto rounded-2xl shadow-sm object-cover banner-image">
+                        @endif
+                    </div>
+                @empty
+                    <div class="swiper-slide">
+                        <div class="w-full h-64 bg-gray-200 rounded-2xl shadow-sm flex items-center justify-center">
+                            <p class="text-gray-500">No banners available</p>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Pagination Dots -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </section>
 
 
 
@@ -134,7 +164,7 @@
     </section> --}}
 
     <!-- Categories Section -->
-    <section class="max-w-7xl mx-auto px-4 py-12">
+    {{-- <section class="max-w-7xl mx-auto px-4 py-12">
         <h2 class="text-2xl font-bold mb-8">Shop by Category</h2>
         <div class="category-scroll flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-2">
             @foreach ([['name' => 'Daily Puja', 'image' => 'daily-puja-kit.jpg', 'link' => '/all-kits?filter=daily'], ['name' => 'Festival', 'image' => 'festival-kit.jpg', 'link' => '/all-kits?filter=festival'], ['name' => 'Custom', 'image' => 'custom-kit.jpg', 'link' => '/all-kits?filter=custom'], ['name' => 'Eco-friendly', 'image' => 'eco-friendly.jpg', 'link' => '/all-kits?filter=eco'], ['name' => 'Accessories', 'image' => 'accessories.jpg', 'link' => '/all-kits?filter=accessories'], ['name' => 'Subscription', 'image' => 'subscription.jpg', 'link' => '/all-kits?filter=subscription']] as $category)
@@ -155,8 +185,62 @@
                 </a>
             @endforeach
         </div>
-    </section>
+    </section> --}}
 
+    <!-- Categories Section -->
+    <section class="max-w-7xl mx-auto px-4 py-12">
+        <h2 class="text-2xl font-bold mb-8">Shop by Category</h2>
+        <div class="category-scroll flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-2">
+            @forelse ($categories as $category)
+                <a href="{{ route('category.show', $category->slug) }}" class="flex-shrink-0 group">
+                    <div class="text-center cursor-pointer w-20 sm:w-24 md:w-32">
+                        <!-- Circular Image -->
+                        <div
+                            class="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 mx-auto mb-2 md:mb-3 rounded-full border-2 border-gray-200 group-hover:border-vibrant-pink transition-all duration-300 overflow-hidden bg-white shadow-sm group-hover:shadow-md">
+                            <img src="{{ $category->image_url }}" alt="{{ $category->name }}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                onerror="this.src='{{ asset('images/default-category.png') }}'">
+                        </div>
+
+                        <!-- Category Name -->
+                        <h3
+                            class="font-medium text-xs sm:text-sm md:text-base text-gray-800 group-hover:text-vibrant-pink transition-colors leading-tight">
+                            {{ $category->name }}
+                        </h3>
+
+                        <!-- Product Count (Optional) -->
+                        @if ($category->products_count > 0)
+                            <p class="text-xs text-gray-500 mt-1">
+                                {{ $category->products_count }} {{ Str::plural('item', $category->products_count) }}
+                            </p>
+                        @endif
+                    </div>
+                </a>
+            @empty
+             
+            @endforelse
+        </div>
+
+        <!-- Subcategories (Optional - only show for first category as example) -->
+        @if ($categories->isNotEmpty() && $categories->first()->children->count() > 0)
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">
+                    {{ $categories->first()->name }} Subcategories
+                </h3>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($categories->first()->children->take(5) as $subcategory)
+                        <a href="{{ route('category.show', $subcategory->slug) }}"
+                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-vibrant-pink hover:text-white transition-colors">
+                            {{ $subcategory->name }}
+                            @if ($subcategory->products_count > 0)
+                                <span class="ml-1 text-xs">({{ $subcategory->products_count }})</span>
+                            @endif
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </section>
 
 
     <!-- Secondary Banners -->
@@ -243,7 +327,7 @@
 
 
     <!-- Products Grid -->
-    <section class="w-full bg-[#FFFBF0] py-12">
+    {{-- <section class="w-full bg-[#FFFBF0] py-12">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-bold">Popular Products</h2>
@@ -311,5 +395,183 @@
                 @endforeach
             </div>
         </div>
+    </section> --}}
+
+
+
+
+
+    <!-- Products Grid -->
+    <section class="w-full bg-[#FFFBF0] py-12">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold">Popular Products</h2>
+                <a href="{{ route('all-kits') }}" class="text-vibrant-pink font-medium hover:underline">View All</a>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6">
+                @forelse ($products as $product)
+                    <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer flex flex-col h-full"
+                        onclick="window.location.href='{{ route('product.show', $product->slug ?? $product->id) }}'">
+
+                        <!-- Image Section -->
+                        <div class="relative overflow-hidden">
+                            <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
+                                class="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+
+                            @if ($product->discount_percentage > 0)
+                                <div
+                                    class="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
+                                    {{ $product->discount_percentage }}% OFF
+                                </div>
+                            @endif
+
+                            @if ($product->is_vendor_product)
+                                <div
+                                    class="absolute top-2 right-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
+                                    Vendor
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Content Section -->
+                        <div class="p-3 lg:p-4 flex flex-col flex-1">
+                            <!-- Product Title -->
+                            <h3
+                                class="font-semibold mb-2 text-xs sm:text-sm lg:text-base text-gray-900 line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem] lg:min-h-[3rem] leading-tight">
+                                {{ $product->name }}
+                            </h3>
+
+                            <!-- Description -->
+                            <p
+                                class="text-xs text-gray-600 mb-3 line-clamp-2 min-h-[1.5rem] sm:min-h-[2rem] leading-relaxed">
+                                {{ Str::limit($product->description ?? 'Premium quality puja items for your spiritual needs', 100) }}
+                            </p>
+
+                            <!-- Category -->
+                            @if ($product->categories->count() > 0)
+                                <div class="mb-2">
+                                    <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                        {{ $product->categories->first()->name }}
+                                    </span>
+                                </div>
+                            @endif
+
+                            <!-- Spacer -->
+                            <div class="flex-1"></div>
+
+                            <!-- Price Section -->
+                            <div class="flex items-center gap-1 sm:gap-2 mb-3">
+                                <span class="text-sm sm:text-base lg:text-lg font-bold text-gray-900">
+                                    ₹{{ number_format($product->final_price, 2) }}
+                                </span>
+                                @if ($product->sale_price && $product->price > $product->sale_price)
+                                    <span class="text-xs lg:text-sm text-gray-500 line-through">
+                                        ₹{{ number_format($product->price, 2) }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            <!-- Stock Status -->
+                            @if ($product->manage_stock)
+                                <div class="text-xs mb-2">
+                                    @if ($product->stock_quantity > 10)
+                                        <span class="text-green-600">In Stock</span>
+                                    @elseif ($product->stock_quantity > 0)
+                                        <span class="text-orange-600">Low Stock ({{ $product->stock_quantity }})</span>
+                                    @else
+                                        <span class="text-red-600">Out of Stock</span>
+                                    @endif
+                                </div>
+                            @endif
+
+                            <!-- Add to Cart Button -->
+                            <button onclick="event.stopPropagation(); addToCart({{ $product->id }})"
+                                class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm group-hover:shadow-md {{ $product->stock_quantity == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                {{ $product->stock_quantity == 0 ? 'disabled' : '' }}>
+                                <i data-lucide="shopping-cart" class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2"></i>
+                                {{ $product->stock_quantity == 0 ? 'Out of Stock' : 'Add to Cart' }}
+                            </button>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full text-center py-12">
+                        <div class="text-gray-500 mb-4">
+                            <i data-lucide="package" class="w-16 h-16 mx-auto mb-4"></i>
+                            <p class="text-lg font-medium">No products available</p>
+                            <p class="text-sm">Check back later for new arrivals!</p>
+                        </div>
+                    </div>
+                @endforelse
+            </div>
+        </div>
     </section>
+
+    @if ($pujaKits->count() > 0)
+        <!-- Puja Kits Section -->
+        <section class="w-full bg-white py-12">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold">Popular Puja Kits</h2>
+                    <a href="{{ route('all-kits') }}" class="text-vibrant-pink font-medium hover:underline">View
+                        All Kits</a>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    @foreach ($pujaKits as $kit)
+                        <div class="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-300 cursor-pointer"
+                            onclick="window.location.href='{{ route('puja-kits.show', $kit->slug) }}'">
+
+                            <!-- Kit Image -->
+                            <div class="relative overflow-hidden">
+                                <img src="{{ $kit->image ? asset('storage/' . $kit->image) : asset('images/default-kit.png') }}"
+                                    alt="{{ $kit->kit_name }}"
+                                    class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
+
+                                @if ($kit->discount_percentage > 0)
+                                    <div
+                                        class="absolute top-2 left-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                                        {{ $kit->discount_percentage }}% OFF
+                                    </div>
+                                @endif
+                            </div>
+
+                            <!-- Kit Content -->
+                            <div class="p-4">
+                                <h3 class="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+                                    {{ $kit->kit_name }}
+                                </h3>
+
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2">
+                                    {{ Str::limit($kit->description, 80) }}
+                                </p>
+
+                                <!-- Puja Names -->
+                                @if ($kit->pujas->count() > 0)
+                                    <p class="text-xs text-gray-500 mb-3">
+                                        <strong>For:</strong> {{ $kit->puja_names }}
+                                    </p>
+                                @endif
+
+                                <!-- Products count -->
+                                <p class="text-xs text-gray-500 mb-3">
+                                    {{ $kit->products->count() }} items included
+                                </p>
+
+                                <!-- Price -->
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-lg font-bold text-gray-900">
+                                            ₹{{ number_format($kit->total_price, 2) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
 @endsection
