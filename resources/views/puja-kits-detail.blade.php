@@ -4,7 +4,8 @@
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Back Button -->
         <div class="mb-6">
-            <a href="{{ route('puja-kits.index') }}" class="inline-flex items-center gap-2 text-gray-600 hover:text-vibrant-pink">
+            <a href="{{ route('puja-kits.index') }}"
+                class="inline-flex items-center gap-2 text-gray-600 hover:text-vibrant-pink">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 Back to Puja Kits
             </a>
@@ -36,19 +37,19 @@
             <div class="space-y-4">
                 <!-- Main Image Display -->
                 <div class="relative">
-                    <img id="mainImage" 
-                         src="{{ $pujaKit->image ? asset('storage/' . $pujaKit->image) : asset('images/default-kit.png') }}" 
-                         alt="{{ $pujaKit->kit_name }}"
-                         class="w-full h-96 object-cover rounded-2xl">
-                    
+                    <img id="mainImage"
+                        src="{{ $pujaKit->image ? asset('storage/' . $pujaKit->image) : asset('images/default-kit.png') }}"
+                        alt="{{ $pujaKit->kit_name }}" class="w-full h-96 object-cover rounded-2xl">
+
                     @if ($pujaKit->discount_percentage > 0)
                         <div class="absolute top-4 left-4 bg-red-500 text-white text-sm font-medium px-3 py-1 rounded-full">
                             {{ $pujaKit->discount_percentage }}% OFF
                         </div>
                     @endif
-                    
+
                     @if ($pujaKit->vendor)
-                        <div class="absolute top-4 right-4 bg-blue-500 text-white text-sm font-medium px-3 py-1 rounded-full">
+                        <div
+                            class="absolute top-4 right-4 bg-blue-500 text-white text-sm font-medium px-3 py-1 rounded-full">
                             By {{ $pujaKit->vendor->name }}
                         </div>
                     @endif
@@ -60,27 +61,28 @@
                         <i data-lucide="package" class="w-5 h-5 text-vibrant-pink"></i>
                         Kit Includes
                     </h3>
-                    
+
                     @if ($pujaKit->products->count() > 0)
                         <div class="space-y-3">
                             @foreach ($pujaKit->products->take(5) as $product)
                                 <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
                                     <div class="flex items-center gap-3">
-                                        <img src="{{ $product->featured_image_url }}" 
-                                             alt="{{ $product->name }}" 
-                                             class="w-12 h-12 object-cover rounded-lg">
+                                        <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
+                                            class="w-12 h-12 object-cover rounded-lg">
                                         <div>
                                             <h4 class="font-medium text-sm">{{ $product->name }}</h4>
-                                            <p class="text-xs text-gray-600">{{ Str::limit($product->description, 40) }}</p>
+                                            <p class="text-xs text-gray-600">{{ Str::limit($product->description, 40) }}
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="text-right">
                                         <p class="text-sm font-medium">Qty: {{ $product->pivot->quantity }}</p>
-                                        <p class="text-xs text-gray-600">₹{{ number_format($product->pivot->price ?? $product->price, 2) }}</p>
+                                        <p class="text-xs text-gray-600">
+                                            ₹{{ number_format($product->pivot->price ?? $product->price, 2) }}</p>
                                     </div>
                                 </div>
                             @endforeach
-                            
+
                             @if ($pujaKit->products->count() > 5)
                                 <p class="text-sm text-gray-600 text-center pt-2">
                                     + {{ $pujaKit->products->count() - 5 }} more items
@@ -108,7 +110,8 @@
                             <div class="text-xs text-gray-600">Total Items</div>
                         </div>
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-green-600">₹{{ number_format($kitStats['total_savings'], 2) }}</div>
+                            <div class="text-2xl font-bold text-green-600">
+                                ₹{{ number_format($kitStats['total_savings'], 2) }}</div>
                             <div class="text-xs text-gray-600">You Save</div>
                         </div>
                     </div>
@@ -128,9 +131,9 @@
                             @endforeach
                         </div>
                     @endif
-                    
+
                     <h1 class="text-3xl font-bold mt-4 mb-2">{{ $pujaKit->kit_name }}</h1>
-                    
+
                     <div class="flex items-center gap-2 mb-4">
                         <div class="flex items-center gap-1 text-yellow-500">
                             @for ($i = 1; $i <= 5; $i++)
@@ -139,7 +142,7 @@
                         </div>
                         <span class="text-gray-600">4.8 (Review system not implemented)</span>
                     </div>
-                    
+
                     <p class="text-gray-600 mb-6">
                         {{ $pujaKit->description ?: 'Complete kit for your spiritual practice with authentic items.' }}
                     </p>
@@ -155,7 +158,8 @@
                                         <div>
                                             <h4 class="font-medium text-orange-900">{{ $puja->name }}</h4>
                                             @if ($puja->description)
-                                                <p class="text-sm text-orange-700">{{ Str::limit($puja->description, 100) }}</p>
+                                                <p class="text-sm text-orange-700">
+                                                    {{ Str::limit($puja->description, 100) }}</p>
                                             @endif
                                         </div>
                                     </div>
@@ -168,7 +172,8 @@
                 <!-- Pricing -->
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex items-center gap-3 mb-2">
-                        <span class="text-3xl font-bold text-vibrant-pink">₹{{ number_format($pujaKit->total_price, 2) }}</span>
+                        <span
+                            class="text-3xl font-bold text-vibrant-pink">₹{{ number_format($pujaKit->total_price, 2) }}</span>
                         @if ($kitStats['total_savings'] > 0)
                             @php
                                 $originalPrice = $pujaKit->total_price + $kitStats['total_savings'];
@@ -189,20 +194,20 @@
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="flex items-center border border-gray-300 rounded-lg">
-                            <button onclick="updateQuantity(-1)" class="p-3 hover:bg-gray-100 rounded-l-lg">
+                            <button onclick="updateKitQuantity(-1)" class="p-3 hover:bg-gray-100 rounded-l-lg">
                                 <i data-lucide="minus" class="w-4 h-4"></i>
                             </button>
                             <span id="quantity" class="px-4 py-3 font-medium">1</span>
-                            <button onclick="updateQuantity(1)" class="p-3 hover:bg-gray-100 rounded-r-lg">
+                            <button onclick="updateKitQuantity(1)" class="p-3 hover:bg-gray-100 rounded-r-lg">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                             </button>
                         </div>
-                        
-                        <button onclick="addKitToCart()"
-                                class="flex-1 bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors">
-                            Add Kit to Cart
+
+                        <button id="addKitBtn" onclick="addKitToCart()"
+                            class="flex-1 bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors">
+                            <span class="button-text">Add Kit to Cart</span>
                         </button>
-                        
+
                         <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
                             <i data-lucide="heart" class="w-5 h-5"></i>
                         </button>
@@ -210,7 +215,6 @@
                             <i data-lucide="share-2" class="w-5 h-5"></i>
                         </button>
                     </div>
-
                     <!-- Service Icons -->
                     <div class="grid grid-cols-3 gap-4 text-center">
                         <div class="flex flex-col items-center gap-2">
@@ -256,14 +260,15 @@
                                     <tr class="hover:bg-gray-50">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-4">
-                                                <img src="{{ $product->featured_image_url }}" 
-                                                     alt="{{ $product->name }}" 
-                                                     class="w-16 h-16 object-cover rounded-lg">
+                                                <img src="{{ $product->featured_image_url }}" alt="{{ $product->name }}"
+                                                    class="w-16 h-16 object-cover rounded-lg">
                                                 <div>
                                                     <h4 class="font-medium">{{ $product->name }}</h4>
-                                                    <p class="text-sm text-gray-600">{{ Str::limit($product->description, 60) }}</p>
+                                                    <p class="text-sm text-gray-600">
+                                                        {{ Str::limit($product->description, 60) }}</p>
                                                     @if ($product->categories->count() > 0)
-                                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded mt-1 inline-block">
+                                                        <span
+                                                            class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded mt-1 inline-block">
                                                             {{ $product->categories->first()->name }}
                                                         </span>
                                                     @endif
@@ -314,14 +319,15 @@
                 <h2 class="text-2xl font-bold mb-6">Related Puja Kits</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     @foreach ($relatedKits as $relatedKit)
-                        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                        <div
+                            class="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
                             <a href="{{ route('puja-kits.show', $relatedKit->slug) }}">
-                                <img src="{{ $relatedKit->image ? asset('storage/' . $relatedKit->image) : asset('images/default-kit.png') }}" 
-                                     alt="{{ $relatedKit->kit_name }}" 
-                                     class="w-full h-32 object-cover">
+                                <img src="{{ $relatedKit->image ? asset('storage/' . $relatedKit->image) : asset('images/default-kit.png') }}"
+                                    alt="{{ $relatedKit->kit_name }}" class="w-full h-32 object-cover">
                                 <div class="p-3">
                                     <h3 class="font-medium text-sm line-clamp-2 mb-2">{{ $relatedKit->kit_name }}</h3>
-                                    <p class="text-vibrant-pink font-bold text-sm">₹{{ number_format($relatedKit->total_price, 2) }}</p>
+                                    <p class="text-vibrant-pink font-bold text-sm">
+                                        ₹{{ number_format($relatedKit->total_price, 2) }}</p>
                                     @if ($relatedKit->pujas->count() > 0)
                                         <p class="text-xs text-gray-500 mt-1">{{ $relatedKit->pujas->first()->name }}</p>
                                     @endif
@@ -335,34 +341,88 @@
     </div>
 
     <script>
-        let currentQuantity = 1;
+        // Define variables in global scope
+        window.currentKitQuantity = 1;
+        window.maxKitQuantity = 5; // Reasonable limit for puja kits
 
-        function updateQuantity(change) {
-            currentQuantity = Math.max(1, currentQuantity + change);
-            document.getElementById('quantity').textContent = currentQuantity;
-        }
+        window.updateKitQuantity = function(change) {
+            const newQuantity = window.currentKitQuantity + change;
 
-        function addKitToCart() {
-            const kit = {
-                id: {{ $pujaKit->id }},
-                name: '{{ $pujaKit->kit_name }}',
-                price: {{ $pujaKit->total_price }},
-                image: '{{ $pujaKit->image ? asset('storage/' . $pujaKit->image) : asset('images/default-kit.png') }}',
-                description: '{{ Str::limit($pujaKit->description, 50) }}',
-                slug: '{{ $pujaKit->slug }}',
-                type: 'kit'
-            };
-
-            for (let i = 0; i < currentQuantity; i++) {
-                addToCart(kit);
+            // Apply min/max limits
+            if (newQuantity >= 1 && newQuantity <= window.maxKitQuantity) {
+                window.currentKitQuantity = newQuantity;
+                const quantityElement = document.getElementById('quantity');
+                if (quantityElement) {
+                    quantityElement.textContent = window.currentKitQuantity;
+                }
             }
 
-            alert(`${currentQuantity} kit(s) added to cart!`);
-        }
+            // Update button states
+            updateKitQuantityButtons();
+        };
+
+        window.updateKitQuantityButtons = function() {
+            const minusBtn = document.querySelector('button[onclick="updateKitQuantity(-1)"]');
+            const plusBtn = document.querySelector('button[onclick="updateKitQuantity(1)"]');
+
+            if (minusBtn) {
+                minusBtn.disabled = window.currentKitQuantity <= 1;
+                minusBtn.classList.toggle('opacity-50', window.currentKitQuantity <= 1);
+                minusBtn.classList.toggle('cursor-not-allowed', window.currentKitQuantity <= 1);
+            }
+
+            if (plusBtn) {
+                plusBtn.disabled = window.currentKitQuantity >= window.maxKitQuantity;
+                plusBtn.classList.toggle('opacity-50', window.currentKitQuantity >= window.maxKitQuantity);
+                plusBtn.classList.toggle('cursor-not-allowed', window.currentKitQuantity >= window.maxKitQuantity);
+            }
+        };
+
+        window.addKitToCart = function() {
+            // Check if global cart system exists
+            if (typeof window.cart !== 'undefined' && window.cart.loading) return;
+
+            const button = document.getElementById('addKitBtn');
+            if (!button) return;
+
+            // Check if global addPujaKitToCart function exists
+            if (typeof window.addPujaKitToCart === 'function') {
+                // Create synthetic event for global function
+                const originalEvent = window.event;
+                window.event = {
+                    target: button
+                };
+
+                try {
+                    // Call the global addPujaKitToCart function with correct parameters
+                    window.addPujaKitToCart({{ $pujaKit->id }}, window.currentKitQuantity);
+                } catch (error) {
+                    console.error('Error adding puja kit to cart:', error);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Failed to add puja kit to cart', 'error');
+                    } else {
+                        alert('Failed to add puja kit to cart. Please try again.');
+                    }
+                } finally {
+                    window.event = originalEvent;
+                }
+            } else {
+                console.error('Global addPujaKitToCart function not found');
+                alert('Cart system not available. Please refresh the page and try again.');
+            }
+        };
 
         // Initialize Lucide icons
         document.addEventListener('DOMContentLoaded', function() {
-            lucide.createIcons();
+            // Initialize button states
+            if (typeof window.updateKitQuantityButtons === 'function') {
+                window.updateKitQuantityButtons();
+            }
+
+            // Initialize Lucide icons if available
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         });
     </script>
 @endsection

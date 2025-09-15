@@ -180,17 +180,11 @@
                                 {{ $kit->products->count() }} items • {{ $kit->products->sum('pivot.quantity') }} pieces
                             </div>
                             
+                            <!-- FIXED: Use addPujaKitToCart with simple parameters -->
                             <button
-                                onclick="event.stopPropagation(); addToCart({{ json_encode([
-                                    'id' => $kit->id,
-                                    'name' => $kit->kit_name,
-                                    'price' => $kit->total_price,
-                                    'image' => $kit->image_url,
-                                    'description' => $kit->kit_description,
-                                    'discount' => $kit->discount_percentage > 0 ? number_format($kit->discount_percentage, 0) . '% OFF' : null
-                                ]) }})"
+                                onclick="event.stopPropagation(); addPujaKitToCart({{ $kit->id }}, 1)"
                                 class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-2 rounded-lg transition-colors">
-                                Add to Cart
+                                <span class="button-text">Add to Cart</span>
                             </button>
                         </div>
                     </div>
@@ -240,13 +234,6 @@
 
             // Re-initialize Lucide icons
             lucide.createIcons();
-        }
-
-        // Add to cart function (placeholder - implement according to your cart system)
-        function addToCart(product) {
-            console.log('Adding to cart:', product);
-            // Implement your cart functionality here
-            alert(`Added "${product.name}" to cart!`);
         }
 
         // Initialize on page load

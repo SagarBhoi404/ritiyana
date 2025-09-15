@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 // Import Vendor Controllers
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\Banner\BannerController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorOrderController;
@@ -38,6 +39,19 @@ Route::get('/puja-kits', [App\Http\Controllers\User\PujaKitController::class, 'i
 // Category routes
 Route::redirect('/category/{category}', '/products?category={category}', 301)->name('category.show');
 
+
+
+// Cart routes 
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/add', [CartController::class, 'add'])->name('add');
+    Route::put('/{id}', [CartController::class, 'update'])->name('update');
+    Route::delete('/{id}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('/', [CartController::class, 'clear'])->name('clear');
+    Route::get('/count', [CartController::class, 'count'])->name('count');
+    Route::get('/mini', [CartController::class, 'mini'])->name('mini');
+    Route::post('/add-puja-kit', [CartController::class, 'addPujaKit'])->name('add-puja-kit');
+});
 
 
 

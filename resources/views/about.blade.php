@@ -116,7 +116,7 @@
     <div class="bg-vibrant-pink rounded-2xl p-8 text-white text-center">
         <h2 class="text-3xl font-bold mb-4">Ready to Start Your Spiritual Journey?</h2>
         <p class="text-purple-100 mb-6">Join thousands of satisfied customers who trust PujaKit for their spiritual needs</p>
-        <a href="{{ route('all-kits') }}" class="inline-block bg-white text-vibrant-pink font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
+        <a href="{{ route('puja-kits.index') }}" class="inline-block bg-white text-vibrant-pink font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors">
             Shop Now
         </a>
     </div>

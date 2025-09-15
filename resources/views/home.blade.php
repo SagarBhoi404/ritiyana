@@ -405,7 +405,7 @@
     <section class="w-full bg-[#FFFBF0] py-12">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-bold">Popular Products</h2>
+                <h2 class="text-2xl font-bold">Featured Products</h2>
                 <a href="{{ route('puja-kits.index') }}" class="text-vibrant-pink font-medium hover:underline">View All</a>
             </div>
 
@@ -486,7 +486,7 @@
                             @endif
 
                             <!-- Add to Cart Button -->
-                            <button onclick="event.stopPropagation(); addToCart({{ $product->id }})"
+                            <button onclick="event.stopPropagation(); addToCart({{ $product->id }}, 1)"
                                 class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-2 px-2 sm:px-3 rounded-lg transition-colors text-xs sm:text-sm group-hover:shadow-md {{ $product->stock_quantity == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
                                 {{ $product->stock_quantity == 0 ? 'disabled' : '' }}>
                                 <i data-lucide="shopping-cart" class="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2"></i>

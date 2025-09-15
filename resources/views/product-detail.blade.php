@@ -123,19 +123,19 @@
                 <div class="border-t border-gray-200 pt-6">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="flex items-center border border-gray-300 rounded-lg">
-                            <button onclick="updateQuantity(-1)" class="p-3 hover:bg-gray-100 rounded-l-lg">
+                            <button onclick="updateProductQuantity(-1)" class="p-3 hover:bg-gray-100 rounded-l-lg">
                                 <i data-lucide="minus" class="w-4 h-4"></i>
                             </button>
                             <span id="quantity" class="px-4 py-3 font-medium">1</span>
-                            <button onclick="updateQuantity(1)" class="p-3 hover:bg-gray-100 rounded-r-lg">
+                            <button onclick="updateProductQuantity(1)" class="p-3 hover:bg-gray-100 rounded-r-lg">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                             </button>
                         </div>
                         
-                        <button onclick="addToCartFromDetail()"
+                        <button id="addToCartBtn" onclick="addToCartFromDetail()"
                                 class="flex-1 bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors {{ $product->stock_quantity == 0 ? 'opacity-50 cursor-not-allowed' : '' }}"
                                 {{ $product->stock_quantity == 0 ? 'disabled' : '' }}>
-                            {{ $product->stock_quantity == 0 ? 'Out of Stock' : 'Add to Cart' }}
+                            <span class="button-text">{{ $product->stock_quantity == 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
                         </button>
                         
                         <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
@@ -232,43 +232,105 @@
         @endif
     </div>
 
+    <!-- FIXED: JavaScript functions defined in window scope -->
     <script>
-        let currentQuantity = 1;
+        // Define global variables
+        window.currentQuantity = 1;
+        window.maxStock = {{ $product->stock_quantity ?: 999 }};
 
-        function updateQuantity(change) {
-            currentQuantity = Math.max(1, currentQuantity + change);
-            document.getElementById('quantity').textContent = currentQuantity;
-        }
-
-        function addToCartFromDetail() {
-            const product = {
-                id: {{ $product->id }},
-                name: '{{ $product->name }}',
-                price: {{ $product->final_price }},
-                originalPrice: {{ $product->price }},
-                image: '{{ $product->featured_image_url }}',
-                description: '{{ Str::limit($product->description, 50) }}',
-                slug: '{{ $product->slug }}'
-            };
-
-            for (let i = 0; i < currentQuantity; i++) {
-                addToCart(product);
+        // Define functions in global window scope
+        window.updateProductQuantity = function(change) {
+            const newQuantity = window.currentQuantity + change;
+            
+            if (newQuantity >= 1 && newQuantity <= Math.min(10, window.maxStock)) {
+                window.currentQuantity = newQuantity;
+                const quantityElement = document.getElementById('quantity');
+                if (quantityElement) {
+                    quantityElement.textContent = window.currentQuantity;
+                }
             }
+            
+            // Update button states
+            updateQuantityButtonStates();
+        };
 
-            alert(`${currentQuantity} item(s) added to cart!`);
-        }
+        // Update quantity button states
+        window.updateQuantityButtonStates = function() {
+            const minusBtn = document.querySelector('button[onclick="updateProductQuantity(-1)"]');
+            const plusBtn = document.querySelector('button[onclick="updateProductQuantity(1)"]');
+            
+            if (minusBtn && plusBtn) {
+                minusBtn.disabled = window.currentQuantity <= 1;
+                plusBtn.disabled = window.currentQuantity >= Math.min(10, window.maxStock);
+                
+                minusBtn.classList.toggle('opacity-50', window.currentQuantity <= 1);
+                plusBtn.classList.toggle('opacity-50', window.currentQuantity >= Math.min(10, window.maxStock));
+            }
+        };
 
-        function changeMainImage(imageSrc, thumbnailElement) {
-            document.getElementById('mainImage').src = imageSrc;
+        // Add to cart from product detail page
+        window.addToCartFromDetail = function() {
+            // Check if global cart system exists
+            if (typeof window.cart !== 'undefined' && window.cart.loading) return;
+            
+            const button = document.getElementById('addToCartBtn');
+            if (!button || button.disabled) return;
+            
+            // Check if global addToCart function exists
+            if (typeof window.addToCart === 'function') {
+                // Create synthetic event for global function
+                const originalEvent = window.event;
+                window.event = { target: button };
+                
+                try {
+                    // Call global addToCart function
+                    window.addToCart({{ $product->id }}, window.currentQuantity, null);
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    if (typeof window.showToast === 'function') {
+                        window.showToast('Failed to add item to cart', 'error');
+                    } else {
+                        alert('Failed to add item to cart');
+                    }
+                } finally {
+                    window.event = originalEvent;
+                }
+            } else {
+                console.error('Global addToCart function not found');
+                alert('Cart system not available. Please refresh the page.');
+            }
+        };
+
+        // Change main image function
+        window.changeMainImage = function(imageSrc, thumbnailElement) {
+            const mainImage = document.getElementById('mainImage');
+            if (mainImage) {
+                mainImage.src = imageSrc;
+            }
             
             document.querySelectorAll('.image-thumbnail').forEach(thumb => {
                 thumb.classList.remove('border-vibrant-pink');
                 thumb.classList.add('border-gray-200');
             });
             
-            thumbnailElement.classList.remove('border-gray-200');
-            thumbnailElement.classList.add('border-vibrant-pink');
-        }
+            if (thumbnailElement) {
+                thumbnailElement.classList.remove('border-gray-200');
+                thumbnailElement.classList.add('border-vibrant-pink');
+            }
+        };
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize button states
+            if (typeof window.updateQuantityButtonStates === 'function') {
+                window.updateQuantityButtonStates();
+            }
+            
+            // Initialize Lucide icons if available
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
     </script>
 
     <style>
@@ -276,7 +338,13 @@
             transition: border-color 0.2s ease;
         }
         .image-thumbnail:hover {
-            border-color: #8B5CF6;
+            border-color: #ff3c65;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 @endsection
