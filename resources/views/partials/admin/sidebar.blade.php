@@ -143,6 +143,12 @@
                 class="mr-3 h-5 w-5 {{ request()->routeIs('admin.analytics*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
             Analytics
         </a>
+        <a href="{{ route('admin.contacts.index') }}"
+            class="group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 {{ request()->routeIs('admin.contacts*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50' }}">
+            <i data-lucide="contact"
+                class="mr-3 h-5 w-5 {{ request()->routeIs('admin.contacts*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
+            Contact
+        </a>
 
         <!-- Settings -->
         <a href="{{ route('admin.settings.index') }}"
