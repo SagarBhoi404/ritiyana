@@ -12,17 +12,30 @@
 
             <div class="flex items-center gap-4">
                 <a href="{{ route('login') }}"
-                    class="text-sm text-gray-600 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="user" class="w-4 h-4"></i>
-                    Login
-                </a>
-                <button onclick="toggleCart()" class="relative p-2">
+                    @auth
+<a href="{{ route('dashboard') }}"
+                        class="text-sm text-gray-600 hover:text-vibrant-pink flex items-center gap-1">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                        Dashboard
+                    </a>
+                    <!-- Optional: Show user name -->
+                    <span class="text-sm text-gray-500">
+                        Hello, {{ Auth::user()->first_name ?? Auth::user()->name }}!
+                    </span>
+                @else
+                    <!-- User is not logged in - Show Login -->
+                    <a href="{{ route('login') }}"
+                        class="text-sm text-gray-600 hover:text-vibrant-pink flex items-center gap-1">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                        Login
+                    </a> @endauth
+                    <button onclick="toggleCart()" class="relative p-2">
                     <i data-lucide="shopping-cart" class="w-5 h-5"></i>
                     <span id="cart-count"
                         class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                </button>
-                <!-- Mobile Menu Button -->
-                {{-- <button
+                    </button>
+                    <!-- Mobile Menu Button -->
+                    {{-- <button
                     onclick="document.getElementById('mobile-menu').classList.toggle('hidden'); document.getElementById('menu-icon').classList.toggle('hidden'); document.getElementById('close-icon').classList.toggle('hidden');"
                     class="md:hidden p-2">
                     <i data-lucide="menu" class="w-5 h-5" id="menu-icon"></i>
@@ -144,6 +157,24 @@
                         </div>
                         <span class="text-xs font-medium">Contact</span>
                     </a>
+
+                    @auth
+                        <a href="{{ route('dashboard') }}"
+                            class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
+                            <div class="bg-gray-100 p-2 rounded-lg mb-1">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-xs font-medium">Dashboard</span>
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}"
+                            class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
+                            <div class="bg-gray-100 p-2 rounded-lg mb-1">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </div>
+                            <span class="text-xs font-medium">Login</span>
+                        </a>
+                    @endauth
                 </div>
             </nav>
         </div>
