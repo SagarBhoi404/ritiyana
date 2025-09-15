@@ -11,6 +11,8 @@ use App\Http\Controllers\PujaController;
 use App\Http\Controllers\PujaKitController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+// use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\ContactController;
 
 // Import Vendor Controllers
 use App\Http\Controllers\Admin\VendorController;
@@ -38,6 +40,7 @@ Route::get('/puja-kits', [App\Http\Controllers\User\PujaKitController::class, 'i
 
 // Category routes
 Route::redirect('/category/{category}', '/products?category={category}', 301)->name('category.show');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
 
 
@@ -103,6 +106,7 @@ Route::middleware('guest')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
         Route::post('/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+   
     });
 
     // Shopkeeper Authentication
@@ -124,6 +128,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
         Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 
+         Route::resource('contacts', ContactController::class);
 
         Route::resource('banners', BannerController::class);
         Route::patch('banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
