@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
@@ -95,7 +96,7 @@ class CategoryController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($category->image) {
-                \Storage::disk('public')->delete($category->image);
+                Storage::disk('public')->delete($category->image);
             }
             $imagePath = $request->file('image')->store('categories', 'public');
             $validated['image'] = $imagePath;
@@ -123,7 +124,7 @@ class CategoryController extends Controller
 
         // Delete image if exists
         if ($category->image) {
-            \Storage::disk('public')->delete($category->image);
+            Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();

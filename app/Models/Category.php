@@ -1,5 +1,7 @@
 <?php
+
 // app/Models/Category.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +14,7 @@ class Category extends Model
 
     protected $fillable = [
         'name',
-        'slug', 
+        'slug',
         'description',
         'image',
         'icon',
@@ -59,6 +61,20 @@ class Category extends Model
     // Accessors
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : asset('images/default-category.png');
+        if ($this->image) {
+            // For storage images - handle environment differences
+            if (app()->environment('production')) {
+                return url('storage/app/public/'.$this->image);
+            } else {
+                return asset('storage/'.$this->image);
+            }
+        } else {
+            // For default images - handle environment differences
+            if (app()->environment('production')) {
+                return url('public/images/default-category.png');
+            } else {
+                return asset('images/default-category.png');
+            }
+        }
     }
 }

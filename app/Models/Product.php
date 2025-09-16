@@ -1,11 +1,12 @@
 <?php
+
 // app/Models/Product.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -167,7 +168,21 @@ class Product extends Model
 
     public function getFeaturedImageUrlAttribute()
     {
-        return $this->featured_image ? asset('storage/' . $this->featured_image) : asset('images/default-product.png');
+        if ($this->featured_image) {
+            // For storage images - handle environment differences
+            if (app()->environment('production')) {
+                return url('storage/app/public/'.$this->featured_image);
+            } else {
+                return asset('storage/'.$this->featured_image);
+            }
+        } else {
+            // For default images - handle environment differences
+            if (app()->environment('production')) {
+                return url('public/images/default-product.png');
+            } else {
+                return asset('images/default-product.png');
+            }
+        }
     }
 
     public function getDiscountPercentageAttribute()
@@ -175,6 +190,7 @@ class Product extends Model
         if ($this->sale_price && $this->price > $this->sale_price) {
             return round((($this->price - $this->sale_price) / $this->price) * 100);
         }
+
         return 0;
     }
 
@@ -187,17 +203,18 @@ class Product extends Model
 
     public function getVendorCommissionAttribute()
     {
-        if (!$this->is_vendor_product || !$this->vendor_id) {
+        if (! $this->is_vendor_product || ! $this->vendor_id) {
             return 0;
         }
 
         $rate = $this->vendor_commission_rate ?? $this->vendor?->vendorProfile?->commission_rate ?? 8.00;
+
         return ($this->final_price * $rate) / 100;
     }
 
     public function getVendorEarningAttribute()
     {
-        if (!$this->is_vendor_product || !$this->vendor_id) {
+        if (! $this->is_vendor_product || ! $this->vendor_id) {
             return $this->final_price;
         }
 
@@ -280,6 +297,4 @@ class Product extends Model
     {
         return 'slug';
     }
-
-    
 }
