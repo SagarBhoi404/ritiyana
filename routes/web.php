@@ -49,10 +49,10 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add', [CartController::class, 'add'])->name('add');
     Route::put('/{id}', [CartController::class, 'update'])->name('update');
-    Route::delete('/{id}', [CartController::class, 'remove'])->name('remove');
+    Route::delete('/{id}', [CartController::class, 'destroy'])->name('remove');
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
     Route::get('/count', [CartController::class, 'count'])->name('count');
-    Route::get('/mini', [CartController::class, 'mini'])->name('mini');
+    Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
     Route::post('/add-puja-kit', [CartController::class, 'addPujaKit'])->name('add-puja-kit');
 });
 

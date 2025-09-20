@@ -507,45 +507,46 @@
             if (cartItems) {
                 if (!items || items.length === 0) {
                     cartItems.innerHTML = `
-                        <div class="flex flex-col items-center justify-center h-64 text-gray-500">
-                            <i data-lucide="shopping-bag" class="w-16 h-16 mb-4"></i>
-                            <h3 class="text-lg font-medium mb-2">Your cart is empty</h3>
-                            <p class="text-sm">Add some puja items to get started</p>
-                        </div>
-                    `;
+                <div class="flex flex-col items-center justify-center h-64 text-gray-500">
+                    <i data-lucide="shopping-bag" class="w-16 h-16 mb-4"></i>
+                    <h3 class="text-lg font-medium mb-2">Your cart is empty</h3>
+                    <p class="text-sm">Add some puja items to get started</p>
+                </div>
+            `;
                 } else {
                     cartItems.innerHTML = items.map(item => `
-                        <div class="flex items-center gap-3 p-4 bg-white rounded-lg border">
-                            <img src="${item.product.image || '/images/placeholder.jpg'}" alt="${item.product.name}" class="w-16 h-16 object-cover rounded-lg">
-                            <div class="flex-1">
-                                <h3 class="font-medium text-sm">${item.product.name}</h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="font-semibold">${item.formatted_price}</span>
-                                    ${item.options && item.options.puja_kit_name ? `<span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Kit: ${item.options.puja_kit_name}</span>` : ''}
-                                </div>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="p-1 hover:bg-gray-200 rounded" ${cart.loading ? 'disabled' : ''}>
-                                        <i data-lucide="minus" class="w-4 h-4"></i>
-                                    </button>
-                                    <span class="px-2 min-w-8 text-center">${item.quantity}</span>
-                                    <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="p-1 hover:bg-gray-200 rounded" ${cart.loading ? 'disabled' : ''}>
-                                        <i data-lucide="plus" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                                <div class="text-sm font-medium text-gray-900 mt-1">
-                                    Subtotal: ${item.formatted_subtotal}
-                                </div>
-                            </div>
-                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 p-1" ${cart.loading ? 'disabled' : ''}>
-                                <i data-lucide="x" class="w-4 h-4"></i>
+                <div class="flex items-center gap-3 p-4 bg-white rounded-lg border">
+                    <img src="${item.display_image || '/images/placeholder.jpg'}" alt="${item.display_name}" class="w-16 h-16 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h3 class="font-medium text-sm">${item.display_name}</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="font-semibold">${item.formatted_price}</span>
+                            ${item.item_type === 'puja_kit' ? '<span class="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">Puja Kit</span>' : ''}
+                        </div>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" class="p-1 hover:bg-gray-200 rounded" ${cart.loading ? 'disabled' : ''}>
+                                <i data-lucide="minus" class="w-4 h-4"></i>
+                            </button>
+                            <span class="px-2 min-w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})" class="p-1 hover:bg-gray-200 rounded" ${cart.loading ? 'disabled' : ''}>
+                                <i data-lucide="plus" class="w-4 h-4"></i>
                             </button>
                         </div>
-                    `).join('');
+                        <div class="text-sm font-medium text-gray-900 mt-1">
+                            Subtotal: ${item.formatted_subtotal}
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 p-1" ${cart.loading ? 'disabled' : ''}>
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `).join('');
                 }
 
                 lucide.createIcons();
             }
         }
+
 
         function proceedToCheckout() {
             // Check if cart has items first

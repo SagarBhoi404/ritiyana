@@ -40,7 +40,7 @@
             
             <div class="flex justify-between items-center mb-4 text-lg font-semibold">
                 <span>Total</span>
-                <span>₹<span id="cart-total">0</span></span>
+                <span><span id="cart-total">0</span></span>
             </div>
             
             <button onclick="proceedToCheckout()"  class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors mb-2">
