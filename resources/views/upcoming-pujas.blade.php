@@ -1255,7 +1255,6 @@ body {
   }
 }
 </style>
-
 <div class="spiritual-container">
   <div class="mandala-bg"></div>
   
@@ -1333,36 +1332,10 @@ body {
 </div>
 
 <script>
-const festivals = [
-  {
-    id: 'ganesh-kit', name: 'Ganesh Chaturthi', date: '2025-09-07',
-    price: 599, originalPrice: 799, discount: '25% OFF',
-    description: 'Celebrate the birth of Lord Ganesha with our complete puja kit including Ganesh idol, modak, durva grass, and all essential items for the auspicious festival.',
-    image: '{{ asset("images/ganesh-chaturthi.jpg") }}', 
-    icon: '🐘', popular: true, color: 'orange'
-  },
-  {
-    id: 'navratri-kit', name: 'Navratri', date: '2025-10-03',
-    price: 899, originalPrice: 1199, discount: '25% OFF',
-    description: 'Nine nights of divine celebration with Goddess Durga complete puja essentials including kalash, coconut, mango leaves, and all worship items.',
-    image: '{{ asset("images/navratri.jpg") }}',
-    icon: '🕉️', popular: false, color: 'purple'
-  },
-  {
-    id: 'karva-kit', name: 'Karva Chauth', date: '2025-10-20',
-    price: 399, originalPrice: 499, discount: '20% OFF',
-    description: 'Sacred fast for married women with moon worship items including decorated karva pot, sieve, diya, sindoor, and all essential fasting items.',
-    image: '{{ asset("images/karva-chauth.jpg") }}',
-    icon: '🌙', popular: false, color: 'pink'
-  },
-  {
-    id: 'diwali-kit', name: 'Diwali', date: '2025-11-01',
-    price: 1299, originalPrice: 1599, discount: '19% OFF',
-    description: 'Festival of lights complete Lakshmi puja essentials including clay diyas, Lakshmi idol, gold coins, rangoli colors, and marigold garlands for prosperity.',
-    image: '{{ asset("images/diwali.jpg") }}',
-    icon: '🪔', popular: true, color: 'gold'
-  }
-];
+// Global variables - declared once
+let festivals = [];
+let currentDate = new Date(2025, 8, 1); // September 2025
+let modalTimeout;
 
 const monthNames = ["January", "February", "March", "April", "May", "June",
                    "July", "August", "September", "October", "November", "December"];
@@ -1370,8 +1343,64 @@ const monthNames = ["January", "February", "March", "April", "May", "June",
 const hindiMonths = ["जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून",
                      "जुलाई", "अगस्त", "सितम्बर", "अक्टूबर", "नवम्बर", "दिसम्बर"];
 
-let currentDate = new Date(2025, 8, 1); // September 2025
+// Load festivals from JSON file - single function
+async function loadFestivals() {
+  try {
+    const response = await fetch("/json/festivals.json");
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    festivals = data;
+    console.log("Festivals loaded:", festivals.length);
+    
+    // Render calendar after data is loaded
+    renderCalendar();
+  } catch (error) {
+    console.error("Failed to load festivals.json:", error);
+    
+    // Fallback: Use empty array if JSON fails to load
+    festivals = [];
+    renderCalendar();
+    
+    // Show user-friendly error
+    showNotification("Unable to load festival data. Please refresh the page.", "error");
+  }
+}
 
+// Show notification to user
+function showNotification(message, type = "info") {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    z-index: 10000;
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  if (type === "error") {
+    notification.style.backgroundColor = "#e74c3c";
+  } else {
+    notification.style.backgroundColor = "#3498db";
+  }
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 5000);
+}
+
+// Render calendar function - single unified function
 function renderCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -1387,41 +1416,50 @@ function renderCalendar() {
   const calendarDays = document.getElementById('calendarDays');
   calendarDays.innerHTML = '';
 
+  // Create today string using local date components to avoid timezone issues
   const today = new Date();
-  const todayString = today.toISOString().split('T')[0];
+  const todayYear = today.getFullYear();
+  const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
+  const todayDay = String(today.getDate()).padStart(2, '0');
+  const todayString = `${todayYear}-${todayMonth}-${todayDay}`;
 
   // Previous month days
   const prevMonth = new Date(year, month - 1, 0);
   const prevMonthDays = prevMonth.getDate();
   
   for (let i = startingDayOfWeek - 1; i >= 0; i--) {
-    const dayDiv = createDayElement(prevMonthDays - i, true, new Date(year, month - 1, prevMonthDays - i));
-    calendarDays.appendChild(dayDiv);
+    const date = new Date(year, month - 1, prevMonthDays - i);
+    calendarDays.appendChild(createDayElement(prevMonthDays - i, true, date, todayString));
   }
 
   // Current month days
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
-    const dayDiv = createDayElement(day, false, date);
-    calendarDays.appendChild(dayDiv);
+    calendarDays.appendChild(createDayElement(day, false, date, todayString));
   }
 
   // Next month days
   const remainingCells = 42 - (startingDayOfWeek + daysInMonth);
   for (let day = 1; day <= remainingCells; day++) {
-    const dayDiv = createDayElement(day, true, new Date(year, month + 1, day));
-    calendarDays.appendChild(dayDiv);
+    const date = new Date(year, month + 1, day);
+    calendarDays.appendChild(createDayElement(day, true, date, todayString));
   }
 }
 
-function createDayElement(dayNumber, isOtherMonth, date) {
+// Create day element function - with timezone fix
+// Create day element function - with ISO date format handling
+function createDayElement(dayNumber, isOtherMonth, date, todayString) {
   const dayDiv = document.createElement('div');
   dayDiv.className = `calendar-day ${isOtherMonth ? 'other-month' : ''}`;
   
-  const dateString = date.toISOString().split('T')[0];
-  const today = new Date().toISOString().split('T')[0];
+  // Fix: Create date string using local date components to avoid timezone issues
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const dateString = `${year}-${month}-${day}`;
   
-  if (dateString === today) {
+  // Check if this is today
+  if (dateString === todayString && !isOtherMonth) {
     dayDiv.classList.add('today');
   }
 
@@ -1430,10 +1468,28 @@ function createDayElement(dayNumber, isOtherMonth, date) {
   dayNumberDiv.textContent = dayNumber;
   dayDiv.appendChild(dayNumberDiv);
 
-  // Add festivals
-  const festival = festivals.find(f => f.date === dateString);
+  // Find matching festival from JSON - handle both simple date and ISO date formats
+  const festival = festivals.find(f => {
+    let festivalDateString;
+    
+    // Check if the date includes time information (ISO format)
+    if (f.date.includes('T')) {
+      // Parse ISO date and extract just the date part
+      const festivalDate = new Date(f.date);
+      const fYear = festivalDate.getFullYear();
+      const fMonth = String(festivalDate.getMonth() + 1).padStart(2, '0');
+      const fDay = String(festivalDate.getDate()).padStart(2, '0');
+      festivalDateString = `${fYear}-${fMonth}-${fDay}`;
+    } else {
+      // Simple date format (YYYY-MM-DD)
+      festivalDateString = f.date;
+    }
+    
+    return festivalDateString === dateString;
+  });
+  
   if (festival && !isOtherMonth) {
-    // Add has-festival class for proper hover effect
+    // Add festival display
     dayDiv.classList.add('has-festival');
     
     const festivalDiv = document.createElement('div');
@@ -1442,10 +1498,9 @@ function createDayElement(dayNumber, isOtherMonth, date) {
       <span class="festival-icon">${festival.icon}</span>
       <span class="festival-name">${festival.name}</span>
     `;
-    
     dayDiv.appendChild(festivalDiv);
-    
-    // Add hover event to the entire calendar day
+
+    // Event listeners for hover and click
     dayDiv.addEventListener('mouseenter', (e) => {
       showFestivalModal(festival, e);
     });
@@ -1463,8 +1518,8 @@ function createDayElement(dayNumber, isOtherMonth, date) {
   return dayDiv;
 }
 
-let modalTimeout;
-
+// Show festival modal
+// Show festival modal - updated to handle ISO dates
 function showFestivalModal(festival, event, isClick = false) {
   clearTimeout(modalTimeout);
   
@@ -1478,13 +1533,30 @@ function showFestivalModal(festival, event, isClick = false) {
   const modalDiscount = document.getElementById('modalDiscount');
   
   modalImage.src = festival.image;
+  modalImage.onerror = function() {
+    this.src = '/images/default-festival.jpg'; // Fallback image
+  };
+  
   modalName.textContent = festival.name;
-  modalDate.textContent = new Date(festival.date).toLocaleDateString('en-US', { 
+  
+  // Handle both ISO date format and simple date format
+  let festivalDate;
+  if (festival.date.includes('T')) {
+    // ISO date format with time
+    festivalDate = new Date(festival.date);
+  } else {
+    // Simple date format (YYYY-MM-DD)
+    const dateParts = festival.date.split('-');
+    festivalDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+  }
+  
+  modalDate.textContent = festivalDate.toLocaleDateString('en-US', { 
     weekday: 'long', 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
   });
+  
   modalDesc.textContent = festival.description;
   modalCurrentPrice.textContent = `₹${festival.price}`;
   modalOriginalPrice.textContent = `₹${festival.originalPrice}`;
@@ -1501,6 +1573,7 @@ function showFestivalModal(festival, event, isClick = false) {
   }
 }
 
+// Hide festival modal
 function hideFestivalModal() {
   clearTimeout(modalTimeout);
   const modal = document.getElementById('festivalModal');
@@ -1509,30 +1582,39 @@ function hideFestivalModal() {
   }
 }
 
-// Modal close functionality
-document.getElementById('modalClose').addEventListener('click', () => {
-  document.getElementById('festivalModal').classList.remove('show');
-});
+// Event listeners - all in one place
+document.addEventListener('DOMContentLoaded', function() {
+  // Load festivals and render calendar
+  loadFestivals();
+  
+  // Navigation buttons
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+  });
 
-document.getElementById('festivalModal').addEventListener('click', (e) => {
-  if (e.target === e.currentTarget) {
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+  });
+
+  // Modal close functionality
+  document.getElementById('modalClose').addEventListener('click', () => {
     document.getElementById('festivalModal').classList.remove('show');
-  }
-});
+  });
 
-// Navigation
-document.getElementById('prevMonth').addEventListener('click', () => {
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  renderCalendar();
-});
+  document.getElementById('festivalModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+      document.getElementById('festivalModal').classList.remove('show');
+    }
+  });
 
-document.getElementById('nextMonth').addEventListener('click', () => {
-  currentDate.setMonth(currentDate.getMonth() + 1);
-  renderCalendar();
+  // Add to cart functionality
+  document.getElementById('modalCtaBtn').addEventListener('click', () => {
+    alert('Item added to cart!');
+    document.getElementById('festivalModal').classList.remove('show');
+  });
 });
-
-// Initialize
-document.addEventListener('DOMContentLoaded', renderCalendar);
 
 // Keyboard navigation
 document.addEventListener('keydown', (e) => {
@@ -1546,12 +1628,4 @@ document.addEventListener('keydown', (e) => {
     document.getElementById('festivalModal').classList.remove('show');
   }
 });
-
-// Add to cart functionality
-document.getElementById('modalCtaBtn').addEventListener('click', () => {
-  alert('Item added to cart!');
-  document.getElementById('festivalModal').classList.remove('show');
-});
 </script>
-
-@endsection
