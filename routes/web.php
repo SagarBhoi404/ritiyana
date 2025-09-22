@@ -1,29 +1,32 @@
 <?php
+
 // routes/web.php
 
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\AdminLoginController;
+use App\Http\Controllers\Banner\BannerController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ShopkeeperLoginController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OtpAuthController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PujaController;
 use App\Http\Controllers\PujaKitController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\UserController;
-// use App\Http\Controllers\ContactController;
-use App\Http\Controllers\Admin\ContactController;
-
-// Import Vendor Controllers
-use App\Http\Controllers\Admin\VendorController;
-use App\Http\Controllers\Banner\BannerController;
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\ShopkeeperLoginController;
+use App\Http\Controllers\User\AddressController;
 use App\Http\Controllers\User\HomeController;
-use App\Http\Controllers\Vendor\VendorProductController;
-use App\Http\Controllers\Vendor\VendorOrderController;
-use App\Http\Controllers\Vendor\VendorProfileController;
+use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Vendor\VendorAnalyticsController;
+use App\Http\Controllers\Vendor\VendorOrderController;
+use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorPujaController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // ===== PUBLIC ROUTES =====
@@ -37,14 +40,11 @@ Route::get('/products', [App\Http\Controllers\User\ProductController::class, 'in
 Route::get('/puja-kit/{pujaKit:slug}', [App\Http\Controllers\User\PujaKitController::class, 'show'])->name('puja-kits.show');
 Route::get('/puja-kits', [App\Http\Controllers\User\PujaKitController::class, 'index'])->name('puja-kits.index');
 
-
 // Category routes
 Route::redirect('/category/{category}', '/products?category={category}', 301)->name('category.show');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'store'])->name('contact.store');
 
-
-
-// Cart routes 
+// Cart routes (both guest and authenticated users)
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
     Route::post('/add', [CartController::class, 'add'])->name('add');
@@ -54,15 +54,27 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/count', [CartController::class, 'count'])->name('count');
     Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
     Route::post('/add-puja-kit', [CartController::class, 'addPujaKit'])->name('add-puja-kit');
+    Route::post('/validate', [CartController::class, 'validate'])->name('validate'); 
 });
 
+// Payment routes (webhook needs to be public)
+Route::prefix('payment')->name('payment.')->group(function () {
+    Route::post('/process', [PaymentController::class, 'process'])->name('process');
+    Route::get('/success', [PaymentController::class, 'success'])->name('success');
+    Route::post('/webhook', [PaymentController::class, 'webhook'])->name('webhook'); // Public webhook
+});
 
+// API routes for AJAX checks
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/user/check', function () {
+        return response()->json([
+            'authenticated' => Auth::check(),
+            'user' => Auth::check() ? Auth::user()->only(['id', 'name', 'email']) : null,
+        ]);
+    })->name('user.check');
+});
 
-
-// Route::get('/all-kits', function () {
-//     return view('all-kits');
-// })->name('all-kits');
-
+// Static pages
 Route::get('/upcoming-pujas', function () {
     return view('upcoming-pujas');
 })->name('upcoming-pujas');
@@ -79,16 +91,13 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Route::get('/product/{id}', function ($id) {
-    return view('product-detail', compact('id'));
-})->name('product.detail');
-
+// Legacy routes that need proper implementation
 Route::get('/my-orders', function () {
-    return view('my-orders');
+    return redirect()->route('orders.index');
 })->name('my-orders');
 
 Route::get('/checkout', function () {
-    return view('checkout');
+    return redirect()->route('checkout.index');
 })->name('checkout');
 
 // ===== GUEST AUTHENTICATION ROUTES =====
@@ -106,7 +115,6 @@ Route::middleware('guest')->group(function () {
     Route::prefix('admin')->group(function () {
         Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
         Route::post('/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-   
     });
 
     // Shopkeeper Authentication
@@ -122,17 +130,48 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [OtpAuthController::class, 'logout'])->name('logout');
 
+    // Checkout routes
+    Route::prefix('checkout')->name('checkout.')->group(function () {
+        Route::get('/', [CheckoutController::class, 'index'])->name('index');
+        Route::post('/process', [CheckoutController::class, 'processCheckout'])->name('process');
+        Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
+    });
+
+    // Order routes
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/{orderNumber}', [OrderController::class, 'show'])->name('show');
+        Route::post('/{orderNumber}/cancel', [OrderController::class, 'cancel'])->name('cancel');
+        Route::post('/{orderNumber}/return', [OrderController::class, 'requestReturn'])->name('return');
+        Route::get('/{orderNumber}/invoice', [OrderController::class, 'downloadInvoice'])->name('invoice');
+        Route::get('/{orderNumber}/track', [OrderController::class, 'track'])->name('track');
+        Route::post('/{orderNumber}/retry-payment', [OrderController::class, 'retryPayment'])->name('retry-payment');
+    });
+
+    // Address management routes
+    Route::prefix('addresses')->name('addresses.')->group(function () {
+        Route::get('/', [AddressController::class, 'index'])->name('index');
+        Route::get('/create', [AddressController::class, 'create'])->name('create');
+        Route::post('/', [AddressController::class, 'store'])->name('store');
+        Route::get('/{address}/edit', [AddressController::class, 'edit'])->name('edit');
+        Route::put('/{address}', [AddressController::class, 'update'])->name('update');
+        Route::delete('/{address}', [AddressController::class, 'destroy'])->name('destroy');
+        Route::post('/{address}/default', [AddressController::class, 'setDefault'])->name('set-default');
+        Route::get('/ajax', [AddressController::class, 'getAddresses'])->name('ajax');
+    });
+
     // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'admin'])->name('dashboard');
         Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 
-         Route::resource('contacts', ContactController::class);
+        // Contact Management
+        Route::resource('contacts', ContactController::class);
 
+        // Banner Management
         Route::resource('banners', BannerController::class);
         Route::patch('banners/{banner}/toggle-status', [BannerController::class, 'toggleStatus'])->name('banners.toggle-status');
-
 
         // User Management
         Route::resource('users', UserController::class);
@@ -204,10 +243,9 @@ Route::middleware('auth')->group(function () {
         // Vendor Analytics
         Route::get('/analytics', [VendorAnalyticsController::class, 'index'])->name('analytics.index');
 
-        // Static View Routes (keep your existing ones)
+        // Static View Routes
         Route::view('/inventory', 'shopkeeper.inventory.index')->name('inventory.index');
         Route::view('/settings', 'shopkeeper.settings.index')->name('settings.index');
-
 
         // Puja Management
         Route::resource('pujas', VendorPujaController::class);

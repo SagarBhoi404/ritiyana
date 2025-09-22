@@ -142,4 +142,6 @@ class PujaKit extends Model
     {
         return $this->discount_percentage && $this->discount_percentage > 0;
     }
+
+    
 }

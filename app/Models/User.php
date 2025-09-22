@@ -1,18 +1,19 @@
 <?php
+
 // app/Models/User.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+// use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-// use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use  HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
         'first_name',
@@ -71,7 +72,7 @@ class User extends Authenticatable
     // Helper methods
     public function getFullNameAttribute()
     {
-        return $this->first_name . ' ' . $this->last_name;
+        return $this->first_name.' '.$this->last_name;
     }
 
     public function hasRole($role)
@@ -79,6 +80,7 @@ class User extends Authenticatable
         if (is_string($role)) {
             return $this->roles->contains('name', $role);
         }
+
         return $this->roles->contains('id', $role);
     }
 
@@ -92,11 +94,11 @@ class User extends Authenticatable
         if (is_string($role)) {
             $role = Role::where('name', $role)->first();
         }
-        
-        if ($role && !$this->hasRole($role->id)) {
+
+        if ($role && ! $this->hasRole($role->id)) {
             $this->roles()->attach($role->id);
         }
-        
+
         return $this;
     }
 
@@ -105,11 +107,11 @@ class User extends Authenticatable
         if (is_string($role)) {
             $role = Role::where('name', $role)->first();
         }
-        
+
         if ($role) {
             $this->roles()->detach($role->id);
         }
-        
+
         return $this;
     }
 
@@ -133,19 +135,18 @@ class User extends Authenticatable
         return $this->status === 'active';
     }
 
-     // Accessor for profile image URL
+    // Accessor for profile image URL
     public function getProfileImageUrlAttribute()
     {
         if ($this->profile_image) {
-            return asset('storage/' . $this->profile_image);
+            return asset('storage/'.$this->profile_image);
         }
-        
+
         // Return default avatar if no image
         return asset('images/default-avatar.png');
     }
 
-
-     // ===== VENDOR RELATIONSHIPS =====
+    // ===== VENDOR RELATIONSHIPS =====
 
     // User has one vendor profile
     public function vendorProfile(): HasOne
@@ -183,7 +184,6 @@ class User extends Authenticatable
         return $this->hasMany(VendorAnalytics::class, 'vendor_id');
     }
 
-
     // ===== HELPER METHODS =====
 
     public function isVendor(): bool
@@ -191,5 +191,17 @@ class User extends Authenticatable
         return $this->roles()->where('name', 'shopkeeper')->exists();
     }
 
- 
+    // ===== CUSTOMER RELATIONSHIPS =====
+
+    // User has many orders (as customer)
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    // User has many payments
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

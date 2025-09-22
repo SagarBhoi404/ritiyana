@@ -548,24 +548,102 @@
         }
 
 
-        function proceedToCheckout() {
-            // Check if cart has items first
-            fetch('{{ route('cart.count') }}')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.count === 0) {
-                        showToast('Your cart is empty', 'error');
-                        return;
-                    }
-
-                    // Redirect to checkout page
-                    window.location.href = "{{ route('checkout') ?? '#' }}";
-                })
-                .catch(error => {
-                    console.error('Error checking cart:', error);
-                    showToast('Failed to proceed to checkout', 'error');
-                });
+        async function proceedToCheckout() {
+    try {
+        // Show loading state
+        const checkoutBtn = document.querySelector('[onclick*="proceedToCheckout"]');
+        if (checkoutBtn) {
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = '<div class="spinner mx-auto"></div> Checking...';
         }
+
+        // Check if user is authenticated first
+        const authCheckResponse = await fetch('/api/user/check', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (authCheckResponse.ok) {
+            const authData = await authCheckResponse.json();
+            
+            if (!authData.authenticated) {
+                // Store checkout intent in session storage
+                sessionStorage.setItem('checkout_intent', 'true');
+                
+                // User not authenticated - redirect to login
+                showToast('Please login to proceed to checkout', 'info');
+                
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+                return;
+            }
+        } else {
+            // Auth check failed - redirect to login
+            sessionStorage.setItem('checkout_intent', 'true');
+            showToast('Please login to proceed to checkout', 'info');
+            
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1000);
+            return;
+        }
+
+        // Check if cart has items
+        const cartResponse = await fetch('{{ route("cart.count") }}', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        if (!cartResponse.ok) {
+            throw new Error('Failed to check cart status');
+        }
+
+        const cartData = await cartResponse.json();
+
+        if (cartData.count === 0) {
+            showToast('Your cart is empty', 'error');
+            return;
+        }
+
+        // All checks passed - proceed to checkout
+        showToast('Redirecting to checkout...', 'success');
+        
+        setTimeout(() => {
+            window.location.href = "{{ route('checkout.index') }}";
+        }, 800);
+
+    } catch (error) {
+        console.error('Error proceeding to checkout:', error);
+        showToast('Failed to proceed to checkout. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        const checkoutBtn = document.querySelector('[onclick*="proceedToCheckout"]');
+        if (checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = 'Proceed to Checkout';
+        }
+    }
+}
+
+
+// Add this to your login page or after successful login
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if user had checkout intent before login
+    if (sessionStorage.getItem('checkout_intent') === 'true') {
+        sessionStorage.removeItem('checkout_intent');
+        // Redirect to checkout
+        window.location.href = '{{ route("checkout.index") }}';
+    }
+});
+
     </script>
 
     <!-- Swiper JS -->

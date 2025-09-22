@@ -1,12 +1,11 @@
 <?php
-// app/Models/Order.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -44,7 +43,7 @@ class Order extends Model
     ];
 
     // ===== RELATIONSHIPS =====
-
+    
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -83,7 +82,7 @@ class Order extends Model
     }
 
     // ===== SCOPES =====
-
+    
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
@@ -130,7 +129,7 @@ class Order extends Model
     }
 
     // ===== ACCESSORS =====
-
+    
     public function getFormattedTotalAttribute()
     {
         return '₹' . number_format($this->total_amount, 2);
@@ -185,14 +184,16 @@ class Order extends Model
 
     public function getShippingAddressTextAttribute()
     {
-        if (!$this->shipping_address) return 'No address provided';
+        if (!$this->shipping_address) {
+            return 'No address provided';
+        }
 
         $addr = $this->shipping_address;
         return $addr['address_line_1'] . ', ' . $addr['city'] . ', ' . $addr['state'] . ' - ' . $addr['postal_code'];
     }
 
     // ===== VENDOR-SPECIFIC ACCESSORS =====
-
+    
     public function getTotalVendorCommissionAttribute()
     {
         return $this->orderItems->sum('vendor_commission');
@@ -219,7 +220,7 @@ class Order extends Model
     }
 
     // ===== HELPER METHODS =====
-
+    
     public function isPaid(): bool
     {
         return $this->payment_status === 'paid';
@@ -266,11 +267,15 @@ class Order extends Model
     }
 
     // ===== CALCULATION METHODS =====
-
-    public function calculateTotals(): self
+    
+    /**
+     * **FIXED: Only recalculate if explicitly called, not in boot**
+     */
+    public function recalculateTotals(): self
     {
         $this->load('orderItems');
-
+        
+        // Calculate subtotal from order items
         $subtotal = $this->orderItems->sum(function ($item) {
             return $item->price * $item->quantity;
         });
@@ -280,10 +285,10 @@ class Order extends Model
         $taxAmount = $subtotal * $taxRate;
 
         // Calculate shipping (you can customize this logic)
-        $shippingAmount = $this->calculateShippingCost();
+        $shippingAmount = $this->calculateShippingCost($subtotal);
 
         // Apply discounts (you can customize this logic)
-        $discountAmount = $this->calculateDiscounts();
+        $discountAmount = $this->calculateDiscounts($subtotal);
 
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
@@ -300,7 +305,7 @@ class Order extends Model
 
     public function calculateVendorCommissions(): void
     {
-        $this->orderItems()->each(function ($item) {
+        $this->orderItems->each(function ($item) {
             if ($item->vendor_id && $item->product) {
                 $commission = $item->calculateCommission();
                 $item->update([
@@ -311,28 +316,26 @@ class Order extends Model
         });
     }
 
-    private function calculateShippingCost(): float
+    private function calculateShippingCost(float $subtotal): float
     {
         // Basic shipping calculation - customize as needed
-        if ($this->subtotal >= 500) {
+        if ($subtotal >= 500) {
             return 0; // Free shipping above ₹500
         }
         return 50; // Flat ₹50 shipping
     }
 
-    private function calculateDiscounts(): float
+    private function calculateDiscounts(float $subtotal): float
     {
         // Apply any applicable discounts - customize as needed
         return 0;
     }
 
     // ===== ORDER STATUS UPDATES =====
-
+    
     public function markAsProcessing(): bool
     {
-        return $this->update([
-            'status' => 'processing'
-        ]);
+        return $this->update(['status' => 'processing']);
     }
 
     public function markAsShipped(string $trackingNumber = null): bool
@@ -340,7 +343,7 @@ class Order extends Model
         return $this->update([
             'status' => 'shipped',
             'shipped_at' => now(),
-            'notes' => $trackingNumber ? "Tracking: {$trackingNumber}" : $this->notes
+            'notes' => $trackingNumber ? "Tracking: $trackingNumber\n" . $this->notes : $this->notes,
         ]);
     }
 
@@ -348,7 +351,7 @@ class Order extends Model
     {
         return $this->update([
             'status' => 'delivered',
-            'delivered_at' => now()
+            'delivered_at' => now(),
         ]);
     }
 
@@ -356,12 +359,12 @@ class Order extends Model
     {
         return $this->update([
             'status' => 'cancelled',
-            'notes' => $reason ? "Cancelled: {$reason}" : $this->notes
+            'notes' => $reason ? "Cancelled: $reason\n" . $this->notes : $this->notes,
         ]);
     }
 
     // ===== VENDOR ORDER MANAGEMENT =====
-
+    
     public function createVendorOrders(): void
     {
         $vendorItems = $this->orderItems->groupBy('vendor_id')->filter(function ($items, $vendorId) {
@@ -380,7 +383,7 @@ class Order extends Model
                 'customer_id' => $this->user_id,
                 'subtotal' => $vendorTotal,
                 'total_amount' => $vendorTotal,
-                'commission_rate' => ($vendorCommission / $vendorTotal) * 100,
+                'commission_rate' => $vendorCommission > 0 ? ($vendorCommission / $vendorTotal) * 100 : 0,
                 'commission_amount' => $vendorCommission,
                 'vendor_earning' => $vendorEarning,
                 'status' => 'pending',
@@ -389,33 +392,24 @@ class Order extends Model
         }
     }
 
-    // ===== BOOT METHOD =====
-
+    // ===== FIXED BOOT METHOD =====
+    
     protected static function boot()
     {
         parent::boot();
 
         static::creating(function ($order) {
             if (empty($order->order_number)) {
-                $order->order_number = 'ORD-' . strtoupper(Str::random(8));
+                $order->order_number = 'ORD-' . strtoupper(\Str::random(8));
             }
-
             if (empty($order->currency)) {
                 $order->currency = 'INR';
             }
         });
 
-        static::created(function ($order) {
-            // Calculate totals after creation
-            $order->calculateTotals();
-
-            // Calculate vendor commissions
-            $order->calculateVendorCommissions();
-
-            // Create vendor orders
-            $order->createVendorOrders();
-        });
-
+        // **REMOVED THE PROBLEMATIC AUTO-CALCULATION**
+        // Don't auto-calculate totals - let CheckoutController handle it
+        
         static::updated(function ($order) {
             // Update vendor order statuses when main order status changes
             if ($order->wasChanged('status')) {

@@ -15,6 +15,7 @@ class OrderItem extends Model
         'product_id',
         'product_name',
         'product_sku',
+        'puja_kit_id',
         'quantity',
         'price',
         'total',
@@ -43,6 +44,11 @@ class OrderItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+      public function pujaKit(): BelongsTo
+    {
+        return $this->belongsTo(PujaKit::class, 'puja_kit_id');
     }
 
     public function vendor(): BelongsTo

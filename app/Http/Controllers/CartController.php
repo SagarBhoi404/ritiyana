@@ -243,4 +243,121 @@ class CartController extends Controller
             ]);
         }
     }
+
+    public function validate(Request $request)
+    {
+        try {
+            $cartItems = Cart::getCartItems();
+            $warnings = [];
+            $errors = [];
+
+            if ($cartItems->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Your cart is empty',
+                ]);
+            }
+
+            foreach ($cartItems as $item) {
+                if ($item->item_type === 'product') {
+                    $product = $item->product;
+
+                    if (! $product) {
+                        $errors[] = "Product '{$item->display_name}' is no longer available";
+
+                        continue;
+                    }
+
+                    if (! $product->is_active) {
+                        $errors[] = "Product '{$product->name}' is currently unavailable";
+
+                        continue;
+                    }
+
+                    // Check stock
+                    if (isset($product->stock_quantity) && $product->stock_quantity < $item->quantity) {
+                        if ($product->stock_quantity > 0) {
+                            $warnings[] = "Only {$product->stock_quantity} units available for '{$product->name}'";
+                            // Update cart quantity to available stock
+                            $item->update(['quantity' => $product->stock_quantity]);
+                        } else {
+                            $errors[] = "'{$product->name}' is out of stock";
+                        }
+                    }
+
+                    // Check price changes
+                    if ($product->final_price != $item->price) {
+                        $warnings[] = "Price updated for '{$product->name}'";
+                        $item->update(['price' => $product->final_price]);
+                    }
+
+                } elseif ($item->item_type === 'puja_kit') {
+                    $pujaKit = $item->pujaKit;
+
+                    if (! $pujaKit) {
+                        $errors[] = "Puja kit '{$item->display_name}' is no longer available";
+
+                        continue;
+                    }
+
+                    if (! $pujaKit->is_active) {
+                        $errors[] = "Puja kit '{$pujaKit->kit_name}' is currently unavailable";
+
+                        continue;
+                    }
+
+                    // Check stock for all products in the kit
+                    foreach ($pujaKit->products as $product) {
+                        $requiredQuantity = $product->pivot->quantity * $item->quantity;
+
+                        if (isset($product->stock_quantity) && $product->stock_quantity < $requiredQuantity) {
+                            if ($product->stock_quantity >= $product->pivot->quantity) {
+                                $maxKits = floor($product->stock_quantity / $product->pivot->quantity);
+                                $warnings[] = "Only {$maxKits} '{$pujaKit->kit_name}' available due to '{$product->name}' stock";
+                                $item->update(['quantity' => $maxKits]);
+                            } else {
+                                $errors[] = "'{$pujaKit->kit_name}' is out of stock due to '{$product->name}'";
+                            }
+                        }
+                    }
+
+                    // Check price changes
+                    if ($pujaKit->final_price != $item->price) {
+                        $warnings[] = "Price updated for '{$pujaKit->kit_name}'";
+                        $item->update(['price' => $pujaKit->final_price]);
+                    }
+                }
+            }
+
+            // Remove invalid items
+            if (! empty($errors)) {
+                // Remove items that are no longer available
+                Cart::forCurrentUser()->whereIn('id',
+                    $cartItems->filter(function ($item) {
+                        return ! $item->product && ! $item->pujaKit;
+                    })->pluck('id')
+                )->delete();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => implode(', ', $errors),
+                    'warnings' => $warnings,
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cart validation successful',
+                'warnings' => $warnings,
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Cart validation failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to validate cart items',
+            ], 500);
+        }
+    }
 }

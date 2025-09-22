@@ -1,12 +1,12 @@
 <?php
-// app/Models/Payment.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class Payment extends Model
 {
@@ -15,6 +15,7 @@ class Payment extends Model
     protected $fillable = [
         'order_id',
         'payment_id',
+        'gateway_order_id', // FIXED: Added this
         'gateway',
         'gateway_transaction_id',
         'method',
@@ -22,6 +23,7 @@ class Payment extends Model
         'amount',
         'currency',
         'gateway_response',
+        'failure_reason', // FIXED: Added this
         'paid_at',
     ];
 
@@ -32,7 +34,7 @@ class Payment extends Model
     ];
 
     // ===== RELATIONSHIPS =====
-
+    
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
@@ -50,7 +52,7 @@ class Payment extends Model
     }
 
     // ===== SCOPES =====
-
+    
     public function scopeSuccessful($query)
     {
         return $query->where('status', 'completed');
@@ -92,7 +94,7 @@ class Payment extends Model
     }
 
     // ===== ACCESSORS =====
-
+    
     public function getFormattedAmountAttribute()
     {
         return '₹' . number_format($this->amount, 2);
@@ -103,6 +105,7 @@ class Payment extends Model
         $gateways = [
             'razorpay' => 'Razorpay',
             'paytm' => 'Paytm',
+            'cashfree' => 'Cashfree', // FIXED: Added Cashfree
             'stripe' => 'Stripe',
             'paypal' => 'PayPal',
             'phonepe' => 'PhonePe',
@@ -141,30 +144,8 @@ class Payment extends Model
         return $badges[$this->status] ?? 'bg-gray-100 text-gray-800';
     }
 
-    public function getPaymentDurationAttribute()
-    {
-        if ($this->paid_at && $this->created_at) {
-            return $this->created_at->diffInMinutes($this->paid_at);
-        }
-        return null;
-    }
-
-    public function getGatewayFeeAttribute()
-    {
-        // Calculate gateway fees (customize based on your gateway)
-        $feeRates = [
-            'razorpay' => 0.02, // 2%
-            'paytm' => 0.018,   // 1.8%
-            'stripe' => 0.029,  // 2.9%
-            'paypal' => 0.035,  // 3.5%
-        ];
-
-        $rate = $feeRates[$this->gateway] ?? 0.02;
-        return $this->amount * $rate;
-    }
-
     // ===== HELPER METHODS =====
-
+    
     public function isSuccessful(): bool
     {
         return $this->status === 'completed';
@@ -175,34 +156,14 @@ class Payment extends Model
         return $this->status === 'pending';
     }
 
-    public function isProcessing(): bool
-    {
-        return $this->status === 'processing';
-    }
-
     public function isFailed(): bool
     {
         return $this->status === 'failed';
     }
 
-    public function isRefunded(): bool
-    {
-        return $this->status === 'refunded';
-    }
-
-    public function isCancelled(): bool
-    {
-        return $this->status === 'cancelled';
-    }
-
     public function canBeRefunded(): bool
     {
         return $this->isSuccessful() && $this->gateway !== 'cod';
-    }
-
-    public function canBeRetried(): bool
-    {
-        return in_array($this->status, ['failed', 'cancelled']);
     }
 
     public function isOnlinePayment(): bool
@@ -215,8 +176,8 @@ class Payment extends Model
         return $this->method === 'cod';
     }
 
-    // ===== VENDOR-SPECIFIC METHODS =====
-
+    // ===== VENDOR-SPECIFIC METHODS (FIXED) =====
+    
     public function calculateVendorSplit(): array
     {
         if (!$this->order) {
@@ -224,11 +185,20 @@ class Payment extends Model
         }
 
         $vendorSplits = [];
-        $vendorItems = $this->order->orderItems->groupBy('vendor_id')->filter(function ($items, $vendorId) {
-            return !is_null($vendorId);
-        });
+        
+        // **FIXED: Only process items that have vendor_id**
+        $vendorItems = $this->order->orderItems()
+            ->whereNotNull('vendor_id')
+            ->get()
+            ->groupBy('vendor_id');
+
+        if ($vendorItems->isEmpty()) {
+            return []; // No vendor items, return empty array
+        }
 
         foreach ($vendorItems as $vendorId => $items) {
+            if (!$vendorId) continue; // Skip if vendor_id is null/empty
+            
             $vendorTotal = $items->sum('total');
             $vendorCommission = $items->sum('vendor_commission');
             $vendorEarning = $items->sum('vendor_earning');
@@ -252,25 +222,57 @@ class Payment extends Model
         }
 
         $vendorSplits = $this->calculateVendorSplit();
+        
+        // **FIXED: Only process if there are actual vendor splits**
+        if (empty($vendorSplits)) {
+            Log::info('No vendor items found for payment, skipping vendor payouts', [
+                'payment_id' => $this->id,
+                'order_id' => $this->order_id
+            ]);
+            return;
+        }
 
         foreach ($vendorSplits as $split) {
-            // Create payout record for each vendor
-            VendorPayout::create([
-                'payout_id' => 'PAY-' . strtoupper(Str::random(8)),
-                'vendor_id' => $split['vendor_id'],
-                'amount' => $split['vendor_earning'],
-                'period_start' => now()->startOfDay(),
-                'period_end' => now()->endOfDay(),
-                'total_orders' => 1,
-                'total_sales' => $split['total_amount'],
-                'total_commission' => $split['commission_amount'],
-                'status' => 'pending',
-            ]);
+            // **FIXED: Validate vendor_id before creating payout**
+            if (empty($split['vendor_id'])) {
+                Log::warning('Empty vendor_id in split, skipping', [
+                    'payment_id' => $this->id,
+                    'split' => $split
+                ]);
+                continue;
+            }
+
+            try {
+                VendorPayout::create([
+                    'payout_id' => 'PAY-' . strtoupper(\Str::random(8)),
+                    'vendor_id' => $split['vendor_id'],
+                    'amount' => $split['vendor_earning'],
+                    'period_start' => now()->startOfDay(),
+                    'period_end' => now()->endOfDay(),
+                    'total_orders' => 1,
+                    'total_sales' => $split['total_amount'],
+                    'total_commission' => $split['commission_amount'],
+                    'status' => 'pending',
+                ]);
+                
+                Log::info('Vendor payout created', [
+                    'payment_id' => $this->id,
+                    'vendor_id' => $split['vendor_id'],
+                    'amount' => $split['vendor_earning']
+                ]);
+                
+            } catch (\Exception $e) {
+                Log::error('Failed to create vendor payout', [
+                    'payment_id' => $this->id,
+                    'vendor_id' => $split['vendor_id'],
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
     }
 
     // ===== PAYMENT OPERATIONS =====
-
+    
     public function markAsCompleted(array $gatewayResponse = []): bool
     {
         return $this->update([
@@ -284,32 +286,16 @@ class Payment extends Model
     {
         return $this->update([
             'status' => 'failed',
-            'gateway_response' => array_merge($this->gateway_response ?? [], [
-                'failure_reason' => $reason,
-                ...$gatewayResponse
-            ]),
-        ]);
-    }
-
-    public function markAsRefunded(float $refundAmount = null, string $refundId = null): bool
-    {
-        $refundAmount = $refundAmount ?? $this->amount;
-        
-        return $this->update([
-            'status' => $refundAmount >= $this->amount ? 'refunded' : 'partially_refunded',
-            'gateway_response' => array_merge($this->gateway_response ?? [], [
-                'refund_amount' => $refundAmount,
-                'refund_id' => $refundId,
-                'refunded_at' => now()->toISOString(),
-            ]),
+            'failure_reason' => $reason,
+            'gateway_response' => array_merge($this->gateway_response ?? [], $gatewayResponse),
         ]);
     }
 
     // ===== STATIC METHODS =====
-
+    
     public static function generatePaymentId(): string
     {
-        return 'PAY_' . strtoupper(Str::random(12));
+        return 'PAY-' . strtoupper(\Str::random(12));
     }
 
     public static function createForOrder(Order $order, array $paymentData): self
@@ -324,8 +310,8 @@ class Payment extends Model
         ]);
     }
 
-    // ===== BOOT METHOD =====
-
+    // ===== BOOT METHOD (FIXED) =====
+    
     protected static function boot()
     {
         parent::boot();
@@ -334,7 +320,6 @@ class Payment extends Model
             if (empty($payment->payment_id)) {
                 $payment->payment_id = self::generatePaymentId();
             }
-
             if (empty($payment->currency)) {
                 $payment->currency = 'INR';
             }
@@ -346,16 +331,28 @@ class Payment extends Model
                 $newPaymentStatus = match ($payment->status) {
                     'completed' => 'paid',
                     'failed', 'cancelled' => 'failed',
-                    'refunded' => 'refunded',
-                    'partially_refunded' => 'partially_refunded',
+                    'refunded', 'partially_refunded' => 'refunded',
                     default => 'pending'
                 };
 
                 $payment->order->update(['payment_status' => $newPaymentStatus]);
+                
+                Log::info('Order payment status updated', [
+                    'order_id' => $payment->order_id,
+                    'payment_status' => $newPaymentStatus
+                ]);
+            }
 
-                // Process vendor payouts if payment is successful
-                if ($payment->status === 'completed') {
+            // **FIXED: Process vendor payouts only if payment is successful AND order has vendor items**
+            if ($payment->status === 'completed' && $payment->wasChanged('status')) {
+                try {
                     $payment->processVendorPayouts();
+                } catch (\Exception $e) {
+                    Log::error('Vendor payout processing failed', [
+                        'payment_id' => $payment->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    // Don't throw the exception - let payment completion succeed
                 }
             }
         });
