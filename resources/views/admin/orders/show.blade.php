@@ -339,16 +339,70 @@
     </div>
 </div>
 
+<!-- Payment Update Modal -->
+<div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Payment Status</h3>
+            <form id="paymentForm">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
+                    <select name="payment_status" id="paymentStatusSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <option value="pending" {{ $order->payment_status == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
+                        <option value="failed" {{ $order->payment_status == 'failed' ? 'selected' : '' }}>Failed</option>
+                        <option value="refunded" {{ $order->payment_status == 'refunded' ? 'selected' : '' }}>Refunded</option>
+                        <option value="partially_refunded" {{ $order->payment_status == 'partially_refunded' ? 'selected' : '' }}>Partially Refunded</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4" id="refundAmountField" style="display: none;">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Refund Amount</label>
+                    <input type="number" step="0.01" name="refund_amount" id="refundAmount" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Enter refund amount">
+                    <p class="text-sm text-gray-500 mt-1">Total Order Amount: {{ $order->formatted_total }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Notes (Optional)</label>
+                    <textarea name="payment_notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500" placeholder="Add any notes about this payment update..."></textarea>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button type="submit" id="submitPaymentBtn" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">
+                        Update Payment
+                    </button>
+                    <button type="button" id="closePaymentModal" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {{-- @push('scripts') --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Status Modal Elements
     const statusModal = document.getElementById('statusModal');
     const statusBtn = document.getElementById('updateStatusBtn');
-    const closeBtn = document.getElementById('closeStatusModal');
+    const closeStatusBtn = document.getElementById('closeStatusModal');
     const statusForm = document.getElementById('statusForm');
     const statusSelect = document.getElementById('statusSelect');
     const trackingField = document.getElementById('trackingNumberField');
-    const submitBtn = document.getElementById('submitStatusBtn');
+    const submitStatusBtn = document.getElementById('submitStatusBtn');
+    
+    // Payment Modal Elements
+    const paymentModal = document.getElementById('paymentModal');
+    const paymentBtn = document.getElementById('updatePaymentBtn');
+    const closePaymentBtn = document.getElementById('closePaymentModal');
+    const paymentForm = document.getElementById('paymentForm');
+    const paymentStatusSelect = document.getElementById('paymentStatusSelect');
+    const refundAmountField = document.getElementById('refundAmountField');
+    const submitPaymentBtn = document.getElementById('submitPaymentBtn');
+    
+    // === STATUS UPDATE FUNCTIONALITY ===
     
     // Show/hide tracking number field based on status
     if (statusSelect) {
@@ -361,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Open modal
+    // Open status modal
     if (statusBtn) {
         statusBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -372,15 +426,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close modal
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
+    // Close status modal
+    if (closeStatusBtn) {
+        closeStatusBtn.addEventListener('click', function() {
             statusModal.classList.add('hidden');
             statusForm.reset();
         });
     }
     
-    // Close on outside click
+    // Close status modal on outside click
     if (statusModal) {
         statusModal.addEventListener('click', function(e) {
             if (e.target === statusModal) {
@@ -390,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Handle form submission
+    // Handle status form submission
     if (statusForm) {
         statusForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -403,30 +457,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Disable submit button
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Updating...';
+            if (submitStatusBtn) {
+                submitStatusBtn.disabled = true;
+                submitStatusBtn.textContent = 'Updating...';
             }
             
-            // Get form data manually to ensure proper formatting
+            // Get form data
             const statusValue = statusSelect.value;
             const trackingValue = document.querySelector('input[name="tracking_number"]').value || '';
             const notesValue = document.querySelector('textarea[name="notes"]').value || '';
             
-            console.log('Sending data:', {
-                status: statusValue,
-                tracking_number: trackingValue,
-                notes: notesValue
-            });
-            
-            // Create form data properly
-            const formData = new FormData();
-            formData.append('status', statusValue);
-            formData.append('tracking_number', trackingValue);
-            formData.append('notes', notesValue);
-            formData.append('_token', csrfToken.getAttribute('content'));
-            
-            // Alternative: send as JSON
             const jsonData = {
                 status: statusValue,
                 tracking_number: trackingValue,
@@ -444,27 +484,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify(jsonData)
             })
             .then(response => {
-                console.log('Response status:', response.status);
-                
-                // Handle different response types
                 const contentType = response.headers.get('content-type');
                 if (contentType && contentType.includes('application/json')) {
                     return response.json();
                 } else {
                     return response.text().then(text => {
-                        console.error('Non-JSON response:', text);
                         throw new Error('Server returned non-JSON response');
                     });
                 }
             })
             .then(data => {
-                console.log('Response data:', data);
-                
                 if (data.success) {
                     alert(data.message || 'Order status updated successfully');
                     window.location.reload();
                 } else {
-                    // Handle validation errors
                     let errorMessage = data.message || 'Unknown error occurred';
                     if (data.errors) {
                         const errorList = Object.values(data.errors).flat();
@@ -474,14 +507,128 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Fetch error:', error);
                 alert('Error updating status: ' + error.message);
             })
             .finally(() => {
-                // Re-enable submit button
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Update Status';
+                if (submitStatusBtn) {
+                    submitStatusBtn.disabled = false;
+                    submitStatusBtn.textContent = 'Update Status';
+                }
+            });
+        });
+    }
+    
+    // === PAYMENT UPDATE FUNCTIONALITY ===
+    
+    // Show/hide refund amount field based on payment status
+    if (paymentStatusSelect) {
+        paymentStatusSelect.addEventListener('change', function() {
+            if (this.value === 'refunded' || this.value === 'partially_refunded') {
+                refundAmountField.style.display = 'block';
+            } else {
+                refundAmountField.style.display = 'none';
+            }
+        });
+    }
+    
+    // Open payment modal
+    if (paymentBtn) {
+        paymentBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            paymentModal.classList.remove('hidden');
+            if (paymentStatusSelect) {
+                paymentStatusSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+    
+    // Close payment modal
+    if (closePaymentBtn) {
+        closePaymentBtn.addEventListener('click', function() {
+            paymentModal.classList.add('hidden');
+            paymentForm.reset();
+        });
+    }
+    
+    // Close payment modal on outside click
+    if (paymentModal) {
+        paymentModal.addEventListener('click', function(e) {
+            if (e.target === paymentModal) {
+                paymentModal.classList.add('hidden');
+                paymentForm.reset();
+            }
+        });
+    }
+    
+    // Handle payment form submission
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                alert('CSRF token missing. Please refresh the page.');
+                return;
+            }
+            
+            // Disable submit button
+            if (submitPaymentBtn) {
+                submitPaymentBtn.disabled = true;
+                submitPaymentBtn.textContent = 'Updating...';
+            }
+            
+            // Get form data
+            const paymentStatusValue = paymentStatusSelect.value;
+            const refundAmountValue = document.querySelector('input[name="refund_amount"]').value || '';
+            const paymentNotesValue = document.querySelector('textarea[name="payment_notes"]').value || '';
+            
+            const jsonData = {
+                payment_status: paymentStatusValue,
+                refund_amount: refundAmountValue,
+                payment_notes: paymentNotesValue
+            };
+            
+            fetch('{{ route("admin.orders.update-payment-status", $order) }}', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content'),
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(jsonData)
+            })
+            .then(response => {
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        throw new Error('Server returned non-JSON response');
+                    });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message || 'Payment status updated successfully');
+                    window.location.reload();
+                } else {
+                    let errorMessage = data.message || 'Unknown error occurred';
+                    if (data.errors) {
+                        const errorList = Object.values(data.errors).flat();
+                        errorMessage += '\n' + errorList.join('\n');
+                    }
+                    alert('Error: ' + errorMessage);
+                }
+            })
+            .catch(error => {
+                alert('Error updating payment status: ' + error.message);
+            })
+            .finally(() => {
+                if (submitPaymentBtn) {
+                    submitPaymentBtn.disabled = false;
+                    submitPaymentBtn.textContent = 'Update Payment';
                 }
             });
         });

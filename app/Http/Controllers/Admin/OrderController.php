@@ -189,22 +189,83 @@ class OrderController extends Controller
     /**
      * Update payment status
      */
-    public function updatePaymentStatus(Request $request, Order $order)
-    {
-        $request->validate([
-            'payment_status' => 'required|in:pending,paid,failed,refunded,partially_refunded',
+   public function updatePaymentStatus(Request $request, Order $order)
+{
+    try {
+        // Validate the request
+        $validated = $request->validate([
+            'payment_status' => 'required|string|in:pending,paid,failed,refunded,partially_refunded',
+            'refund_amount' => 'nullable|numeric|min:0|max:' . $order->total_amount,
+            'payment_notes' => 'nullable|string|max:1000'
         ]);
 
-        $order->update(['payment_status' => $request->payment_status]);
+        $oldPaymentStatus = $order->payment_status;
+        $newPaymentStatus = $validated['payment_status'];
+
+        // Prepare update data
+        $updateData = ['payment_status' => $newPaymentStatus];
+        
+        // Handle refund logic
+        if (in_array($newPaymentStatus, ['refunded', 'partially_refunded'])) {
+            if (!empty($validated['refund_amount'])) {
+                // You might want to create a refund record here
+                // For now, we'll just add it to notes
+                $currentNotes = $order->notes ?? '';
+                $updateData['notes'] = $currentNotes . "\n[" . now()->format('Y-m-d H:i') . "] Refund Amount: ₹" . number_format($validated['refund_amount'], 2);
+            }
+        }
+
+        // Add payment notes if provided
+        if (!empty($validated['payment_notes'])) {
+            $currentNotes = $order->notes ?? '';
+            $updateData['notes'] = ($updateData['notes'] ?? $currentNotes) . "\n[" . now()->format('Y-m-d H:i') . "] Payment Note: " . $validated['payment_notes'];
+        }
+
+        // Update the order
+        $order->update($updateData);
+
+        // Update related payments if they exist
+        if ($order->payments()->exists()) {
+            $paymentStatus = $newPaymentStatus === 'paid' ? 'completed' : 
+                           ($newPaymentStatus === 'failed' ? 'failed' : 
+                           ($newPaymentStatus === 'refunded' ? 'refunded' : 'pending'));
+            
+            $order->payments()->update(['status' => $paymentStatus]);
+        }
+
+        // Log success
+        Log::info('Order payment status updated successfully', [
+            'order_id' => $order->id,
+            'old_payment_status' => $oldPaymentStatus,
+            'new_payment_status' => $newPaymentStatus
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Payment status updated successfully',
-            'payment_status' => $order->payment_status,
-            'payment_status_badge' => $order->payment_status_badge,
+            'message' => "Payment status updated from {$oldPaymentStatus} to {$newPaymentStatus} successfully",
+            'payment_status' => $newPaymentStatus,
+            'old_payment_status' => $oldPaymentStatus
         ]);
-    }
 
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation failed',
+            'errors' => $e->errors()
+        ], 422);
+        
+    } catch (\Exception $e) {
+        Log::error('Error updating payment status', [
+            'order_id' => $order->id,
+            'error' => $e->getMessage()
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while updating the payment status: ' . $e->getMessage()
+        ], 500);
+    }
+}
     /**
      * Export orders to CSV
      */
