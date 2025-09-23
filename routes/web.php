@@ -3,6 +3,7 @@
 // routes/web.php
 
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\AdminLoginController;
 use App\Http\Controllers\Banner\BannerController;
@@ -54,7 +55,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/count', [CartController::class, 'count'])->name('count');
     Route::get('/mini', [CartController::class, 'miniCart'])->name('mini');
     Route::post('/add-puja-kit', [CartController::class, 'addPujaKit'])->name('add-puja-kit');
-    Route::post('/validate', [CartController::class, 'validate'])->name('validate'); 
+    Route::post('/validate', [CartController::class, 'validate'])->name('validate');
 });
 
 // Payment routes (webhook needs to be public)
@@ -209,7 +210,15 @@ Route::middleware('auth')->group(function () {
         });
 
         // Static View Routes
-        Route::view('/orders', 'admin.orders.index')->name('orders.index');
+        // Route::view('/orders', 'admin.orders.index')->name('orders.index');
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show']);
+        Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::patch('orders/{order}/payment-status', [AdminOrderController::class, 'updatePaymentStatus'])->name('orders.update-payment-status');
+        Route::get('orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
+        Route::post('orders/bulk-action', [AdminOrderController::class, 'bulkAction'])->name('orders.bulk-action');
+        Route::get('orders/{order}/invoice', [AdminOrderController::class, 'printInvoice'])->name('orders.invoice');
+        Route::get('orders-analytics', [AdminOrderController::class, 'analytics'])->name('orders.analytics');
+
         Route::view('/inventory', 'admin.inventory.index')->name('inventory.index');
         Route::view('/analytics', 'admin.analytics.index')->name('analytics.index');
         Route::view('/settings', 'admin.settings.index')->name('settings.index');
