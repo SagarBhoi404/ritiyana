@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6">
+            {{-- <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
                     <div class="p-2 bg-green-100 rounded-lg">
                         <i data-lucide="heart" class="w-6 h-6 text-green-600"></i>
@@ -53,7 +53,7 @@
                         <p class="text-2xl font-semibold text-gray-900">0</p>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
@@ -67,7 +67,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-lg shadow p-6">
+            {{-- <div class="bg-white rounded-lg shadow p-6">
                 <div class="flex items-center">
                     <div class="p-2 bg-orange-100 rounded-lg">
                         <i data-lucide="user" class="w-6 h-6 text-orange-600"></i>
@@ -77,7 +77,7 @@
                         <p class="text-2xl font-semibold text-gray-900">{{ ucfirst($user->status) }}</p>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Quick Actions -->

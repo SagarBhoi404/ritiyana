@@ -59,6 +59,48 @@ class UserController extends Controller
         ));
     }
 
+
+    public function settings()
+{
+    $user = auth()->user();
+    return view('user.settings', compact('user'));
+}
+
+public function changePassword(Request $request)
+{
+    $user = auth()->user();
+
+    $validated = $request->validate([
+        'current_password' => 'required|string',
+        'password' => 'required|string|min:8|confirmed',
+        'password_confirmation' => 'required|string|min:8',
+    ], [
+        'current_password.required' => 'Current password is required.',
+        'password.required' => 'New password is required.',
+        'password.min' => 'New password must be at least 8 characters.',
+        'password.confirmed' => 'Password confirmation does not match.',
+    ]);
+
+    // Verify current password
+    if (!Hash::check($validated['current_password'], $user->password)) {
+        return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    }
+
+    // Check if new password is different from current password
+    if (Hash::check($validated['password'], $user->password)) {
+        return redirect()->back()->withErrors(['password' => 'New password must be different from current password.']);
+    }
+
+    // Update password
+    $user->update([
+        'password' => Hash::make($validated['password']),
+        'password_changed_at' => now(), // Add this field to users table if needed
+    ]);
+
+    return redirect()->route('settings')->with('success', 'Password changed successfully.');
+}
+
+
     public function create()
     {
         $roles = Role::where('is_active', true)->get(); // Use is_active
@@ -249,6 +291,35 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully');
     }
+public function profile()
+{
+    $user = auth()->user();
+    $user->load('roles', 'vendorProfile');
+    return view('user.profile', compact('user'));
+}
+
+public function editProfile()
+{
+    $user = auth()->user();
+    return view('user.edit-profile', compact('user'));
+}
+
+public function updateProfile(Request $request)
+{
+    $user = auth()->user();
+
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'phone' => 'nullable|string|max:15',
+        'gender' => 'nullable|in:male,female,other',
+        'date_of_birth' => 'nullable|date',
+    ]);
+
+    $user->update($validated);
+
+    return redirect()->route('profile')->with('success', 'Profile updated successfully.');
+}
 
     public function toggleStatus(User $user)
     {

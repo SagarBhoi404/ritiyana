@@ -45,24 +45,26 @@ class CustomerNavigation extends Component
                 'icon' => 'map-pin',
                 'active' => str_contains($this->currentRoute, 'addresses.index')
             ],
-            // [
-            //     'name' => 'Profile',
-            //     'route' => 'customer.profile',
-            //     'icon' => 'user',
-            //     'active' => str_contains($this->currentRoute, 'profile')
-            // ],
-            // [
-            //     'name' => 'Settings',
-            //     'route' => 'customer.settings',
-            //     'icon' => 'settings',
-            //     'active' => str_contains($this->currentRoute, 'settings')
-            // ],
-            // [
-            //     'name' => 'Support',
-            //     'route' => 'customer.support',
-            //     'icon' => 'help-circle',
-            //     'active' => str_contains($this->currentRoute, 'support')
-            // ]
+            [
+                'name' => 'Profile',
+                'route' => 'profile',
+                'icon' => 'user',
+                'active' => str_contains($this->currentRoute, 'profile')
+            ],
+            [
+                'name' => 'Settings',
+                'route' => 'settings',
+                'icon' => 'settings',
+                'active' => str_contains($this->currentRoute, 'settings')
+            ],
+         [
+    'name' => 'Logout',
+    'route' => 'logout',
+    'icon' => 'log-out',
+    'active' => false
+]
+
+            
         ];
     }
 }
