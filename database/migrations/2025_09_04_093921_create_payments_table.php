@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
             $table->string('payment_id')->unique();
             $table->string('gateway'); // razorpay, paytm, stripe, etc.
+            $table->string('gateway_order_id');
             $table->string('gateway_transaction_id')->nullable();
             $table->enum('method', ['card', 'netbanking', 'upi', 'wallet', 'cod'])->nullable();
             $table->enum('status', ['pending', 'processing', 'completed', 'failed', 'cancelled', 'refunded']);
