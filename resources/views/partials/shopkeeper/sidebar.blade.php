@@ -45,12 +45,12 @@
         </div>
 
         <!-- Pujas & Kits Management -->
-        <div x-data="{ open: {{ request()->routeIs('admin.pujas*') || request()->routeIs('admin.puja-kits*') ? 'true' : 'false' }} }">
+        <div x-data="{ open: {{ request()->routeIs('vendor.pujas*') || request()->routeIs('vendor.puja-kits*') ? 'true' : 'false' }} }">
             <button @click="open = !open"
-                class="w-full group flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 {{ request()->routeIs('admin.pujas*') || request()->routeIs('admin.puja-kits*') ? 'bg-indigo-50 text-indigo-700' : '' }}">
+                class="w-full group flex items-center justify-between px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 {{ request()->routeIs('vendor.pujas*') || request()->routeIs('vendor.puja-kits*') ? 'bg-indigo-50 text-indigo-700' : '' }}">
                 <div class="flex items-center">
                     <i data-lucide="flame"
-                        class="mr-3 h-5 w-5 {{ request()->routeIs('admin.pujas*') || request()->routeIs('admin.puja-kits*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
+                        class="mr-3 h-5 w-5 {{ request()->routeIs('vendor.pujas*') || request()->routeIs('vendor.puja-kits*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-600' }}"></i>
                     Pujas & Kits
                 </div>
                 <i data-lucide="chevron-down" class="h-4 w-4 transition-transform duration-200"
@@ -58,17 +58,17 @@
             </button>
             <div x-show="open" x-transition class="mt-2 pl-9 space-y-1">
                 <a href="{{ route('vendor.pujas.index') }}"
-                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.pujas.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">All
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('vendor.pujas.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">All
                     Pujas</a>
                 <a href="{{ route('vendor.pujas.create') }}"
-                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.pujas.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Add
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('vendor.pujas.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Add
                     Puja</a>
-                {{-- <a href="{{ route('vendor.puja-kits.index') }}"
-                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.puja-kits.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Puja
+                <a href="{{ route('vendor.puja-kits.index') }}"
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('vendor.puja-kits.index') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Puja
                     Kits</a>
                 <a href="{{ route('vendor.puja-kits.create') }}"
-                    class="block px-4 py-2 text-sm {{ request()->routeIs('admin.puja-kits.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Create
-                    Kit</a> --}}
+                    class="block px-4 py-2 text-sm {{ request()->routeIs('vendor.puja-kits.create') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600' }} rounded-lg hover:bg-gray-50 transition-colors">Create
+                    Kit</a>
             </div>
         </div>
 

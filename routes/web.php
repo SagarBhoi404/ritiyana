@@ -27,6 +27,7 @@ use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorProfileController;
 use App\Http\Controllers\Vendor\VendorPujaController;
+use App\Http\Controllers\Vendor\VendorPujaKitController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -235,6 +236,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Vendor\DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [ShopkeeperLoginController::class, 'logout'])->name('logout');
 
+    // Puja Kit Management
+        // Route::resource('puja-kits', PujaKitController::class);
+
         // Vendor Profile Management
         Route::prefix('profile')->name('profile.')->group(function () {
             Route::get('/', [VendorProfileController::class, 'show'])->name('show');
@@ -263,5 +267,8 @@ Route::middleware('auth')->group(function () {
 
         // Puja Management
         Route::resource('pujas', VendorPujaController::class);
+        Route::resource('puja-kits', VendorPujaKitController::class);
+        // Route::resource('puja-kits', PujaKitController::class);
+
     });
 });

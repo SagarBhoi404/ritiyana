@@ -40,7 +40,7 @@ class VendorOrderController extends Controller
             'delivered' => VendorOrder::where('vendor_id', auth()->id())->where('status', 'delivered')->count(),
         ];
 
-        return view('vendor.orders.index', compact('orders', 'stats'));
+        return view('shopkeeper.orders.index', compact('orders', 'stats'));
     }
 
     public function show(VendorOrder $vendorOrder)
