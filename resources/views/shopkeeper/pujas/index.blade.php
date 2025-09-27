@@ -144,7 +144,7 @@
                                             class="text-purple-600 hover:text-purple-900">
                                             <i data-lucide="edit" class="w-4 h-4"></i>
                                         </a>
-                                        @if ($puja->kits_count == 0)
+                                        {{-- @if ($puja->kits_count == 0)
                                             <form action="{{ route('vendor.pujas.destroy', $puja) }}" method="POST"
                                                 class="inline" onsubmit="return confirm('Are you sure?')">
                                                 @csrf
@@ -153,7 +153,7 @@
                                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                 </button>
                                             </form>
-                                        @endif
+                                        @endif --}}
                                     </div>
                                 </td>
                             </tr>

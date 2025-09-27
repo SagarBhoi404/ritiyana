@@ -1,4 +1,4 @@
-<!-- resources/views/shopkeeper/dashboard.blade.php -->
+<!-- resources/views/vendor/dashboard.blade.php -->
 @extends('layouts.shopkeeper')
 
 @section('title', 'Dashboard')
@@ -47,13 +47,13 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Your Sales</p>
-                            <p class="text-2xl font-bold text-gray-900">₹1,25,000</p>
+                            <p class="text-2xl font-bold text-gray-900">₹{{ number_format($stats['totalSales'], 0) }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex items-center">
-                        <div class="flex items-center text-green-600 text-sm font-medium">
-                            <i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>
-                            +12%
+                        <div class="flex items-center {{ $growthPercentages['sales'] >= 0 ? 'text-green-600' : 'text-red-600' }} text-sm font-medium">
+                            <i data-lucide="{{ $growthPercentages['sales'] >= 0 ? 'trending-up' : 'trending-down' }}" class="h-4 w-4 mr-1"></i>
+                            {{ $growthPercentages['sales'] >= 0 ? '+' : '' }}{{ $growthPercentages['sales'] }}%
                         </div>
                         <span class="text-gray-500 text-sm ml-2">vs last month</span>
                     </div>
@@ -71,13 +71,13 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Orders</p>
-                            <p class="text-2xl font-bold text-gray-900">450</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ $stats['totalOrders'] }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex items-center">
-                        <div class="flex items-center text-green-600 text-sm font-medium">
-                            <i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>
-                            +8%
+                        <div class="flex items-center {{ $growthPercentages['orders'] >= 0 ? 'text-green-600' : 'text-red-600' }} text-sm font-medium">
+                            <i data-lucide="{{ $growthPercentages['orders'] >= 0 ? 'trending-up' : 'trending-down' }}" class="h-4 w-4 mr-1"></i>
+                            {{ $growthPercentages['orders'] >= 0 ? '+' : '' }}{{ $growthPercentages['orders'] }}%
                         </div>
                         <span class="text-gray-500 text-sm ml-2">vs last month</span>
                     </div>
@@ -95,13 +95,13 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Products</p>
-                            <p class="text-2xl font-bold text-gray-900">150</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ $stats['totalProducts'] }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex items-center">
-                        <div class="flex items-center text-green-600 text-sm font-medium">
-                            <i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>
-                            +5%
+                        <div class="flex items-center {{ $growthPercentages['products'] >= 0 ? 'text-green-600' : 'text-red-600' }} text-sm font-medium">
+                            <i data-lucide="{{ $growthPercentages['products'] >= 0 ? 'trending-up' : 'trending-down' }}" class="h-4 w-4 mr-1"></i>
+                            {{ $growthPercentages['products'] >= 0 ? '+' : '' }}{{ $growthPercentages['products'] }}%
                         </div>
                         <span class="text-gray-500 text-sm ml-2">vs last month</span>
                     </div>
@@ -119,13 +119,13 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600">Customers</p>
-                            <p class="text-2xl font-bold text-gray-900">1,245</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ $stats['totalCustomers'] }}</p>
                         </div>
                     </div>
                     <div class="mt-4 flex items-center">
-                        <div class="flex items-center text-green-600 text-sm font-medium">
-                            <i data-lucide="trending-up" class="h-4 w-4 mr-1"></i>
-                            +18%
+                        <div class="flex items-center {{ $growthPercentages['customers'] >= 0 ? 'text-green-600' : 'text-red-600' }} text-sm font-medium">
+                            <i data-lucide="{{ $growthPercentages['customers'] >= 0 ? 'trending-up' : 'trending-down' }}" class="h-4 w-4 mr-1"></i>
+                            {{ $growthPercentages['customers'] >= 0 ? '+' : '' }}{{ $growthPercentages['customers'] }}%
                         </div>
                         <span class="text-gray-500 text-sm ml-2">vs last month</span>
                     </div>
@@ -143,89 +143,69 @@
                     <h3 class="text-lg font-semibold text-gray-900">Sales Analytics</h3>
                     <p class="text-sm text-gray-500">Your weekly sales overview</p>
                 </div>
-                <select class="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <option>Last 7 days</option>
-                    <option>Last 30 days</option>
-                    <option>Last 3 months</option>
+                <select id="chartPeriod" class="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="week">Last 7 days</option>
+                    <option value="month">Last 30 days</option>
+                    <option value="quarter">Last 3 months</option>
                 </select>
             </div>
-            <div id="shopkeeperSalesChart" class="w-full"></div>
+            <div id="vendorSalesChart" class="w-full"></div>
         </div>
 
         <!-- Recent Orders -->
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 class="text-lg font-semibold text-gray-900 mb-6">Recent Orders</h3>
             <div class="space-y-4">
+                @forelse($recentOrders as $order)
                 <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                            <span class="text-blue-600 font-semibold text-sm">#1847</span>
+                            <span class="text-blue-600 font-semibold text-sm">#{{ $order->id }}</span>
                         </div>
                         <div>
-                            <p class="font-medium text-gray-900">Ganesh Puja Kit</p>
+                            <p class="font-medium text-gray-900">{{ $order->product->name ?? 'Product' }}</p>
                             <p class="text-sm text-gray-500 flex items-center">
                                 <i data-lucide="user" class="h-3 w-3 mr-1"></i>
-                                Rajesh Kumar
+                                {{ $order->customer->first_name ?? 'Customer' }} {{ $order->customer->last_name ?? '' }}
                             </p>
                         </div>
                     </div>
                     <div class="text-right">
-                        <p class="font-semibold text-gray-900">₹1,250</p>
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            Completed
+                        <p class="font-semibold text-gray-900">₹{{ number_format($order->vendor_earning, 0) }}</p>
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                            @switch($order->status)
+                                @case('delivered')
+                                    bg-green-100 text-green-800
+                                    @break
+                                @case('processing')
+                                    bg-yellow-100 text-yellow-800
+                                    @break
+                                @case('shipped')
+                                    bg-blue-100 text-blue-800
+                                    @break
+                                @default
+                                    bg-gray-100 text-gray-800
+                            @endswitch
+                        ">
+                            {{ ucfirst($order->status) }}
                         </span>
                     </div>
                 </div>
-                
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                            <span class="text-yellow-600 font-semibold text-sm">#1848</span>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Diwali Special Kit</p>
-                            <p class="text-sm text-gray-500 flex items-center">
-                                <i data-lucide="user" class="h-3 w-3 mr-1"></i>
-                                Priya Sharma
-                            </p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-semibold text-gray-900">₹2,100</p>
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Processing
-                        </span>
-                    </div>
+                @empty
+                <div class="text-center py-8">
+                    <p class="text-gray-500">No recent orders found</p>
                 </div>
-
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                            <span class="text-green-600 font-semibold text-sm">#1849</span>
-                        </div>
-                        <div>
-                            <p class="font-medium text-gray-900">Navratri Puja Set</p>
-                            <p class="text-sm text-gray-500 flex items-center">
-                                <i data-lucide="user" class="h-3 w-3 mr-1"></i>
-                                Amit Kumar
-                            </p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-semibold text-gray-900">₹850</p>
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                            Shipped
-                        </span>
-                    </div>
-                </div>
+                @endforelse
             </div>
 
+            @if($recentOrders->count() > 0)
             <div class="mt-6">
-                <a href="#" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                <a href="{{ route('vendor.orders') }}" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
                     <i data-lucide="arrow-right" class="w-4 h-4 mr-2"></i>
                     View All Orders
                 </a>
             </div>
+            @endif
         </div>
     </div>
 
@@ -233,7 +213,7 @@
     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <h3 class="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="#" class="flex items-center p-4 rounded-xl hover:bg-green-50 transition-colors group">
+            <a href="{{ route('vendor.products.create') }}" class="flex items-center p-4 rounded-xl hover:bg-green-50 transition-colors group">
                 <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                     <i data-lucide="plus" class="h-5 w-5 text-green-600"></i>
                 </div>
@@ -243,7 +223,7 @@
                 </div>
             </a>
             
-            <a href="#" class="flex items-center p-4 rounded-xl hover:bg-blue-50 transition-colors group">
+            <a href="{{ route('vendor.orders.index') }}" class="flex items-center p-4 rounded-xl hover:bg-blue-50 transition-colors group">
                 <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                     <i data-lucide="shopping-cart" class="h-5 w-5 text-blue-600"></i>
                 </div>
@@ -253,7 +233,7 @@
                 </div>
             </a>
             
-            <a href="#" class="flex items-center p-4 rounded-xl hover:bg-purple-50 transition-colors group">
+            <a href="{{ route('vendor.products.index') }}" class="flex items-center p-4 rounded-xl hover:bg-purple-50 transition-colors group">
                 <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                     <i data-lucide="package" class="h-5 w-5 text-purple-600"></i>
                 </div>
@@ -263,7 +243,7 @@
                 </div>
             </a>
             
-            <a href="#" class="flex items-center p-4 rounded-xl hover:bg-orange-50 transition-colors group">
+            <a href="{{ route('vendor.analytics.index') }}" class="flex items-center p-4 rounded-xl hover:bg-orange-50 transition-colors group">
                 <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
                     <i data-lucide="bar-chart-3" class="h-5 w-5 text-orange-600"></i>
                 </div>
@@ -275,63 +255,111 @@
         </div>
     </div>
 </div>
-
+{{-- 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Sales Chart for Shopkeeper
-    const salesChartElement = document.getElementById('shopkeeperSalesChart');
-    if (salesChartElement && typeof ApexCharts !== 'undefined') {
-        const options = {
-            chart: {
-                type: 'area',
-                height: 300,
-                fontFamily: 'Inter, ui-sans-serif, system-ui',
-                toolbar: { show: false }
-            },
-            series: [{
-                name: 'Sales (₹)',
-                data: [15000, 20000, 18000, 25000, 22000, 30000, 28000]
-            }],
-            xaxis: {
-                categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-            },
-            yaxis: {
-                labels: {
-                    formatter: function(val) {
-                        return '₹' + (val/1000) + 'K';
+    let salesChart;
+    const chartElement = document.getElementById('vendorSalesChart');
+    const periodSelect = document.getElementById('chartPeriod');
+    
+    // Initial chart data from Laravel
+    const initialChartData = @json($chartData);
+    
+    // Initialize chart
+    function initializeChart(chartData) {
+        if (chartElement && typeof ApexCharts !== 'undefined') {
+            const options = {
+                chart: {
+                    type: 'area',
+                    height: 300,
+                    fontFamily: 'Inter, ui-sans-serif, system-ui',
+                    toolbar: { show: false }
+                },
+                series: [{
+                    name: 'Sales (₹)',
+                    data: chartData.data
+                }],
+                xaxis: {
+                    categories: chartData.categories
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(val) {
+                            return '₹' + (val >= 1000 ? (val/1000).toFixed(1) + 'K' : val);
+                        }
                     }
-                }
-            },
-            tooltip: {
-                y: {
-                    formatter: function(val) {
-                        return '₹' + val.toLocaleString();
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return '₹' + val.toLocaleString();
+                        }
                     }
+                },
+                colors: ['#8B5CF6'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.9,
+                        stops: [0, 90, 100]
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 4,
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
                 }
-            },
-            colors: ['#8B5CF6'],
-            fill: {
-                type: 'gradient',
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.7,
-                    opacityTo: 0.9,
-                    stops: [0, 90, 100]
-                }
-            },
-            grid: {
-                borderColor: '#f1f5f9',
-                strokeDashArray: 4,
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 3
-            }
-        };
+            };
 
-        const chart = new ApexCharts(salesChartElement, options);
-        chart.render();
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            salesChart = new ApexCharts(chartElement, options);
+            salesChart.render();
+        }
     }
+    
+    // Initialize with default data
+    initializeChart(initialChartData);
+    
+    // Handle period change
+    periodSelect.addEventListener('change', function() {
+        const selectedPeriod = this.value;
+        
+        // Show loading state
+        chartElement.innerHTML = '<div class="flex items-center justify-center h-64"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div></div>';
+        
+        // Fetch new data
+        fetch(`{{ route('vendor.dashboard.chart-data') }}?period=${selectedPeriod}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            initializeChart(data);
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+            chartElement.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500">Error loading chart data</div>';
+        });
+    });
+
+    // Update live time every minute
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('currentHour').textContent = now.getHours().toString().padStart(2, '0');
+        document.getElementById('currentMinute').textContent = now.getMinutes().toString().padStart(2, '0');
+    }
+    
+    setInterval(updateTime, 60000); // Update every minute
 });
-</script>
+</script> --}}
 @endsection
