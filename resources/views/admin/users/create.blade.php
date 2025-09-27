@@ -11,7 +11,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Add New User</h1>
-                    <p class="mt-2 text-sm text-gray-700">Create a new user account for your Ritiyana platform</p>
+                    <p class="mt-2 text-sm text-gray-700">Create a new user account for your Shree Samagri platform</p>
                 </div>
                 <a href="{{ route('admin.users.index') }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200">

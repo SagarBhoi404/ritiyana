@@ -58,10 +58,10 @@
 <table class="layout-table">
     <tr>
         <td class="layout-td w-50">
-            <h1 class="brand">Ritiyana</h1>
+            <h1 class="brand">Shree Samagri</h1>
             <p class="muted mb-0">Premium Puja Samagri & Kits</p>
-            <small class="muted">support@ritiyana.com</small><br>
-            <small class="muted">www.ritiyana.com</small>
+            <small class="muted">support@shreesamagri.com</small><br>
+            <small class="muted">www.shreesamagri.com</small>
         </td>
         <td class="layout-td w-50 text-right">
             <h2>Invoice</h2>
@@ -204,13 +204,13 @@
     <div class="section-title accent">Important Notes</div>
     <p class="muted mb-0">• This is a computer generated invoice and does not require signature.</p>
     <p class="muted mb-0">• Please retain this invoice for your records.</p>
-    <p class="muted mb-0">• For any queries, contact us at support@ritiyana.com</p>
+    <p class="muted mb-0">• For any queries, contact us at support@shreesamagri.com</p>
 </div>
 
 <!-- Footer -->
 <div class="footer">
     <div class="separator"></div>
-    <p><strong>Thank you for choosing Ritiyana!</strong></p>
+    <p><strong>Thank you for choosing Shree Samagri!</strong></p>
     <p>May divine blessings bring peace and prosperity to your life.</p>
 </div>
 

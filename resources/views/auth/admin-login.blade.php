@@ -11,7 +11,7 @@
                     <i data-lucide="shield-check" class="h-6 w-6 text-blue-600"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Admin Login</h1>
-                <p class="text-gray-600">Access Ritiyana Admin Panel</p>
+                <p class="text-gray-600">Access Shree Samagri Admin Panel</p>
             </div>
 
             <!-- Display Errors -->

@@ -11,7 +11,7 @@
                     <i data-lucide="store" class="h-6 w-6 text-green-600"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Shopkeeper Login</h1>
-                <p class="text-gray-600">Access Your Ritiyana Store</p>
+                <p class="text-gray-600">Access Your Shree Samagri Store</p>
             </div>
 
             <!-- Display Errors -->

@@ -5,9 +5,9 @@
         <!-- Replace the current div with this -->
         <div class="flex items-center space-x-3">
             <a href="{{ url('/') }}" class="flex items-center">
-                <img src="{{ asset('images/logo.png') }}" alt="Ritiyana Logo" class="h-16 w-auto">
+                <img src="{{ asset('images/logo.png') }}" alt="Shree Samagri Logo" class="h-16 w-auto">
             </a>
-            {{-- <h1 class="text-xl font-bold text-white">Ritiyana</h1> --}}
+            {{-- <h1 class="text-xl font-bold text-white">Shree Samagri</h1> --}}
         </div>
     </div>
 

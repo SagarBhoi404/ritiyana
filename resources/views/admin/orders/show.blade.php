@@ -96,7 +96,7 @@
                                 @if($item->vendor)
                                     Sold by {{ $item->vendor->first_name }} {{ $item->vendor->last_name }}
                                 @else
-                                    Sold by Ritiyana
+                                    Sold by Shree Samagri
                                 @endif
                             </p>
                             @if($item->product && $item->product->sku)

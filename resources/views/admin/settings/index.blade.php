@@ -40,7 +40,7 @@
                         <input type="text" 
                                name="store_name" 
                                id="store_name" 
-                               value="{{ old('store_name', $settings->store_name ?? 'Ritiyana') }}" 
+                               value="{{ old('store_name', $settings->store_name ?? 'Shree Samagri') }}" 
                                required
                                placeholder="Enter store name"
                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
@@ -67,7 +67,7 @@
                         <input type="email" 
                                name="store_email" 
                                id="store_email" 
-                               value="{{ old('store_email', $settings->store_email ?? 'admin@ritiyana.com') }}" 
+                               value="{{ old('store_email', $settings->store_email ?? 'admin@shreesamagri.com') }}" 
                                required
                                placeholder="store@example.com"
                                class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">

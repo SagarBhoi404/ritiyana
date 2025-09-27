@@ -4,9 +4,9 @@
     <div class="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-purple-600 to-pink-600">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center p-1">
-                <img src="{{ asset('images/logo.png') }}" alt="Ritiyana Logo" class="w-full h-full object-contain">
+                <img src="{{ asset('images/logo.png') }}" alt="Shree Samagri Logo" class="w-full h-full object-contain">
             </div>
-            <h1 class="text-xl font-bold text-white">Ritiyana</h1>
+            <h1 class="text-xl font-bold text-white">Shree Samagri</h1>
         </div>
     </div>
 

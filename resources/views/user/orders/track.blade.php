@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Track Order - Ritiyana')
+@section('title', 'Track Order - Shree Samagri')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">
@@ -168,7 +168,7 @@
                             <i data-lucide="phone" class="w-4 h-4 mr-2"></i>
                             Call Support
                         </a>
-                        <a href="mailto:support@ritiyana.com" 
+                        <a href="mailto:support@shreesamagri.com" 
                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-lg hover:bg-blue-50 border border-blue-200">
                             <i data-lucide="mail" class="w-4 h-4 mr-2"></i>
                             Email Us

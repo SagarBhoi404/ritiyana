@@ -26,11 +26,11 @@
         <div class="border-b-2 border-gray-200 pb-8 mb-8">
             <div class="flex justify-between items-start">
                 <div>
-                    <h1 class="text-4xl font-bold text-purple-600 mb-2">RITIYANA</h1>
+                    <h1 class="text-4xl font-bold text-purple-600 mb-2">Shree Samagri</h1>
                     <p class="text-gray-600">Premium Puja Kits & Spiritual Items</p>
                     <div class="mt-4 text-sm text-gray-600">
                         <p>GST: 27XXXXX1234X1XX</p>
-                        <p>Email: orders@ritiyana.com</p>
+                        <p>Email: orders@shreesamagri.com</p>
                         <p>Phone: +91 XXXXX XXXXX</p>
                     </div>
                 </div>
@@ -219,14 +219,14 @@
             <div class="text-sm text-gray-600 space-y-2">
                 <p>1. All sales are final. Returns are only accepted for damaged or defective items within 7 days of delivery.</p>
                 <p>2. Spiritual items are blessed and consecrated. Please handle with respect and care.</p>
-                <p>3. For any queries regarding your order, please contact us at orders@ritiyana.com</p>
+                <p>3. For any queries regarding your order, please contact us at orders@shreesamagri.com</p>
                 <p>4. This invoice is generated electronically and does not require a signature.</p>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-500">
-            <p>Thank you for choosing Ritiyana for your spiritual needs!</p>
+            <p>Thank you for choosing Shree Samagri for your spiritual needs!</p>
             <p class="mt-2">Generated on {{ now()->format('F j, Y \a\t g:i A') }}</p>
         </div>
     </div>

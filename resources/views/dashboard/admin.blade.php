@@ -13,7 +13,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 class="text-3xl font-bold mb-2">Welcome back, {{ $user->first_name }}! 🙏</h1>
-                    <p class="text-purple-100 text-lg">Manage your Ritiyana puja store with ease</p>
+                    <p class="text-purple-100 text-lg">Manage your Shree Samagri puja store with ease</p>
                     <div class="flex items-center mt-4 text-purple-100">
                         <i data-lucide="calendar" class="h-4 w-4 mr-2"></i>
                         <span>{{ now()->format('l, F j, Y') }}</span>

@@ -10,7 +10,7 @@
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 Back to Home
             </a>
-            <h1 class="text-2xl font-bold mb-2">Welcome to Ritiyana</h1>
+            <h1 class="text-2xl font-bold mb-2">Welcome to Shree Samagri</h1>
             <p class="text-gray-600">Enter your email to continue</p>
         </div>
 

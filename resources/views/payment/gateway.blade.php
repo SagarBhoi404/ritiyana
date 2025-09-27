@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Complete Payment - Ritiyana')
+@section('title', 'Complete Payment - Shree Samagri')
 
 @section('head')
 <!-- Cashfree Checkout SDK -->

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'My Addresses - Ritiyana')
+@section('title', 'My Addresses - Shree Samagri')
 
 @section('content')
 <div class="min-h-screen bg-gray-50 py-8">

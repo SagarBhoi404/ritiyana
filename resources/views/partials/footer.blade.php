@@ -3,7 +3,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <!-- Company Info -->
             <div>
-                <h3 class="text-xl font-bold mb-4">Ritiyana</h3>
+                <h3 class="text-xl font-bold mb-4">Shree Samagri</h3>
                 <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts here.</p>
                 <div class="flex gap-4">
                     <a href="#" class="text-gray-400 hover:text-white">
@@ -53,7 +53,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="mail" class="w-4 h-4"></i>
-                        <span>support@ritiyana.com</span>
+                        <span>support@shreesamagri.com</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-4 h-4"></i>
@@ -65,7 +65,7 @@
         
         <div class="border-t border-gray-800 pt-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 text-sm">© 2025 Ritiyana. All rights reserved.</p>
+                <p class="text-gray-400 text-sm">© 2025 Shree Samagri. All rights reserved.</p>
                 <div class="flex gap-6 mt-4 md:mt-0">
                     <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
                     <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
