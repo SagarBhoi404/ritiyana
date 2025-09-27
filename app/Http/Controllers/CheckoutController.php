@@ -359,7 +359,13 @@ class CheckoutController extends Controller
             if ($request->payment_method === 'cod') {
                 // Cash on Delivery
                 $this->processCODPayment($order, $user);
-                Cart::clearCart();
+                // **FIX: Clear cart immediately after COD order**
+                $cartClearResult = Cart::clearCart();
+                Log::info('Cart clear result for COD order', [
+                    'order_number' => $order->order_number,
+                    'clear_success' => $cartClearResult['success'],
+                    'clear_message' => $cartClearResult['message'],
+                ]);
                 DB::commit();
 
                 Log::info('COD order completed: '.$order->order_number);
