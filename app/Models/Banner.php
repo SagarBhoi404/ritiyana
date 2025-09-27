@@ -47,7 +47,7 @@ class Banner extends Model
 
         // Check if running in production environment
         if (app()->environment('production')) {
-            return url('storage/app/public/'.$this->image_path);
+            return url('public/storage/'.$this->image_path);
         } else {
             return asset('storage/'.$this->image_path);
         }
