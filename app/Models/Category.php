@@ -63,18 +63,19 @@ class Category extends Model
     {
         if ($this->image) {
             // For storage images - handle environment differences
-            if (app()->environment('production')) {
-                return url('storage/app/public/'.$this->image);
-            } else {
+            // if (app()->environment('production')) {
+            //     return url('public/'.$this->image);
+            // } else {
                 return asset('storage/'.$this->image);
-            }
+            // }
         } else {
             // For default images - handle environment differences
-            if (app()->environment('production')) {
-                return url('public/images/default-category.png');
-            } else {
-                return asset('images/default-category.png');
-            }
+            // if (app()->environment('production')) {
+            //     return url('public/images/default-category.png');
+            // } else {
+            //     return asset('images/default-category.png');
+            // }
+            return asset('storage/'.$this->image);
         }
     }
 }

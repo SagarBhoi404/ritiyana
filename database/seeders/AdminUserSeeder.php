@@ -17,7 +17,7 @@ class AdminUserSeeder extends Seeder
         $adminData = [
             'first_name' => 'Admin',
             'last_name'  => 'User',
-            'email'      => 'admin@ritiyana.com',
+            'email'      => 'admin@shreesamagri.com',
             'phone'      => '9876543210',
             'password'   => Hash::make('admin1234'),
             'status'     => 'active',
@@ -33,7 +33,7 @@ class AdminUserSeeder extends Seeder
         $shopkeeperData = [
             'first_name' => 'Shop',
             'last_name'  => 'Keeper',
-            'email'      => 'shopkeeper@ritiyana.com',
+            'email'      => 'shopkeeper@shreesamagri.com',
             'phone'      => '9998887770',
             'password'   => Hash::make('shop1234'),
             'status'     => 'active',
