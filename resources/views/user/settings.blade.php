@@ -65,7 +65,7 @@
                                 <i data-lucide="shield" class="w-4 h-4 mr-3"></i>
                                 <span class="font-medium">Security</span>
                             </a>
-                            <a href="#preferences" onclick="showSection('preferences')" 
+                            {{-- <a href="#preferences" onclick="showSection('preferences')" 
                                class="settings-tab flex items-center p-3 rounded-lg text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 transition-all">
                                 <i data-lucide="sliders" class="w-4 h-4 mr-3"></i>
                                 <span class="font-medium">Preferences</span>
@@ -79,7 +79,7 @@
                                class="settings-tab flex items-center p-3 rounded-lg text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 transition-all">
                                 <i data-lucide="eye" class="w-4 h-4 mr-3"></i>
                                 <span class="font-medium">Privacy</span>
-                            </a>
+                            </a> --}}
                         </nav>
                     </div>
                 </div>

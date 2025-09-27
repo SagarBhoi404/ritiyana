@@ -234,11 +234,11 @@
                             <span class="text-sm font-medium text-gray-700 group-hover:text-vibrant-pink">Order History</span>
                         </a>
                         {{-- <a href="{{ route('wishlist.index') }}"  --}}
-                        <a href=""
+                        {{-- <a href=""
                            class="flex items-center p-3 rounded-lg border border-gray-200 hover:border-vibrant-pink hover:bg-pink-50 transition-all group">
                             <i data-lucide="heart" class="w-4 h-4 mr-3 text-gray-500 group-hover:text-vibrant-pink"></i>
                             <span class="text-sm font-medium text-gray-700 group-hover:text-vibrant-pink">Wishlist</span>
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             </div>
