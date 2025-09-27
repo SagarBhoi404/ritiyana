@@ -112,7 +112,7 @@
                                     <div class="flex items-center">
                                         @if ($puja->image)
                                             <img class="h-10 w-10 rounded object-cover"
-                                                src="{{ asset('storage/' . $puja->image) }}" alt="{{ $puja->name }}">
+                                                src="{{ $puja->getImageUrlAttribute() }}" alt="{{ $puja->name }}">
                                         @else
                                             <div class="h-10 w-10 bg-orange-100 rounded flex items-center justify-center">
                                                 <i data-lucide="flame" class="w-5 h-5 text-orange-600"></i>

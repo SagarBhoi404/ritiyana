@@ -36,7 +36,7 @@
                     <div class="flex-shrink-0">
                         @if ($puja->image)
                             <img class="h-48 w-48 rounded-xl object-cover border-4 border-white shadow-lg"
-                                src="{{ asset('storage/' . $puja->image) }}" alt="{{ $puja->name }}">
+                                src="{{ $puja->getImageUrlAttribute() }}" alt="{{ $puja->name }}">
                         @else
                             <div
                                 class="h-48 w-48 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg">

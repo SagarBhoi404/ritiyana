@@ -1,5 +1,7 @@
 <?php
+
 // app/Models/Puja.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +22,7 @@ class Puja extends Model
         'auspicious_days',
         'required_items',
         'vendor_id',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
@@ -51,7 +53,12 @@ class Puja extends Model
     // Accessors
     public function getImageUrlAttribute()
     {
-        return $this->image ? asset('storage/' . $this->image) : asset('images/default-puja.png');
+        // return $this->image ? asset('storage/' . $this->image) : asset('images/default-puja.png');
+        if (app()->environment('production')) {
+            return url('public/storage/'.$this->image);
+        } else {
+            return asset('storage/'.$this->image);
+        }
     }
 
     // Scopes
@@ -59,7 +66,6 @@ class Puja extends Model
     {
         return $query->where('is_active', true);
     }
-
 
     public function vendor()
     {
