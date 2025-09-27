@@ -37,7 +37,7 @@ class OtpAuthController extends Controller
         try {
             Mail::send('emails.otp', ['otp' => $otp], function ($message) use ($email) {
                 $message->to($email)
-                        ->subject('Ritiyana - Your Login OTP');
+                        ->subject('Shree Samagri - Your Login OTP');
             });
 
             return redirect()->route('auth.verify-otp-form')
@@ -90,7 +90,7 @@ class OtpAuthController extends Controller
             } elseif ($user->hasRole('shopkeeper')) {
                 return redirect('/shopkeeper/dashboard')->with('success', 'Welcome back, Shopkeeper!');
             } else {
-                return redirect('/dashboard')->with('success', 'Welcome back to Ritiyana!');
+                return redirect('/dashboard')->with('success', 'Welcome back to Shree Samagri!');
             }
         } else {
             // New user, redirect to profile completion
@@ -160,7 +160,7 @@ class OtpAuthController extends Controller
         session()->forget(['verified_email', 'email']);
 
         return redirect('/dashboard')
-                       ->with('success', 'Welcome to Ritiyana! Your account has been created successfully.');
+                       ->with('success', 'Welcome to Shree Samagri! Your account has been created successfully.');
     }
 
     public function logout(Request $request)

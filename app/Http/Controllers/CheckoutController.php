@@ -390,7 +390,7 @@ class CheckoutController extends Controller
                     'customer_email' => $user->email,
                     'customer_phone' => $user->phone ?? '9999999999',
                     'return_url' => url('/payment/success?order_id='.$order->order_number),
-                    'order_note' => 'Order from Ritiyana - '.$order->order_number,
+                    'order_note' => 'Order from Shree Samagri - '.$order->order_number,
                     'payment_methods' => 'cc,dc,upi,nb',
                 ];
 
