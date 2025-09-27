@@ -36,7 +36,7 @@
                     <div class="flex-shrink-0">
                         @if ($category->image)
                             <img class="h-24 w-24 rounded-xl object-cover border-4 border-white shadow-lg"
-                                src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}">
+                                src="{{ $category->getImageUrlAttribute() }}" alt="{{ $category->name }}">
                         @else
                             <div
                                 class="h-24 w-24 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">

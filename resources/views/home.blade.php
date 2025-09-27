@@ -197,7 +197,7 @@
                         <!-- Circular Image -->
                         <div
                             class="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 mx-auto mb-2 md:mb-3 rounded-full border-2 border-gray-200 group-hover:border-vibrant-pink transition-all duration-300 overflow-hidden bg-white shadow-sm group-hover:shadow-md">
-                            <img src="{{ asset('public/storage/' . $category->image) }}" alt="{{ $category->name }}"
+                            <img src="{{ $category->getImageUrlAttribute() }}" alt="{{ $category->name }}"
                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                 >
                         </div>

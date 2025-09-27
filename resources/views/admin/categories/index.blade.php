@@ -100,7 +100,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
                                 @if($category->image)
-                                    <img class="h-10 w-10 rounded object-cover" src="{{ asset('public/storage/' . $category->image) }}" alt="{{ $category->name }}">
+                                    <img class="h-10 w-10 rounded object-cover" src="{{ $category->getImageUrlAttribute() }}" alt="{{ $category->name }}">
                                 @else
                                     <div class="h-10 w-10 bg-gray-100 rounded flex items-center justify-center">
                                         <i data-lucide="folder" class="w-5 h-5 text-gray-400"></i>
