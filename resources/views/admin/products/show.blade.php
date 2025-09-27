@@ -36,7 +36,7 @@
                     <div class="flex-shrink-0">
                         @if ($product->featured_image)
                             <img class="h-48 w-48 rounded-xl object-cover border-4 border-white shadow-lg"
-                                src="{{ asset('storage/' . $product->featured_image) }}" alt="{{ $product->name }}">
+                                src="{{  $product->getFeaturedImageUrlAttribute() }}" alt="{{ $product->name }}">
                         @else
                             <div
                                 class="h-48 w-48 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">

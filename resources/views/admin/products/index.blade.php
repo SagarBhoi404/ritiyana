@@ -161,7 +161,7 @@
                                         <div class="flex-shrink-0 h-12 w-12">
                                             @if ($product->featured_image)
                                                 <img class="h-12 w-12 rounded-lg object-cover"
-                                                    src="{{ asset('storage/' . $product->featured_image) }}"
+                                                    src="{{  $product->getFeaturedImageUrlAttribute() }}"
                                                     alt="{{ $product->name }}">
                                             @else
                                                 <div

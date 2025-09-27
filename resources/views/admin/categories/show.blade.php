@@ -169,7 +169,7 @@
                                     <div class="flex items-center">
                                         @if ($product->featured_image)
                                             <img class="h-8 w-8 rounded object-cover mr-3"
-                                                src="{{ asset('storage/' . $product->featured_image) }}"
+                                                src="{{  $product->getFeaturedImageUrlAttribute() }}"
                                                 alt="{{ $product->name }}">
                                         @else
                                             <div class="h-8 w-8 bg-gray-200 rounded flex items-center justify-center mr-3">

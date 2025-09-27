@@ -171,7 +171,7 @@ class Product extends Model
         if ($this->featured_image) {
             // For storage images - handle environment differences
             if (app()->environment('production')) {
-                return url('storage/app/public/'.$this->featured_image);
+                return url('public/storage/'.$this->featured_image);
             } else {
                 return asset('storage/'.$this->featured_image);
             }
