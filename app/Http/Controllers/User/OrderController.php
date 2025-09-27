@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\CashfreeService;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;   
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -222,30 +222,58 @@ class OrderController extends Controller
     /**
      * Download order invoice
      */
-    public function downloadInvoice($orderNumber)
-    {
-        $order = Auth::user()->orders()
-            ->with(['orderItems.product', 'orderItems.pujaKit', 'payments'])
-            ->where('order_number', $orderNumber)
-            ->firstOrFail();
-
-        // Only allow invoice download for paid orders
-        if ($order->payment_status !== 'paid') {
-            return redirect()->back()->with('error', 'Invoice is not available for unpaid orders.');
-        }
-
-        try {
-            // **FIXED: Use correct Pdf facade**
-            $pdf = Pdf::loadView('user.orders.invoice', compact('order'));
-
-            return $pdf->download("invoice-{$order->order_number}.pdf");
-
-        } catch (\Exception $e) {
-            Log::error('Invoice generation failed: '.$e->getMessage());
-
-            return redirect()->back()->with('error', 'Failed to generate invoice. Please try again.');
-        }
+    public function downloadInvoice(string $orderNumber)
+{
+    // Guard: must be logged in
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('error', 'Please login to view invoices.');
     }
+
+    // Fetch order owned by the current user with required relations
+    $order = Auth::user()->orders()
+        ->with(['orderItems.product', 'orderItems.pujaKit', 'payments'])
+        ->where('order_number', $orderNumber)
+        ->firstOrFail();
+
+    // Only allow invoice for paid orders
+    if ($order->payment_status !== 'paid') {
+        return redirect()->back()->with('error', 'Invoice is not available for unpaid orders.');
+    }
+
+    try {
+        // Validate view exists to avoid silent failures
+        if (!view()->exists('user.orders.invoice')) {
+            Log::error('Invoice view missing: user.orders.invoice', [
+                'order_number' => $order->order_number
+            ]);
+            return redirect()->back()->with('error', 'Invoice template missing. Please contact support.');
+        }
+
+        // Generate PDF with DomPDF
+            $pdf = Pdf::setOptions([
+            'defaultFont' => 'helvetica',
+            'isRemoteEnabled' => true,
+            'enable_html5_parser' => true,
+        ])
+        ->loadView('user.orders.invoice', compact('order'))
+        ->setPaper('a4');
+
+        // File name
+        $fileName = "invoice-{$order->order_number}.pdf";
+
+        // Return a proper binary download response
+        return $pdf->download($fileName);
+
+    } catch (\Throwable $e) {
+        Log::error('Invoice generation failed', [
+            'order_number' => $order->order_number,
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        return redirect()->back()->with('error', 'Failed to generate invoice. Please try again.');
+    }
+}
 
     /**
      * Track order status
