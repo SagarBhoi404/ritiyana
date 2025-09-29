@@ -3,6 +3,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <!-- Company Info -->
             <div>
+                <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-10 md:h-14 w-auto">
                 <h3 class="text-xl font-bold mb-4">Shree Samagri</h3>
                 <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts here.</p>
                 <div class="flex gap-4">

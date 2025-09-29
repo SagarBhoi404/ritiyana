@@ -48,7 +48,7 @@
         <div class="flex items-center gap-4 py-4">
             <div class="flex items-center gap-3">
                 <a href="{{ route('home') }}" class="flex items-center gap-2 md:gap-3">
-                    {{-- <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-8 md:h-12 w-auto"> --}}
+                    <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-8 md:h-12 w-auto">
                     <span class="text-xl md:text-2xl font-bold text-vibrant-pink">Shree Samagri</span>
                 </a>
             </div>
