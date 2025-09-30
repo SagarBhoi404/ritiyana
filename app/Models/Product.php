@@ -297,4 +297,22 @@ class Product extends Model
     {
         return 'slug';
     }
+
+
+    public function isInStock($quantity = 1)
+    {
+        return $this->stock_quantity >= $quantity;
+    }
+
+    public function isLowStock()
+    {
+        return $this->stock_quantity <= ($this->low_stock_threshold ?? 10);
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('stock_quantity', '>', 0);
+    }
+
+  
 }

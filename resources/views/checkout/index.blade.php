@@ -62,10 +62,10 @@
                                 <span>Subtotal</span>
                                 <span>₹{{ number_format($cartTotal, 2) }}</span>
                             </div>
-                            <div class="flex justify-between text-sm">
+                            {{-- <div class="flex justify-between text-sm">
                                 <span>Tax (18% GST)</span>
                                 <span>₹{{ number_format($taxAmount, 2) }}</span>
-                            </div>
+                            </div> --}}
                             <div class="flex justify-between text-sm">
                                 <span>Shipping</span>
                                 <span>
@@ -137,7 +137,7 @@
                         
                         <div class="space-y-4">
                             <!-- Cash on Delivery - Always Available -->
-                            <div class="flex items-center p-4 border border-gray-200 rounded-lg">
+                            {{-- <div class="flex items-center p-4 border border-gray-200 rounded-lg">
                                 <input type="radio" id="cod" name="payment_method" value="cod" 
                                        class="h-4 w-4 text-vibrant-pink focus:ring-vibrant-pink border-gray-300"
                                        {{ (isset($amountExceeded) && $amountExceeded) ? 'checked' : '' }}>
@@ -146,7 +146,7 @@
                                     <div class="text-sm text-gray-600">Pay when your order is delivered (No amount limits)</div>
                                 </label>
                                 <i data-lucide="banknote" class="w-6 h-6 text-gray-400"></i>
-                            </div>
+                            </div> --}}
                             
                             <!-- Online Payment - May be disabled -->
                             <div class="flex items-center p-4 border border-gray-200 rounded-lg {{ (isset($amountExceeded) && $amountExceeded) ? 'opacity-50' : '' }}">

@@ -41,9 +41,11 @@ class CheckoutController extends Controller
             $defaultAddress = $user->defaultAddress ?? null;
 
             $cartTotal = Cart::getCartTotal();
-            $taxAmount = $cartTotal * 0.18; // 18% GST
+
+            // **FIX: Use proper decimal calculations for financial calculations**
+            $taxAmount = round($cartTotal * 0.18, 2); // 18% GST - properly rounded
             $shippingAmount = $cartTotal >= 500 ? 0 : 50; // Free shipping above ₹500
-            $totalAmount = $cartTotal + $taxAmount + $shippingAmount;
+            $totalAmount = round($cartTotal + $taxAmount + $shippingAmount, 2);
 
             // Check amount limits
             $maxAllowed = config('cashfree.mode') === 'sandbox' ? $this->maxSandboxAmount : $this->maxProductionAmount;
@@ -91,9 +93,8 @@ class CheckoutController extends Controller
                 'payment_method' => $request->payment_method,
             ]);
 
-            // Get cart items with proper relationships
+            // **FIX: Better cart item loading with proper error handling**
             $cartItems = Cart::forCurrentUser()
-                ->withItems()
                 ->with(['product', 'pujaKit'])
                 ->get();
 
@@ -122,7 +123,7 @@ class CheckoutController extends Controller
 
             $user = Auth::user();
 
-            // Verify addresses belong to user
+            // **FIX: Validate addresses with better error handling**
             $billingAddress = $user->addresses()
                 ->where('id', $request->billing_address_id)
                 ->first();
@@ -132,7 +133,12 @@ class CheckoutController extends Controller
                 ->first();
 
             if (! $billingAddress || ! $shippingAddress) {
-                Log::warning('Invalid addresses for user: '.Auth::id());
+                Log::warning('Invalid addresses for user: '.Auth::id(), [
+                    'billing_address_id' => $request->billing_address_id,
+                    'shipping_address_id' => $request->shipping_address_id,
+                    'billing_found' => (bool) $billingAddress,
+                    'shipping_found' => (bool) $shippingAddress,
+                ]);
 
                 return response()->json([
                     'success' => false,
@@ -140,8 +146,8 @@ class CheckoutController extends Controller
                 ], 400);
             }
 
-            // **CRITICAL FIX: Calculate prices correctly**
-            $subtotal = 0;
+            // **CRITICAL FIX: Improved price calculation with proper decimal handling**
+            $subtotal = 0.0;
             $calculatedItems = [];
 
             foreach ($cartItems as $cartItem) {
@@ -152,29 +158,31 @@ class CheckoutController extends Controller
                     'quantity' => $cartItem->quantity,
                 ]);
 
-                $unitPrice = 0;
+                $unitPrice = 0.0;
                 $itemName = 'Unknown Item';
 
-                // **FIX: Get prices directly from relationships or fallback to stored price**
+                // **FIX: Improved price extraction with better fallback logic**
                 if ($cartItem->item_type === 'puja_kit') {
                     if ($cartItem->pujaKit) {
-                        // Try different price fields for puja kit
-                        $unitPrice = $cartItem->pujaKit->final_price ??
-                                   $cartItem->pujaKit->total_price ??
-                                   $cartItem->price ?? 0;
-                        $itemName = $cartItem->pujaKit->kit_name;
+                        // Get the best available price for puja kit
+                        $unitPrice = $cartItem->pujaKit->final_price
+                                   ?? $cartItem->pujaKit->total_price
+                                   ?? $cartItem->pujaKit->price
+                                   ?? floatval($cartItem->price ?? 0);
+                        $itemName = $cartItem->pujaKit->kit_name ?? 'Unknown Puja Kit';
 
                         Log::info('PujaKit pricing', [
                             'kit_id' => $cartItem->puja_kit_id,
                             'kit_name' => $itemName,
                             'kit_final_price' => $cartItem->pujaKit->final_price,
                             'kit_total_price' => $cartItem->pujaKit->total_price,
+                            'kit_price' => $cartItem->pujaKit->price ?? null,
                             'stored_price' => $cartItem->price,
                             'used_price' => $unitPrice,
                         ]);
                     } else {
                         // Fallback to stored price
-                        $unitPrice = $cartItem->price ?? 0;
+                        $unitPrice = floatval($cartItem->price ?? 0);
                         $itemName = $cartItem->item_name ?? 'Unknown Puja Kit';
 
                         Log::warning('PujaKit not found, using stored price', [
@@ -186,11 +194,11 @@ class CheckoutController extends Controller
                 } else {
                     // Product
                     if ($cartItem->product) {
-                        // Try different price fields for product
-                        $unitPrice = $cartItem->product->sale_price ??
-                                   $cartItem->product->price ??
-                                   $cartItem->price ?? 0;
-                        $itemName = $cartItem->product->name;
+                        // Get the best available price for product
+                        $unitPrice = $cartItem->product->sale_price
+                                   ?? $cartItem->product->price
+                                   ?? floatval($cartItem->price ?? 0);
+                        $itemName = $cartItem->product->name ?? 'Unknown Product';
 
                         Log::info('Product pricing', [
                             'product_id' => $cartItem->product_id,
@@ -202,7 +210,7 @@ class CheckoutController extends Controller
                         ]);
                     } else {
                         // Fallback to stored price
-                        $unitPrice = $cartItem->price ?? 0;
+                        $unitPrice = floatval($cartItem->price ?? 0);
                         $itemName = $cartItem->item_name ?? 'Unknown Product';
 
                         Log::warning('Product not found, using stored price', [
@@ -213,40 +221,54 @@ class CheckoutController extends Controller
                     }
                 }
 
-                // **CRITICAL: Ensure we have a valid price**
-                if ($unitPrice <= 0) {
-                    // Try to get price from stored cart price as last resort
-                    $unitPrice = floatval($cartItem->price ?? 0);
+                // **CRITICAL: Ensure we have a valid price with proper validation**
+                $unitPrice = floatval($unitPrice);
 
+                if ($unitPrice <= 0) {
                     Log::error('Zero or negative price detected!', [
                         'cart_id' => $cartItem->id,
                         'item_type' => $cartItem->item_type,
                         'final_unit_price' => $unitPrice,
                         'item_name' => $itemName,
+                        'original_stored_price' => $cartItem->price,
                     ]);
 
-                    if ($unitPrice <= 0) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Invalid price for item: '.$itemName.'. Please remove and re-add this item to your cart.',
-                        ], 400);
-                    }
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid price for item: '.$itemName.'. Please remove and re-add this item to your cart.',
+                    ], 400);
                 }
 
-                $itemSubtotal = $unitPrice * $cartItem->quantity;
-                $subtotal += $itemSubtotal;
+                // **FIX: Proper decimal calculation with rounding**
+                $quantity = intval($cartItem->quantity);
+                if ($quantity <= 0) {
+                    Log::error('Invalid quantity detected!', [
+                        'cart_id' => $cartItem->id,
+                        'quantity' => $cartItem->quantity,
+                        'item_name' => $itemName,
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid quantity for item: '.$itemName,
+                    ], 400);
+                }
+
+                $itemSubtotal = round($unitPrice * $quantity, 2);
+                $subtotal = round($subtotal + $itemSubtotal, 2);
 
                 $calculatedItems[] = [
                     'cart_item' => $cartItem,
                     'unit_price' => $unitPrice,
                     'subtotal' => $itemSubtotal,
                     'item_name' => $itemName,
+                    'quantity' => $quantity,
                 ];
 
                 Log::info('Item calculation completed', [
                     'item_name' => $itemName,
                     'unit_price' => $unitPrice,
-                    'quantity' => $cartItem->quantity,
+                    'quantity' => $quantity,
                     'item_subtotal' => $itemSubtotal,
                     'running_subtotal' => $subtotal,
                 ]);
@@ -254,7 +276,7 @@ class CheckoutController extends Controller
 
             // Final validation
             if ($subtotal <= 0) {
-                Log::error('CRITICAL: Final subtotal is zero!', [
+                Log::error('CRITICAL: Final subtotal is zero or negative!', [
                     'calculated_subtotal' => $subtotal,
                     'items_count' => count($calculatedItems),
                     'user_id' => Auth::id(),
@@ -266,10 +288,10 @@ class CheckoutController extends Controller
                 ], 400);
             }
 
-            // Calculate final amounts
+            // **FIX: Calculate final amounts with proper decimal handling**
             $taxAmount = round($subtotal * 0.18, 2); // 18% GST
-            $shippingAmount = $subtotal >= 500 ? 0 : 50;
-            $totalAmount = $subtotal + $taxAmount + $shippingAmount;
+            $shippingAmount = $subtotal >= 500 ? 0.00 : 50.00;
+            $totalAmount = round($subtotal + $taxAmount + $shippingAmount, 2);
 
             Log::info('=== FINAL CALCULATIONS ===', [
                 'subtotal' => $subtotal,
@@ -294,13 +316,13 @@ class CheckoutController extends Controller
                 ], 400);
             }
 
-            // **CRITICAL: Create order with CORRECT values**
+            // **FIX: Create order with validated and properly calculated values**
             $order = Order::create([
                 'user_id' => $user->id,
                 'order_number' => 'ORD-'.strtoupper(uniqid()),
                 'status' => 'pending',
                 'payment_status' => 'pending',
-                'subtotal' => $subtotal, // This should now be correct
+                'subtotal' => $subtotal,
                 'tax_amount' => $taxAmount,
                 'shipping_amount' => $shippingAmount,
                 'total_amount' => $totalAmount,
@@ -311,6 +333,7 @@ class CheckoutController extends Controller
             ]);
 
             Log::info('=== ORDER CREATED ===', [
+                'order_id' => $order->id,
                 'order_number' => $order->order_number,
                 'order_subtotal' => $order->subtotal,
                 'order_tax' => $order->tax_amount,
@@ -318,7 +341,8 @@ class CheckoutController extends Controller
                 'order_total' => $order->total_amount,
             ]);
 
-            // Create order items with validated prices
+            // **FIX: Create order items with validated prices and better error handling**
+            $createdOrderItems = [];
             foreach ($calculatedItems as $calculatedItem) {
                 $cartItem = $calculatedItem['cart_item'];
 
@@ -329,7 +353,7 @@ class CheckoutController extends Controller
                     'product_name' => $calculatedItem['item_name'],
                     'product_sku' => $this->generateSKU($cartItem),
                     'product_image' => $cartItem->display_image ?? null,
-                    'quantity' => $cartItem->quantity,
+                    'quantity' => $calculatedItem['quantity'],
                     'price' => $calculatedItem['unit_price'],
                     'total' => $calculatedItem['subtotal'],
                     'vendor_id' => $this->getVendorId($cartItem),
@@ -337,35 +361,67 @@ class CheckoutController extends Controller
                 ];
 
                 $orderItem = OrderItem::create($orderItemData);
+                $createdOrderItems[] = $orderItem;
 
                 Log::info('Order item created', [
                     'order_item_id' => $orderItem->id,
                     'product_name' => $calculatedItem['item_name'],
-                    'quantity' => $cartItem->quantity,
+                    'quantity' => $calculatedItem['quantity'],
                     'unit_price' => $calculatedItem['unit_price'],
                     'item_total' => $calculatedItem['subtotal'],
                 ]);
             }
 
-            // Verify order items were created correctly
-            $orderItemsTotal = $order->orderItems()->sum('total');
+            // **FIX: Verify order items were created correctly with tolerance for float precision**
+            $orderItemsTotal = round(collect($createdOrderItems)->sum('total'), 2);
+            $orderSubtotal = round($order->subtotal, 2);
+
             Log::info('Order verification', [
-                'order_subtotal' => $order->subtotal,
+                'order_subtotal' => $orderSubtotal,
                 'order_items_total' => $orderItemsTotal,
-                'match' => abs($order->subtotal - $orderItemsTotal) < 0.01,
+                'difference' => abs($orderSubtotal - $orderItemsTotal),
+                'match' => abs($orderSubtotal - $orderItemsTotal) < 0.01,
             ]);
+
+            $this->decreaseProductStock($order);
+
+            if (abs($orderSubtotal - $orderItemsTotal) >= 0.01) {
+                Log::error('Order items total mismatch!', [
+                    'order_subtotal' => $orderSubtotal,
+                    'order_items_total' => $orderItemsTotal,
+                    'difference' => abs($orderSubtotal - $orderItemsTotal),
+                ]);
+
+                // This is a critical error - rollback
+                DB::rollback();
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order calculation error. Please try again.',
+                ], 500);
+            }
 
             // Handle payment methods
             if ($request->payment_method === 'cod') {
                 // Cash on Delivery
                 $this->processCODPayment($order, $user);
-                // **FIX: Clear cart immediately after COD order**
-                $cartClearResult = Cart::clearCart();
-                Log::info('Cart clear result for COD order', [
-                    'order_number' => $order->order_number,
-                    'clear_success' => $cartClearResult['success'],
-                    'clear_message' => $cartClearResult['message'],
-                ]);
+
+                // **FIX: Clear cart immediately after COD order with better error handling**
+                try {
+                    $cartClearResult = Cart::clearCart();
+                    Log::info('Cart clear result for COD order', [
+                        'order_number' => $order->order_number,
+                        'clear_success' => $cartClearResult['success'] ?? true,
+                        'clear_message' => $cartClearResult['message'] ?? 'Cart cleared',
+                    ]);
+                } catch (\Exception $e) {
+                    Log::warning('Failed to clear cart after COD order', [
+                        'order_number' => $order->order_number,
+                        'error' => $e->getMessage(),
+                    ]);
+                    // Don't fail the order for cart clear failure
+                }
+
                 DB::commit();
 
                 Log::info('COD order completed: '.$order->order_number);
@@ -380,51 +436,61 @@ class CheckoutController extends Controller
                 // Online Payment - Create Cashfree order
                 $payment = $this->createPendingPayment($order, $user);
 
+                // **FIX: Better customer name handling**
+                $customerName = $this->getCustomerName($user);
+                $customerPhone = $user->phone ?? '9999999999';
+
                 // Create Cashfree order with correct amount
                 $cashfreeOrderData = [
                     'order_id' => $order->order_number,
                     'amount' => $totalAmount,
                     'currency' => 'INR',
                     'customer_id' => 'customer_'.$user->id,
-                    'customer_name' => $user->full_name ?? ($user->first_name.' '.$user->last_name) ?? $user->name ?? 'Customer',
+                    'customer_name' => $customerName,
                     'customer_email' => $user->email,
-                    'customer_phone' => $user->phone ?? '9999999999',
+                    'customer_phone' => $customerPhone,
                     'return_url' => url('/payment/success?order_id='.$order->order_number),
                     'order_note' => 'Order from Shree Samagri - '.$order->order_number,
                     'payment_methods' => 'cc,dc,upi,nb',
                 ];
 
+                // **FIX: Better webhook URL handling**
                 try {
                     $webhookUrl = route('payment.webhook');
                     $cashfreeOrderData['webhook_url'] = $webhookUrl;
                 } catch (\Exception $e) {
-                    // Webhook route not available
+                    Log::warning('Webhook route not available: '.$e->getMessage());
+                    // Continue without webhook
                 }
 
-                Log::info('Creating Cashfree order', $cashfreeOrderData);
+                Log::info('Creating Cashfree order', [
+                    'order_data' => array_merge($cashfreeOrderData, [
+                        'customer_phone' => substr($customerPhone, 0, 4).'****', // Mask phone for logging
+                    ]),
+                ]);
 
                 $cashfreeResponse = $this->cashfreeService->createOrder($cashfreeOrderData);
 
-                // **IMPROVED: Handle different Cashfree response structures**
-                if (! $cashfreeResponse['success']) {
+                // **FIX: Better Cashfree response handling**
+                if (! $cashfreeResponse || ! ($cashfreeResponse['success'] ?? false)) {
                     DB::rollback();
-                    Log::error('Cashfree order creation failed: '.$cashfreeResponse['error']);
+                    $errorMessage = $cashfreeResponse['error'] ?? 'Unknown payment gateway error';
+
+                    Log::error('Cashfree order creation failed', [
+                        'error' => $errorMessage,
+                        'response' => $cashfreeResponse,
+                        'order_number' => $order->order_number,
+                    ]);
 
                     return response()->json([
                         'success' => false,
-                        'message' => 'Payment gateway error: '.$cashfreeResponse['error'],
+                        'message' => 'Payment gateway error: '.$errorMessage,
                     ], 500);
                 }
 
-                // Extract cf_order_id from various possible locations in response
-                $cfOrderId = $cashfreeResponse['cf_order_id'] ??
-                             $cashfreeResponse['full_response']['cf_order_id'] ??
-                             $cashfreeResponse['order_details']['cf_order_id'] ??
-                             null;
-
-                $paymentSessionId = $cashfreeResponse['payment_session_id'] ??
-                                   $cashfreeResponse['full_response']['payment_session_id'] ??
-                                   null;
+                // **FIX: More robust extraction of cf_order_id**
+                $cfOrderId = $this->extractCfOrderId($cashfreeResponse);
+                $paymentSessionId = $this->extractPaymentSessionId($cashfreeResponse);
 
                 Log::info('Cashfree response parsed', [
                     'cf_order_id' => $cfOrderId,
@@ -434,8 +500,8 @@ class CheckoutController extends Controller
                 if (! $cfOrderId) {
                     DB::rollback();
                     Log::error('Could not extract cf_order_id from Cashfree response', [
-                        'response_keys' => array_keys($cashfreeResponse),
-                        'full_response' => $cashfreeResponse,
+                        'response_structure' => $this->getResponseStructure($cashfreeResponse),
+                        'order_number' => $order->order_number,
                     ]);
 
                     return response()->json([
@@ -454,6 +520,7 @@ class CheckoutController extends Controller
                     'payment_id' => $payment->id,
                     'gateway_order_id' => $cfOrderId,
                 ]);
+
                 DB::commit();
 
                 Log::info('Online payment setup completed for order: '.$order->order_number);
@@ -463,26 +530,30 @@ class CheckoutController extends Controller
                     'message' => 'Order created successfully!',
                     'show_payment_gateway' => true,
                     'payment_data' => [
-                        'cf_order_id' => $cashfreeResponse['cf_order_id'],
-                        'payment_session_id' => $cashfreeResponse['payment_session_id'] ?? null,
+                        'cf_order_id' => $cfOrderId,
+                        'payment_session_id' => $paymentSessionId,
                         'order_id' => $order->order_number,
                         'amount' => $totalAmount,
-                        'customer_name' => $user->full_name ?? ($user->first_name.' '.$user->last_name) ?? $user->name ?? 'Customer',
+                        'customer_name' => $customerName,
                         'customer_email' => $user->email,
-                        'customer_phone' => $user->phone ?? '9999999999',
+                        'customer_phone' => $customerPhone,
                     ],
                 ]);
             }
 
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Checkout process failed: '.$e->getMessage());
-            Log::error('Stack trace: '.$e->getTraceAsString());
+            Log::error('Checkout process failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all(),
+            ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Checkout failed. Please try again.',
-                'error_details' => config('app.debug') ? $e->getMessage() : 'Please try again',
+                'error_details' => config('app.debug') ? $e->getMessage() : 'Please contact support if the problem persists',
             ], 500);
         }
     }
@@ -494,19 +565,33 @@ class CheckoutController extends Controller
             $order = $user->orders()
                 ->with(['orderItems.product', 'orderItems.pujaKit', 'payments'])
                 ->where('order_number', $orderNumber)
-                ->firstOrFail();
+                ->first();
+
+            if (! $order) {
+                Log::warning('Order not found for success page', [
+                    'order_number' => $orderNumber,
+                    'user_id' => $user->id,
+                ]);
+
+                return redirect()->route('home')
+                    ->with('error', 'Order not found');
+            }
 
             return view('checkout.success', compact('order'));
 
         } catch (\Exception $e) {
-            Log::error('Checkout success page error: '.$e->getMessage());
+            Log::error('Checkout success page error: '.$e->getMessage(), [
+                'order_number' => $orderNumber,
+                'user_id' => Auth::id(),
+            ]);
 
             return redirect()->route('home')
                 ->with('error', 'Unable to load order confirmation');
         }
     }
 
-    // Helper methods
+    // **FIX: Enhanced helper methods with better error handling**
+
     private function generateSKU($cartItem)
     {
         if ($cartItem->item_type === 'puja_kit') {
@@ -570,6 +655,185 @@ class CheckoutController extends Controller
             'gateway' => 'cashfree',
             'method' => 'card',
             'status' => 'pending',
+        ]);
+    }
+
+    // **NEW: Additional helper methods for better code organization**
+
+    private function getCustomerName($user)
+    {
+        return $user->full_name
+            ?? ($user->first_name && $user->last_name ? $user->first_name.' '.$user->last_name : null)
+            ?? $user->name
+            ?? 'Customer';
+    }
+
+    private function extractCfOrderId($response)
+    {
+        return $response['cf_order_id']
+            ?? $response['full_response']['cf_order_id']
+            ?? $response['order_details']['cf_order_id']
+            ?? $response['data']['cf_order_id']
+            ?? null;
+    }
+
+    private function extractPaymentSessionId($response)
+    {
+        return $response['payment_session_id']
+            ?? $response['full_response']['payment_session_id']
+            ?? $response['data']['payment_session_id']
+            ?? null;
+    }
+
+    private function getResponseStructure($response)
+    {
+        if (! is_array($response)) {
+            return 'non-array response';
+        }
+
+        $structure = [];
+        foreach ($response as $key => $value) {
+            if (is_array($value)) {
+                $structure[$key] = 'array['.implode(',', array_keys($value)).']';
+            } else {
+                $structure[$key] = gettype($value);
+            }
+        }
+
+        return $structure;
+    }
+
+    /**
+     * Decrease stock quantity for products when order is successful
+     */
+    private function decreaseProductStock(Order $order)
+    {
+        Log::info('Starting stock decrease for order', [
+            'order_number' => $order->order_number,
+            'items_count' => $order->orderItems->count(),
+        ]);
+
+        foreach ($order->orderItems as $orderItem) {
+            try {
+                if ($orderItem->product_id && $orderItem->product) {
+                    $product = $orderItem->product;
+                    $quantityToDecrease = $orderItem->quantity;
+
+                    // Check if enough stock is available
+                    if ($product->stock_quantity >= $quantityToDecrease) {
+                        // Decrease stock quantity
+                        $oldStock = $product->stock_quantity;
+                        $product->decrement('stock_quantity', $quantityToDecrease);
+
+                        // Refresh to get updated stock
+                        $product->refresh();
+                        $newStock = $product->stock_quantity;
+
+                        Log::info('Product stock decreased', [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'old_stock' => $oldStock,
+                            'quantity_decreased' => $quantityToDecrease,
+                            'new_stock' => $newStock,
+                            'order_number' => $order->order_number,
+                        ]);
+
+                        // Create inventory log for the stock decrease
+                        \App\Models\InventoryLog::create([
+                            'product_id' => $product->id,
+                            'type' => 'decrease',
+                            'quantity' => $quantityToDecrease,
+                            'reason' => 'Order placed',
+                            'reference_type' => 'order',
+                            'reference_id' => $order->id,
+                            'notes' => "Stock decreased for order #{$order->order_number}",
+                            'previous_quantity' => $oldStock,
+                            'new_quantity' => $newStock,
+                            'created_by' => $order->user_id,
+                        ]);
+
+                    } else {
+                        Log::warning('Insufficient stock for product', [
+                            'product_id' => $product->id,
+                            'product_name' => $product->name,
+                            'available_stock' => $product->stock_quantity,
+                            'required_quantity' => $quantityToDecrease,
+                            'order_number' => $order->order_number,
+                        ]);
+                    }
+
+                } elseif ($orderItem->puja_kit_id && $orderItem->pujaKit) {
+                    // Handle puja kit stock decrease
+                    $pujaKit = $orderItem->pujaKit;
+
+                    Log::info('Processing puja kit stock decrease', [
+                        'puja_kit_id' => $pujaKit->id,
+                        'kit_name' => $pujaKit->kit_name,
+                        'kit_quantity' => $orderItem->quantity,
+                    ]);
+
+                    foreach ($pujaKit->products as $kitProduct) {
+                        $requiredQuantity = $kitProduct->pivot->quantity * $orderItem->quantity;
+
+                        if ($kitProduct->stock_quantity >= $requiredQuantity) {
+                            $oldStock = $kitProduct->stock_quantity;
+                            $kitProduct->decrement('stock_quantity', $requiredQuantity);
+
+                            // Refresh to get updated stock
+                            $kitProduct->refresh();
+                            $newStock = $kitProduct->stock_quantity;
+
+                            Log::info('Puja kit product stock decreased', [
+                                'product_id' => $kitProduct->id,
+                                'product_name' => $kitProduct->name,
+                                'old_stock' => $oldStock,
+                                'quantity_decreased' => $requiredQuantity,
+                                'new_stock' => $newStock,
+                                'puja_kit_id' => $pujaKit->id,
+                                'order_number' => $order->order_number,
+                            ]);
+
+                            // Create inventory log for puja kit product
+                            \App\Models\InventoryLog::create([
+                                'product_id' => $kitProduct->id,
+                                'type' => 'decrease',
+                                'quantity' => $requiredQuantity,
+                                'reason' => 'Puja kit order placed',
+                                'reference_type' => 'order',
+                                'reference_id' => $order->id,
+                                'notes' => "Stock decreased for puja kit in order #{$order->order_number}",
+                                'previous_quantity' => $oldStock,
+                                'new_quantity' => $newStock,
+                                'created_by' => $order->user_id,
+                            ]);
+
+                        } else {
+                            Log::warning('Insufficient stock for puja kit product', [
+                                'product_id' => $kitProduct->id,
+                                'product_name' => $kitProduct->name,
+                                'available_stock' => $kitProduct->stock_quantity,
+                                'required_quantity' => $requiredQuantity,
+                                'puja_kit_id' => $pujaKit->id,
+                                'order_number' => $order->order_number,
+                            ]);
+                        }
+                    }
+                }
+
+            } catch (\Exception $e) {
+                Log::error('Failed to decrease stock for order item', [
+                    'order_item_id' => $orderItem->id,
+                    'product_id' => $orderItem->product_id,
+                    'puja_kit_id' => $orderItem->puja_kit_id,
+                    'error' => $e->getMessage(),
+                    'order_number' => $order->order_number,
+                ]);
+                // Continue with other items, don't fail the entire process
+            }
+        }
+
+        Log::info('Stock decrease completed for order', [
+            'order_number' => $order->order_number,
         ]);
     }
 }
