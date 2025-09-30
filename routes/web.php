@@ -3,6 +3,7 @@
 // routes/web.php
 
 use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\VendorController;
 use App\Http\Controllers\AdminLoginController;
@@ -225,7 +226,12 @@ Route::middleware('auth')->group(function () {
         Route::get('orders/{order}/invoice', [AdminOrderController::class, 'printInvoice'])->name('orders.invoice');
         Route::get('orders-analytics', [AdminOrderController::class, 'analytics'])->name('orders.analytics');
 
-        Route::view('/inventory', 'admin.inventory.index')->name('inventory.index');
+        // Route::view('/inventory', 'admin.inventory.index')->name('inventory.index');
+ Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('inventory/{product}', [InventoryController::class, 'show'])->name('inventory.show');
+    Route::post('inventory/{product}/update-stock', [InventoryController::class, 'updateStock'])->name('inventory.update-stock');
+
+
         Route::view('/analytics', 'admin.analytics.index')->name('analytics.index');
         Route::view('/settings', 'admin.settings.index')->name('settings.index');
     });
