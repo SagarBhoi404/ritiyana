@@ -189,25 +189,32 @@
                 </div>
 
                 <!-- Gallery Images -->
-                @if ($product->gallery_images && count($product->gallery_images) > 0)
-                    <div class="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
-                        <div class="p-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
-                                <i data-lucide="images" class="w-5 h-5 mr-2"></i>
-                                Product Gallery ({{ count($product->gallery_images) }})
-                            </h3>
-                        </div>
-                        <div class="p-6">
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                @foreach ($product->gallery_images as $image)
-                                    <img src="{{ asset('storage/' . $image) }}" alt="Gallery image"
-                                        class="w-full h-32 rounded-lg object-cover cursor-pointer hover:opacity-75 transition-opacity"
-                                        onclick="openImageModal('{{ asset('storage/' . $image) }}')">
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-                @endif
+             @if ($product->gallery_images && count($product->gallery_images) > 0)
+    <div class="mt-8 bg-white rounded-2xl border border-gray-200 shadow-sm">
+        <div class="p-6 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i data-lucide="images" class="w-5 h-5 mr-2"></i>
+                Product Gallery ({{ count($product->gallery_images) }})
+            </h3>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @foreach ($product->gallery_images as $image)
+                    @php
+                        $imageUrl = app()->environment('production') 
+                            ? url('public/storage/' . $image) 
+                            : asset('storage/' . $image);
+                    @endphp
+                    <img src="{{ $imageUrl }}" 
+                         alt="Gallery image"
+                        class="w-full h-32 rounded-lg object-cover cursor-pointer hover:opacity-75 transition-opacity"
+                        onclick="openImageModal('{{ $imageUrl }}')">
+                @endforeach
+            </div>
+        </div>
+    </div>
+@endif
+
             </div>
 
             <!-- Sidebar -->

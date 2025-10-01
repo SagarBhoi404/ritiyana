@@ -314,5 +314,13 @@ class Product extends Model
         return $query->where('stock_quantity', '>', 0);
     }
 
-  
+  // Add to Product.php model
+public function getGalleryImageUrl($imagePath)
+{
+    if (app()->environment('production')) {
+        return url('public/storage/' . $imagePath);
+    } else {
+        return asset('storage/' . $imagePath);
+    }
+}
 }

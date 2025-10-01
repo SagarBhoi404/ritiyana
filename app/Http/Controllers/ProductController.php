@@ -1,13 +1,14 @@
 <?php
+
 // app/Http/Controllers/Admin/ProductController.php
+
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller; 
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -16,7 +17,7 @@ class ProductController extends Controller
         $products = Product::with(['categories', 'creator', 'vendor.vendorProfile'])
             ->latest()
             ->paginate(15);
-            
+
         $totalProducts = Product::count();
         $activeProducts = Product::where('is_active', true)->count();
         $featuredProducts = Product::where('is_featured', true)->count();
@@ -27,7 +28,7 @@ class ProductController extends Controller
         return view('admin.products.index', compact(
             'products',
             'totalProducts',
-            'activeProducts', 
+            'activeProducts',
             'featuredProducts',
             'lowStockProducts',
             'outOfStockProducts',
@@ -38,10 +39,11 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::where('is_active', true)->get();
+
         return view('admin.products.create', compact('categories'));
     }
 
-       public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -97,17 +99,28 @@ class ProductController extends Controller
             ->with('success', 'Product created successfully');
     }
 
+  public function show(Product $product)
+{
+    $product->load(['categories', 'creator', 'vendor.vendorProfile']);
+    
+    // Add helper method to product for image URLs
+    $product->image_url_helper = function($imagePath) {
+        if (app()->environment('production')) {
+            return url('public/storage/' . $imagePath);
+        } else {
+            return asset('storage/' . $imagePath);
+        }
+    };
+    
+    return view('admin.products.show', compact('product'));
+}
 
-    public function show(Product $product)
-    {
-        $product->load(['categories', 'creator', 'vendor.vendorProfile']);
-        return view('admin.products.show', compact('product'));
-    }
 
     public function edit(Product $product)
     {
         $categories = Category::where('is_active', true)->get();
         $product->load('categories');
+
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
@@ -192,61 +205,60 @@ class ProductController extends Controller
     }
 
     public function vendorProducts()
-{
-    $products = Product::where('is_vendor_product', true)
-        ->with(['vendor.vendorProfile', 'categories'])
-        ->latest()
-        ->paginate(15);
+    {
+        $products = Product::where('is_vendor_product', true)
+            ->with(['vendor.vendorProfile', 'categories'])
+            ->latest()
+            ->paginate(15);
 
-    return view('admin.products.vendor-products', compact('products'));
-}
-
-public function approveVendorProduct(Request $request, $id)
-{
-    $product = Product::findOrFail($id);
-    
-    // Check if product is vendor product
-    if (!$product->is_vendor_product) {
-        return redirect()->back()->with('error', 'This is not a vendor product!');
+        return view('admin.products.vendor-products', compact('products'));
     }
-    
-    $product->update([
-        'approval_status' => 'approved',
-        'approved_at' => now(),
-        'approved_by' => auth()->id(),
-        'is_active' => true,
-    ]);
 
-    // Optional: Notify vendor
-    // event(new ProductApproved($product));
+    public function approveVendorProduct(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
 
-    return redirect()->back()->with('success', 'Vendor product approved successfully!');
-}
+        // Check if product is vendor product
+        if (! $product->is_vendor_product) {
+            return redirect()->back()->with('error', 'This is not a vendor product!');
+        }
 
-public function rejectVendorProduct(Request $request, $id)
-{
-    $product = Product::findOrFail($id);
-    
-    // Check if product is vendor product
-    if (!$product->is_vendor_product) {
-        return redirect()->back()->with('error', 'This is not a vendor product!');
+        $product->update([
+            'approval_status' => 'approved',
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
+            'is_active' => true,
+        ]);
+
+        // Optional: Notify vendor
+        // event(new ProductApproved($product));
+
+        return redirect()->back()->with('success', 'Vendor product approved successfully!');
     }
-    
-    $validated = $request->validate([
-        'rejection_reason' => 'required|string|max:500',
-    ]);
-    
-    $product->update([
-        'approval_status' => 'rejected',
-        'rejection_reason' => $validated['rejection_reason'],
-        'rejected_at' => now(),
-        'rejected_by' => auth()->id(),
-    ]);
 
-    // Optional: Notify vendor
-    // event(new ProductRejected($product));
+    public function rejectVendorProduct(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
 
-    return redirect()->back()->with('success', 'Vendor product rejected successfully!');
-}
+        // Check if product is vendor product
+        if (! $product->is_vendor_product) {
+            return redirect()->back()->with('error', 'This is not a vendor product!');
+        }
 
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $product->update([
+            'approval_status' => 'rejected',
+            'rejection_reason' => $validated['rejection_reason'],
+            'rejected_at' => now(),
+            'rejected_by' => auth()->id(),
+        ]);
+
+        // Optional: Notify vendor
+        // event(new ProductRejected($product));
+
+        return redirect()->back()->with('success', 'Vendor product rejected successfully!');
+    }
 }
