@@ -90,7 +90,7 @@ class VendorPujaKitController extends Controller
 
         $pujaKit->products()->sync($productData);
 
-        return redirect()->route('shopkeeper.puja-kits.index')
+        return redirect()->route('vendor.puja-kits.index')
             ->with('success', 'Puja Kit created successfully');
     }
 

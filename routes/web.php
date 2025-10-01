@@ -48,7 +48,6 @@ Route::get('/refund-cancellation-policy', function () {
     return view('policies.refund');
 })->name('refund');
 
-
 // Product routes
 Route::get('/product/{product:slug}', [App\Http\Controllers\User\ProductController::class, 'show'])->name('product.show');
 Route::get('/products', [App\Http\Controllers\User\ProductController::class, 'index'])->name('products.index');
@@ -202,10 +201,15 @@ Route::middleware('auth')->group(function () {
         // Category Management
         Route::resource('categories', CategoryController::class);
 
-        // Product Management
-        Route::resource('products', ProductController::class);
-        Route::get('/products/vendor-products', [ProductController::class, 'vendorProducts'])->name('products.vendor-products');
 
+           // Admin Product Approval Routes
+       Route::patch('products/{id}/approve', [ProductController::class, 'approveVendorProduct'])->name('products.approve');
+Route::patch('products/{id}/reject', [ProductController::class, 'rejectVendorProduct'])->name('products.reject');
+
+        // Product Management
+        Route::get('/products/vendor-products', [ProductController::class, 'vendorProducts'])->name('products.vendor-products');
+        Route::resource('products', ProductController::class);
+     
         // Puja Management
         Route::resource('pujas', PujaController::class);
 
@@ -241,10 +245,9 @@ Route::middleware('auth')->group(function () {
         Route::get('orders-analytics', [AdminOrderController::class, 'analytics'])->name('orders.analytics');
 
         // Route::view('/inventory', 'admin.inventory.index')->name('inventory.index');
- Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    Route::get('inventory/{product}', [InventoryController::class, 'show'])->name('inventory.show');
-    Route::post('inventory/{product}/update-stock', [InventoryController::class, 'updateStock'])->name('inventory.update-stock');
-
+        Route::get('inventory', [InventoryController::class, 'index'])->name('inventory.index');
+        Route::get('inventory/{product}', [InventoryController::class, 'show'])->name('inventory.show');
+        Route::post('inventory/{product}/update-stock', [InventoryController::class, 'updateStock'])->name('inventory.update-stock');
 
         Route::view('/analytics', 'admin.analytics.index')->name('analytics.index');
         Route::view('/settings', 'admin.settings.index')->name('settings.index');
@@ -256,7 +259,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Vendor\DashboardController::class, 'index'])->name('dashboard');
         Route::post('/logout', [ShopkeeperLoginController::class, 'logout'])->name('logout');
 
-    // Puja Kit Management
+        // Puja Kit Management
         // Route::resource('puja-kits', PujaKitController::class);
 
         // Vendor Profile Management
@@ -276,6 +279,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [VendorOrderController::class, 'index'])->name('index');
             Route::get('/{vendorOrder}', [VendorOrderController::class, 'show'])->name('show');
             Route::patch('/{vendorOrder}/status', [VendorOrderController::class, 'updateStatus'])->name('update-status');
+            Route::get('/{order}/invoice', [VendorOrderController::class, 'invoice'])->name('invoice');
         });
 
         // Vendor Analytics

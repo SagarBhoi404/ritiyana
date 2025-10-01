@@ -201,8 +201,15 @@ class ProductController extends Controller
     return view('admin.products.vendor-products', compact('products'));
 }
 
-public function approveVendorProduct(Product $product)
+public function approveVendorProduct(Request $request, $id)
 {
+    $product = Product::findOrFail($id);
+    
+    // Check if product is vendor product
+    if (!$product->is_vendor_product) {
+        return redirect()->back()->with('error', 'This is not a vendor product!');
+    }
+    
     $product->update([
         'approval_status' => 'approved',
         'approved_at' => now(),
@@ -210,15 +217,36 @@ public function approveVendorProduct(Product $product)
         'is_active' => true,
     ]);
 
+    // Optional: Notify vendor
+    // event(new ProductApproved($product));
+
     return redirect()->back()->with('success', 'Vendor product approved successfully!');
 }
 
-public function rejectVendorProduct(Product $product)
+public function rejectVendorProduct(Request $request, $id)
 {
+    $product = Product::findOrFail($id);
+    
+    // Check if product is vendor product
+    if (!$product->is_vendor_product) {
+        return redirect()->back()->with('error', 'This is not a vendor product!');
+    }
+    
+    $validated = $request->validate([
+        'rejection_reason' => 'required|string|max:500',
+    ]);
+    
     $product->update([
         'approval_status' => 'rejected',
+        'rejection_reason' => $validated['rejection_reason'],
+        'rejected_at' => now(),
+        'rejected_by' => auth()->id(),
     ]);
+
+    // Optional: Notify vendor
+    // event(new ProductRejected($product));
 
     return redirect()->back()->with('success', 'Vendor product rejected successfully!');
 }
+
 }
