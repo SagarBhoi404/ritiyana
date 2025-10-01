@@ -227,11 +227,11 @@
                                     </div>
                                 @endif
 
-                                @if ($product->is_vendor_product)
+                                {{-- @if ($product->is_vendor_product)
                                     <div class="absolute top-2 right-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded">
                                         Vendor
                                     </div>
-                                @endif
+                                @endif --}}
 
                                 @if ($product->manage_stock && $product->stock_quantity <= 5 && $product->stock_quantity > 0)
                                     <div class="absolute bottom-2 left-2 bg-orange-500 text-white text-xs font-medium px-2 py-1 rounded">

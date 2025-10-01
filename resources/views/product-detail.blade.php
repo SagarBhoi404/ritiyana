@@ -26,11 +26,11 @@
                         </div>
                     @endif
                     
-                    @if ($product->is_vendor_product)
+                    {{-- @if ($product->is_vendor_product)
                         <div class="absolute top-4 right-4 bg-blue-500 text-white text-sm font-medium px-3 py-1 rounded-full">
                             Vendor Product
                         </div>
-                    @endif
+                    @endif --}}
                 </div>
 
                 <!-- Image Thumbnails -->

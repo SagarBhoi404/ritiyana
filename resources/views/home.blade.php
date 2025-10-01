@@ -426,12 +426,12 @@
                                 </div>
                             @endif
 
-                            @if ($product->is_vendor_product)
+                            {{-- @if ($product->is_vendor_product)
                                 <div
                                     class="absolute top-2 right-2 bg-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-sm">
                                     Vendor
                                 </div>
-                            @endif
+                            @endif --}}
                         </div>
 
                         <!-- Content Section -->
