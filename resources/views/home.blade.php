@@ -114,7 +114,7 @@
 
     <!-- Top Banner Slider -->
     <section class="max-w-7xl mx-auto px-4 pt-4">
-        <div class="banner-swiper relative pb-12">
+        <div class="banner-swiper relative">
             <div class="swiper-wrapper">
                 @forelse($banners as $banner)
                     <div class="swiper-slide">
@@ -188,7 +188,7 @@
     </section> --}}
 
     <!-- Categories Section -->
-    <section class="max-w-7xl mx-auto px-4 py-12">
+    <section class="max-w-7xl mx-auto px-4 ">
         <h2 class="text-2xl font-bold mb-8">Shop by Category</h2>
         <div class="category-scroll flex gap-3 sm:gap-4 md:gap-6 overflow-x-auto pb-2">
             @forelse ($categories as $category)
@@ -243,64 +243,16 @@
     </section>
 
 
-    <!-- Secondary Banners -->
-    <section class="max-w-7xl mx-auto px-4 py-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Ganesh Chaturthi Banner -->
-            <div class="relative bg-orange-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <a href="/all-kits?filter=ganesh" class="block">
-                    <img src="{{ asset('images/diwali-small.jpg') }}" alt="Ganesh Chaturthi Collection"
-                        class="w-full h-auto object-cover" style="aspect-ratio: 352/124; height: 124px;">
-                    <!-- Overlay Content -->
-                    {{-- <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div class="text-center text-white p-4">
-                        <h3 class="text-lg font-semibold mb-2">Ganesh Chaturthi</h3>
-                        <p class="text-sm mb-3">Complete essentials for celebration</p>
-                        <span class="bg-white text-orange-600 font-medium px-4 py-1 rounded-full text-sm hover:bg-orange-50 transition-colors inline-block">
-                            Shop Collection
-                        </span>
-                    </div>
-                </div> --}}
-                </a>
-            </div>
+ <!-- Secondary Banners -->
+<section class="max-w-7xl mx-auto px-4 py-8">
+    <div class="relative bg-yellow-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
+        <a href="/all-kits?filter=diwali" class="block">
+            <img src="{{ asset('images/SL-092921-45900-40.jpg') }}" alt="Diwali Collection"
+                class="w-full h-auto object-cover" style="aspect-ratio: 352/124; height: auto;">
+        </a>
+    </div>
+</section>
 
-            <!-- Navratri Banner -->
-            <div class="relative bg-purple-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <a href="/all-kits?filter=navratri" class="block">
-                    <img src="{{ asset('images/78248595_18867.jpg') }}" alt="Navratri Special Collection"
-                        class="w-full h-auto object-cover" style="aspect-ratio: 352/124; height: 124px;">
-                    <!-- Overlay Content -->
-                    {{-- <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div class="text-center text-white p-4">
-                        <h3 class="text-lg font-semibold mb-2">Navratri Special</h3>
-                        <p class="text-sm mb-3">Sacred items for 9 days of celebration</p>
-                        <span class="bg-white text-purple-600 font-medium px-4 py-1 rounded-full text-sm hover:bg-purple-50 transition-colors inline-block">
-                            Shop Collection
-                        </span>
-                    </div>
-                </div> --}}
-                </a>
-            </div>
-
-            <!-- Diwali Banner -->
-            <div class="relative bg-yellow-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <a href="/all-kits?filter=diwali" class="block">
-                    <img src="{{ asset('images/SL-092921-45900-40.jpg') }}" alt="Diwali Collection"
-                        class="w-full h-auto object-cover" style="aspect-ratio: 352/124; height: 124px;">
-                    <!-- Overlay Content -->
-                    {{-- <div class="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div class="text-center text-white p-4">
-                        <h3 class="text-lg font-semibold mb-2">Diwali Collection</h3>
-                        <p class="text-sm mb-3">Premium Diwali collection</p>
-                        <span class="bg-white text-yellow-600 font-medium px-4 py-1 rounded-full text-sm hover:bg-yellow-50 transition-colors inline-block">
-                            Shop Collection
-                        </span>
-                    </div>
-                </div> --}}
-                </a>
-            </div>
-        </div>
-    </section>
 
     <!-- Original Text-Only Secondary Banners (Alternative/Fallback) -->
     {{-- <section class="max-w-7xl mx-auto px-4 py-8">

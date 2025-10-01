@@ -43,7 +43,7 @@ class CheckoutController extends Controller
             $cartTotal = Cart::getCartTotal();
 
             // **FIX: Use proper decimal calculations for financial calculations**
-            $taxAmount = round($cartTotal * 0.18, 2); // 18% GST - properly rounded
+            $taxAmount = 0; // 18% GST - properly rounded
             $shippingAmount = $cartTotal >= 500 ? 0 : 50; // Free shipping above ₹500
             $totalAmount = round($cartTotal + $taxAmount + $shippingAmount, 2);
 
@@ -289,7 +289,7 @@ class CheckoutController extends Controller
             }
 
             // **FIX: Calculate final amounts with proper decimal handling**
-            $taxAmount = round($subtotal * 0.18, 2); // 18% GST
+            $taxAmount = 0; // 18% GST
             $shippingAmount = $subtotal >= 500 ? 0.00 : 50.00;
             $totalAmount = round($subtotal + $taxAmount + $shippingAmount, 2);
 

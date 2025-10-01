@@ -45,9 +45,14 @@ class AddressController extends Controller
             'address_line_2' => 'nullable|string|max:255',
             'landmark' => 'nullable|string|max:255',
             'city' => 'required|string|max:255',
-            'state' => 'required|string|max:255',
-            'postal_code' => 'required|string|max:10',
-            'country' => 'required|string|max:255',
+            'state' => 'required|in:Maharashtra',
+            'postal_code' => [
+                'required',
+                'digits:6',
+                'regex:/^(4[0-4])[0-9]{4}$/',
+            ],
+
+            'country' => 'required|in:India',
             'type' => 'required|in:billing,shipping,both',
             'is_default' => 'boolean',
         ]);

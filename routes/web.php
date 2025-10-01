@@ -96,9 +96,9 @@ Route::get('/upcoming-pujas', function () {
     return view('upcoming-pujas');
 })->name('upcoming-pujas');
 
-Route::get('/consult', function () {
-    return view('consult');
-})->name('consult');
+// Route::get('/consult', function () {
+//     return view('consult');
+// })->name('consult');
 
 Route::get('/about', function () {
     return view('about');
@@ -147,7 +147,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [OtpAuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-    Route::get('/settings', [UserController::class, 'settings'])->name('settings');
+    // Route::get('/settings', [UserController::class, 'settings'])->name('settings');
     Route::post('/settings/password', [UserController::class, 'changePassword'])->name('password.change');
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('profile.edit');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');

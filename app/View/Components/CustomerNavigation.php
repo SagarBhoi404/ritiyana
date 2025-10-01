@@ -51,12 +51,12 @@ class CustomerNavigation extends Component
                 'icon' => 'user',
                 'active' => str_contains($this->currentRoute, 'profile')
             ],
-            [
-                'name' => 'Settings',
-                'route' => 'settings',
-                'icon' => 'settings',
-                'active' => str_contains($this->currentRoute, 'settings')
-            ],
+            // [
+            //     'name' => 'Settings',
+            //     'route' => 'settings',
+            //     'icon' => 'settings',
+            //     'active' => str_contains($this->currentRoute, 'settings')
+            // ],
          [
     'name' => 'Logout',
     'route' => 'logout',

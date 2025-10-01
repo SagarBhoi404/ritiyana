@@ -57,11 +57,11 @@
 
             <!-- Search Bar -->
             <div class="flex-1 max-w-md">
-                <div class="relative">
+                {{-- <div class="relative">
                     <input type="text" placeholder="Search for puja items..."
                         class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-pink focus:border-transparent">
                     <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"></i>
-                </div>
+                </div> --}}
             </div>
 
             <!-- Desktop Navigation -->
@@ -86,10 +86,10 @@
                     <i data-lucide="calendar" class="w-4 h-4"></i>
                     Upcoming Pujas
                 </a>
-                <a href="{{ route('consult') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
+                {{-- <a href="{{ route('consult') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
                     <i data-lucide="user-check" class="w-4 h-4"></i>
                     Consult
-                </a>
+                </a> --}}
                 <a href="{{ route('about') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
                     <i data-lucide="info" class="w-4 h-4"></i>
                     About
@@ -137,13 +137,13 @@
                         </div>
                         <span class="text-xs font-medium">Pujas</span>
                     </a>
-                    <a href="{{ route('consult') }}"
+                    {{-- <a href="{{ route('consult') }}"
                         class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
                         <div class="bg-gray-100 p-2 rounded-lg mb-1">
                             <i data-lucide="user-check" class="w-4 h-4"></i>
                         </div>
                         <span class="text-xs font-medium">Consult</span>
-                    </a>
+                    </a> --}}
                     <a href="{{ route('about') }}"
                         class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
                         <div class="bg-gray-100 p-2 rounded-lg mb-1">

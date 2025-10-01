@@ -138,15 +138,6 @@
                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vibrant-pink focus:border-transparent @error('state') border-red-500 @enderror">
                                     <option value="">Select State</option>
                                     <option value="Maharashtra" {{ old('state') == 'Maharashtra' ? 'selected' : '' }}>Maharashtra</option>
-                                    <option value="Gujarat" {{ old('state') == 'Gujarat' ? 'selected' : '' }}>Gujarat</option>
-                                    <option value="Karnataka" {{ old('state') == 'Karnataka' ? 'selected' : '' }}>Karnataka</option>
-                                    <option value="Tamil Nadu" {{ old('state') == 'Tamil Nadu' ? 'selected' : '' }}>Tamil Nadu</option>
-                                    <option value="Uttar Pradesh" {{ old('state') == 'Uttar Pradesh' ? 'selected' : '' }}>Uttar Pradesh</option>
-                                    <option value="West Bengal" {{ old('state') == 'West Bengal' ? 'selected' : '' }}>West Bengal</option>
-                                    <option value="Rajasthan" {{ old('state') == 'Rajasthan' ? 'selected' : '' }}>Rajasthan</option>
-                                    <option value="Punjab" {{ old('state') == 'Punjab' ? 'selected' : '' }}>Punjab</option>
-                                    <option value="Haryana" {{ old('state') == 'Haryana' ? 'selected' : '' }}>Haryana</option>
-                                    <option value="Delhi" {{ old('state') == 'Delhi' ? 'selected' : '' }}>Delhi</option>
                                     <!-- Add more states as needed -->
                                 </select>
                                 @error('state')
@@ -155,17 +146,20 @@
                             </div>
 
                             <div>
-                                <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Postal Code <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" name="postal_code" id="postal_code" 
-                                       value="{{ old('postal_code') }}" required
-                                       pattern="[0-9]{6}" maxlength="6"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vibrant-pink focus:border-transparent @error('postal_code') border-red-500 @enderror">
-                                @error('postal_code')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
-                            </div>
+    <label for="postal_code" class="block text-sm font-medium text-gray-700 mb-2">PIN Code</label>
+    <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code') }}"
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg"
+        pattern="^(4[0-4])[0-9]{4}$"
+        title="Please enter a valid Maharashtra PIN code (e.g., 400001, 411001, 440001)"
+        minlength="6"
+        maxlength="6"
+        placeholder="411001"
+        required>
+    @error('postal_code')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
+
                         </div>
 
                         <div>
@@ -184,7 +178,9 @@
                 </div>
 
                 <!-- Address Type and Options -->
-                <div class="mb-8">
+                {{-- show address type with new option --}}
+
+                <div class="mb-8" hidden> 
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Address Options</h3>
                     
                     <div class="space-y-4">

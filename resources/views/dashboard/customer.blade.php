@@ -3,19 +3,25 @@
 @section('content')
     <div class="min-h-screen bg-gray-50">
         <!-- Header -->
+        <!-- Header -->
         <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-6">
-                    <div>
-                        <h1 class="text-3xl font-bold">Welcome back, {{ $user->first_name }}!</h1>
-                        <p class="text-purple-100 mt-1">Explore our puja samagri collection</p>
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 space-y-4 sm:space-y-0">
+                    <!-- Left Section: Welcome Message -->
+                    <div class="text-center sm:text-left">
+                        <h1 class="text-2xl sm:text-3xl font-bold">Welcome back, {{ $user->first_name }}!</h1>
+                        <p class="text-purple-100 mt-1 text-sm sm:text-base">Explore our puja samagri collection</p>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-sm text-purple-100">{{ $user->email }}</span>
+
+                    <!-- Right Section: User Info & Logout -->
+                    <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                        <span class="text-xs sm:text-sm text-purple-100 truncate max-w-[200px] sm:max-w-none">
+                            {{ $user->email }}
+                        </span>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
                             <button type="submit"
-                                class="bg-white text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                class="bg-white text-purple-600 hover:bg-purple-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors w-full sm:w-auto">
                                 <i data-lucide="log-out" class="w-4 h-4 inline mr-1"></i>
                                 Logout
                             </button>

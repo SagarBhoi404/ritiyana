@@ -5,7 +5,7 @@
             <div>
                 <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-10 md:h-14 w-auto">
                 <h3 class="text-xl font-bold mb-4">Shree Samagri</h3>
-                <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts
+                <p class="text-gray-300 mb-4">Authentic puja items delivered in Same Day. Your spiritual journey starts
                     here.</p>
                 <div class="flex gap-4">
                     <a href="#" class="text-gray-400 hover:text-white">
@@ -30,7 +30,7 @@
                     <li><a href="{{ route('home') }}" class="hover:text-white">Home</a></li>
                     <li><a href="{{ route('puja-kits.index') }}" class="hover:text-white">Puja Kits</a></li>
                     <li><a href="{{ route('upcoming-pujas') }}" class="hover:text-white">Upcoming Pujas</a></li>
-                    <li><a href="{{ route('consult') }}" class="hover:text-white">Consult</a></li>
+                    {{-- <li><a href="{{ route('consult') }}" class="hover:text-white">Consult</a></li> --}}
                 </ul>
             </div>
 
@@ -52,7 +52,7 @@
                 <div class="space-y-3 text-gray-300">
                     <div class="flex items-center gap-2">
                         <i data-lucide="phone" class="w-4 h-4"></i>
-                        <span>+91 98765 43210</span>
+                        <span>+91 95798 09188</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="mail" class="w-4 h-4"></i>
@@ -60,20 +60,20 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        <span>Pune, India</span>
+                        <span>Flat 602 bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune, Maharashtra 412101</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="border-t border-gray-800 pt-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="flex flex-col md:flex-row justify-center items-center">
                 <p class="text-gray-400 text-sm">© 2025 Shree Samagri. All rights reserved.</p>
-                <div class="flex gap-6 mt-4 md:mt-0">
+                {{-- <div class="flex gap-6 mt-4 md:mt-0">
                     <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
                     <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
                     <a href="#" class="text-gray-400 hover:text-white text-sm">Refund Policy</a>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

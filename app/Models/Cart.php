@@ -210,25 +210,35 @@ class Cart extends Model
     // ===== STATIC METHODS FOR CART OPERATIONS =====
     
     public static function getCartItems()
-    {
-        try {
-            return self::forCurrentUser()
-                ->withItems()
-                ->with([
-                    'product' => function ($query) {
-                        $query->select('id', 'name', 'slug', 'featured_image', 'stock_quantity', 'price', 'sale_price');
-                    },
-                    'pujaKit' => function ($query) {
-                        $query->select('id', 'kit_name', 'slug', 'image');
-                    }
-                ])
-                ->orderBy('created_at', 'desc')
-                ->get();
-        } catch (\Exception $e) {
-            Log::error('Error getting cart items: ' . $e->getMessage());
-            return collect(); // Return empty collection on error
-        }
+{
+    try {
+        return self::forCurrentUser()
+            ->withItems()
+            ->with([
+                'product' => function ($query) {
+                    $query->select('id', 'name', 'slug', 'featured_image', 'stock_quantity', 'price', 'sale_price');
+                },
+                'pujaKit' => function ($query) {
+                    $query->select('id', 'kit_name', 'slug', 'image');
+                }
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->each(function ($item) {
+                // Call accessor methods directly
+                if ($item->product) {
+                    $item->product->featured_image = $item->product->getFeaturedImageUrlAttribute();
+                }
+                if ($item->pujaKit) {
+                    $item->pujaKit->image = $item->pujaKit->getImageUrlAttribute();
+                }
+            });
+    } catch (\Exception $e) {
+        Log::error('Error getting cart items: ' . $e->getMessage());
+        return collect(); // Return empty collection on error
     }
+}
+
 
     public static function getCartCount()
     {

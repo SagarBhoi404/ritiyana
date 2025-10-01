@@ -37,6 +37,8 @@
                 <div class="grid grid-cols-4 gap-2">
                     @if (isset($productImages))
                         @foreach ($productImages as $index => $image)
+
+                {{-- {{ dd($image); }} --}}
                             <div class="image-thumbnail cursor-pointer border-2 {{ $index === 0 ? 'border-vibrant-pink' : 'border-gray-200' }} hover:border-vibrant-pink rounded-lg overflow-hidden"
                                  onclick="changeMainImage('{{ $image['url'] }}', this)">
                                 <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? $product->name }}" class="w-full h-20 object-cover">

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-      public function index(Request $request)
+    public function index(Request $request)
     {
         $query = Product::active()
             ->approved()
@@ -17,20 +17,20 @@ class ProductController extends Controller
 
         // Filter by category
         if ($request->has('category') && $request->category) {
-            $query->whereHas('categories', function($q) use ($request) {
+            $query->whereHas('categories', function ($q) use ($request) {
                 $q->where('slug', $request->category)
-                  ->orWhere('name', 'like', '%' . $request->category . '%');
+                    ->orWhere('name', 'like', '%'.$request->category.'%');
             });
         }
 
         // Filter by search
         if ($request->has('search') && $request->search) {
-            $query->where(function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%')
-                  ->orWhereHas('categories', function($categoryQuery) use ($request) {
-                      $categoryQuery->where('name', 'like', '%' . $request->search . '%');
-                  });
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%')
+                    ->orWhereHas('categories', function ($categoryQuery) use ($request) {
+                        $categoryQuery->where('name', 'like', '%'.$request->search.'%');
+                    });
             });
         }
 
@@ -63,7 +63,7 @@ class ProductController extends Controller
             case 'featured':
             default:
                 $query->orderBy('is_featured', 'desc')
-                      ->orderBy('created_at', 'desc');
+                    ->orderBy('created_at', 'desc');
                 break;
         }
 
@@ -71,10 +71,10 @@ class ProductController extends Controller
 
         // Get categories for filter sidebar with product counts
         $categories = Category::active()
-            ->whereHas('products', function($q) {
+            ->whereHas('products', function ($q) {
                 $q->active()->approved();
             })
-            ->withCount(['products' => function($q) {
+            ->withCount(['products' => function ($q) {
                 $q->active()->approved();
             }])
             ->orderBy('products_count', 'desc')
@@ -90,9 +90,9 @@ class ProductController extends Controller
         $totalProducts = Product::active()->approved()->count();
 
         return view('products', compact(
-            'products', 
-            'categories', 
-            'priceRange', 
+            'products',
+            'categories',
+            'priceRange',
             'totalProducts'
         ));
     }
@@ -105,17 +105,17 @@ class ProductController extends Controller
         // Product is already resolved and validated by route model binding
         // Load relationships
         $product->load([
-            'categories', 
-            'vendor', 
-            'reviews.user', 
-            'pujaKits'
+            'categories',
+            'vendor',
+            'reviews.user',
+            'pujaKits',
         ]);
 
         // Get related products from same categories
         $relatedProducts = Product::active()
             ->approved()
             ->where('id', '!=', $product->id)
-            ->whereHas('categories', function($query) use ($product) {
+            ->whereHas('categories', function ($query) use ($product) {
                 $query->whereIn('categories.id', $product->categories->pluck('id'));
             })
             ->with(['categories', 'vendor'])
@@ -128,39 +128,70 @@ class ProductController extends Controller
         // Get product images (if you have a separate images table)
         $productImages = $this->getProductImages($product);
 
+        // dd($productImages);
+
         return view('product-detail', compact(
-            'product', 
-            'relatedProducts', 
+            'product',
+            'relatedProducts',
             'recentlyViewed',
             'productImages'
         ));
     }
 
-    
-
     private function getProductImages($product)
     {
-        // If you have a separate product_images table, use this
-        // return $product->images()->orderBy('sort_order')->get();
-        
-        // For now, return a default set using the featured image
         $images = [];
+
+        // Add featured image first if exists
         if ($product->featured_image) {
             $images[] = [
-                'url' => asset('storage/' . $product->featured_image),
+                'url' => $this->getImageUrl($product->featured_image),
                 'alt' => $product->name,
-                'is_featured' => true
+                'is_featured' => true,
             ];
         }
-        
-        // Add default images for demo
-        $defaultImages = [
-            ['url' => asset('images/puja-items-1.jpg'), 'alt' => 'Product view 1'],
-            ['url' => asset('images/puja-items-2.jpg'), 'alt' => 'Product view 2'],
-            ['url' => asset('images/puja-items-3.jpg'), 'alt' => 'Product view 3'],
-        ];
-        
-        return array_merge($images, $defaultImages);
+
+        // Add gallery images from database
+        if ($product->gallery_images && is_array($product->gallery_images)) {
+            foreach ($product->gallery_images as $galleryImage) {
+                $images[] = [
+                    'url' => $this->getImageUrl($galleryImage),
+                    'alt' => $product->name.' - Gallery',
+                    'is_featured' => false,
+                ];
+            }
+        }
+
+        // Return empty array with placeholder if no images
+        if (empty($images)) {
+            $images[] = [
+                'url' => $this->getDefaultImageUrl(),
+                'alt' => $product->name,
+                'is_featured' => true,
+            ];
+        }
+
+        return $images;
+    }
+
+    // Helper method for image URLs
+    private function getImageUrl($imagePath)
+    {
+        if (app()->environment('production')) {
+            return url('public/storage/'.$imagePath);
+        } else {
+            return asset('storage/'.$imagePath);
+        }
+    }
+
+    // Helper method for default image URL
+    private function getDefaultImageUrl()
+    {
+        if (app()->environment('production')) {
+            return url('public/images/default-product.png');
+        } else {
+            return asset('images/default-product.png');
+        }
     }
 
     /**
@@ -169,15 +200,15 @@ class ProductController extends Controller
     private function getRecentlyViewedProducts($currentProductId)
     {
         $recentlyViewed = session()->get('recently_viewed', []);
-        
+
         // Add current product to recently viewed
-        $recentlyViewed = array_filter($recentlyViewed, function($id) use ($currentProductId) {
+        $recentlyViewed = array_filter($recentlyViewed, function ($id) use ($currentProductId) {
             return $id != $currentProductId;
         });
-        
+
         array_unshift($recentlyViewed, $currentProductId);
         $recentlyViewed = array_slice($recentlyViewed, 0, 10);
-        
+
         session()->put('recently_viewed', $recentlyViewed);
 
         return Product::active()

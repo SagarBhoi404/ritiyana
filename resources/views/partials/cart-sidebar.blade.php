@@ -31,7 +31,7 @@
         <div class="border-t p-4 bg-gray-50">
             <div class="flex justify-between text-sm mb-2">
                 <span>Delivery in</span>
-                <span class="font-medium text-green-600">10 minutes</span>
+                <span class="font-medium text-green-600">Same Day</span>
             </div>
             <div class="flex justify-between text-sm mb-4">
                 <span>Delivery charge</span>
@@ -46,7 +46,7 @@
             <button onclick="proceedToCheckout()"  class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors mb-2">
                 Proceed to Checkout
             </button>
-            <p class="text-xs text-gray-500 text-center">Free delivery on orders above ₹199</p>
+            <p class="text-xs text-gray-500 text-center">Free delivery on orders above ₹499</p>
         </div>
     </div>
 </div>

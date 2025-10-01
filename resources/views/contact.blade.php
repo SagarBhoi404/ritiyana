@@ -53,8 +53,14 @@
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                     <input type="tel" id="phone" name="phone" value="{{ old('phone') }}"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg" required>
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg" pattern="[6-9][0-9]{9}"
+                        title="Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9"
+                        minlength="10" maxlength="10" placeholder="9876543210" required>
+                    @error('phone')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
+
 
                 <div>
                     <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
@@ -113,7 +119,8 @@
                             </div>
                             <div>
                                 <h3 class="font-semibold">Address</h3>
-                                <p class="text-gray-600">Flat 602 bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune, Maharashtra 412101</p>
+                                <p class="text-gray-600">Flat 602 bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune,
+                                    Maharashtra 412101</p>
                             </div>
                         </div>
                     </div>
@@ -182,7 +189,7 @@
                     <p class="text-gray-600">Yes, all our puja items are sourced directly from trusted suppliers and
                         artisans. We ensure authenticity and quality in every product we deliver.</p>
                 </div>
-{{-- 
+                {{-- 
                 <div class="bg-white rounded-2xl border border-gray-200 p-6">
                     <h3 class="text-lg font-semibold mb-3">Can I customize my puja kit?</h3>
                     <p class="text-gray-600">Absolutely! We offer custom puja kits tailored to your specific requirements.
