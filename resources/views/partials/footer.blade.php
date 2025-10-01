@@ -5,7 +5,8 @@
             <div>
                 <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-10 md:h-14 w-auto">
                 <h3 class="text-xl font-bold mb-4">Shree Samagri</h3>
-                <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts here.</p>
+                <p class="text-gray-300 mb-4">Authentic puja items delivered in 10 minutes. Your spiritual journey starts
+                    here.</p>
                 <div class="flex gap-4">
                     <a href="#" class="text-gray-400 hover:text-white">
                         <i data-lucide="facebook" class="w-5 h-5"></i>
@@ -21,7 +22,7 @@
                     </a>
                 </div>
             </div>
-            
+
             <!-- Quick Links -->
             <div>
                 <h4 class="font-semibold mb-4">Quick Links</h4>
@@ -32,18 +33,19 @@
                     <li><a href="{{ route('consult') }}" class="hover:text-white">Consult</a></li>
                 </ul>
             </div>
-            
-            <!-- Categories -->
+
+            <!-- Legal & Policies -->
             <div>
-                <h4 class="font-semibold mb-4">Categories</h4>
+                <h4 class="font-semibold mb-4">Legal & Policies</h4>
                 <ul class="space-y-2 text-gray-300">
-                    <li><a href="#" class="hover:text-white">Daily Puja Kits</a></li>
-                    <li><a href="#" class="hover:text-white">Festival Kits</a></li>
-                    <li><a href="#" class="hover:text-white">Custom Kits</a></li>
-                    <li><a href="#" class="hover:text-white">Eco-friendly</a></li>
+                    <li><a href="{{ route('terms') }}" class="hover:text-white">Terms & Conditions</a></li>
+                    <li><a href="{{ route('privacy') }}" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="{{ route('refund') }}" class="hover:text-white">Refund & Cancellation</a></li>
+                    <li><a href="{{ route('contact') }}" class="hover:text-white">Contact Us</a></li>
                 </ul>
             </div>
-            
+
+
             <!-- Contact -->
             <div>
                 <h4 class="font-semibold mb-4">Contact</h4>
@@ -63,7 +65,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="border-t border-gray-800 pt-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-gray-400 text-sm">© 2025 Shree Samagri. All rights reserved.</p>

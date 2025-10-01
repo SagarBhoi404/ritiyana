@@ -35,6 +35,20 @@ use Illuminate\Support\Facades\Route;
 // ===== PUBLIC ROUTES =====
 Route::get('/', [HomeController::class, 'home'])->name('home');
 
+// Legal and Policy Pages
+Route::get('/terms-and-conditions', function () {
+    return view('policies.terms');
+})->name('terms');
+
+Route::get('/privacy-policy', function () {
+    return view('policies.privacy');
+})->name('privacy');
+
+Route::get('/refund-cancellation-policy', function () {
+    return view('policies.refund');
+})->name('refund');
+
+
 // Product routes
 Route::get('/product/{product:slug}', [App\Http\Controllers\User\ProductController::class, 'show'])->name('product.show');
 Route::get('/products', [App\Http\Controllers\User\ProductController::class, 'index'])->name('products.index');
