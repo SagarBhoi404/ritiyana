@@ -134,10 +134,10 @@
                             <span class="text-gray-600">Subtotal</span>
                             <span>₹{{ number_format($order->subtotal, 2) }}</span>
                         </div>
-                        <div class="flex justify-between">
+                        {{-- <div class="flex justify-between">
                             <span class="text-gray-600">Tax (18% GST)</span>
                             <span>₹{{ number_format($order->tax_amount, 2) }}</span>
-                        </div>
+                        </div> --}}
                         <div class="flex justify-between">
                             <span class="text-gray-600">Shipping</span>
                             <span>
