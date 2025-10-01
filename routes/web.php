@@ -20,6 +20,7 @@ use App\Http\Controllers\PujaKitController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ShopkeeperLoginController;
 use App\Http\Controllers\User\AddressController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\HomeController;
 use App\Http\Controllers\User\OrderController;
 use App\Http\Controllers\UserController;
@@ -143,7 +144,7 @@ Route::middleware('guest')->group(function () {
 // ===== AUTHENTICATED ROUTES =====
 Route::middleware('auth')->group(function () {
     // Customer Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [OtpAuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('profile');
     Route::get('/settings', [UserController::class, 'settings'])->name('settings');
