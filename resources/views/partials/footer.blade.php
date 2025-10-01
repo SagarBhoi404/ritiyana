@@ -60,7 +60,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-4 h-4"></i>
-                        <span>Flat 602 bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune, Maharashtra 412101</span>
+                        <span>Bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune, Maharashtra 412101</span>
                     </div>
                 </div>
             </div>

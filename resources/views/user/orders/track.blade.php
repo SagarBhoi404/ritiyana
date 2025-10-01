@@ -163,7 +163,7 @@
                         If you have any questions about your order or need assistance, we're here to help!
                     </p>
                     <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="tel:+919999999999" 
+                        <a href="tel:+919579809188" 
                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-white rounded-lg hover:bg-blue-50 border border-blue-200">
                             <i data-lucide="phone" class="w-4 h-4 mr-2"></i>
                             Call Support

@@ -1,189 +1,197 @@
-<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4">
-        <!-- Top Bar -->
-        <div class="flex items-center justify-between py-3 border-b border-gray-100">
-            <div class="flex items-center gap-2 text-sm text-gray-600">
-                <i data-lucide="map-pin" class="w-4 h-4"></i>
-                <span>Delivering to</span>
-                <button class="font-medium text-vibrant-pink hover:underline">
-                    Select Location
-                </button>
-            </div>
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Top Bar - Compact Info Section -->
+        <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+            <!-- Logo -->
+            <a href="{{ route('home') }}" class="flex items-center gap-2 group">
+                <img src="{{ asset('images/logo.png') }}" alt="Shree Samagri Logo" class="h-8 w-auto">
+                <span class="text-lg sm:text-xl font-bold text-vibrant-pink group-hover:text-pink-600 transition-colors">
+                    Shree Samagri
+                </span>
+            </a>
 
-            <div class="flex items-center gap-4">
-                <a href="{{ route('login') }}"
-                    @auth
-<a href="{{ route('dashboard') }}"
-                        class="text-sm text-gray-600 hover:text-vibrant-pink flex items-center gap-1">
+            <!-- Delivery Info - Hidden on mobile -->
+            {{-- <div class="hidden md:flex items-center gap-2 text-sm text-gray-600 bg-pink-50 px-3 py-1.5 rounded-full">
+                <i data-lucide="map-pin" class="w-4 h-4 text-vibrant-pink"></i>
+                <span class="text-gray-600">Delivery only in</span>
+                <span class="font-semibold text-vibrant-pink">Maharashtra</span>
+            </div> --}}
+
+            <!-- User Actions -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                @auth
+                    <a href="{{ route('dashboard') }}"
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all">
                         <i data-lucide="user" class="w-4 h-4"></i>
-                        Dashboard
+                        <span class="hidden sm:inline font-medium">Dashboard</span>
                     </a>
-                    <!-- Optional: Show user name -->
-                    <span class="text-sm text-gray-500">
-                        Hello, {{ Auth::user()->first_name ?? Auth::user()->name }}!
+                    <span class="hidden lg:inline text-sm text-gray-500 px-2">
+                        Hi, {{ Auth::user()->first_name ?? Auth::user()->name }}!
                     </span>
                 @else
-                    <!-- User is not logged in - Show Login -->
                     <a href="{{ route('login') }}"
-                        class="text-sm text-gray-600 hover:text-vibrant-pink flex items-center gap-1">
+                        class="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all">
                         <i data-lucide="user" class="w-4 h-4"></i>
-                        Login
-                    </a> @endauth
-                    <button onclick="toggleCart()" class="relative p-2">
-                    <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+                        <span class="hidden sm:inline font-medium">Login</span>
+                    </a>
+                @endauth
+                
+                <!-- Cart Button with Badge -->
+                <button onclick="toggleCart()" class="relative p-2 hover:bg-pink-50 rounded-lg transition-all group">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-gray-700 group-hover:text-vibrant-pink transition-colors"></i>
                     <span id="cart-count"
-                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                    <!-- Mobile Menu Button -->
-                    {{-- <button
-                    onclick="document.getElementById('mobile-menu').classList.toggle('hidden'); document.getElementById('menu-icon').classList.toggle('hidden'); document.getElementById('close-icon').classList.toggle('hidden');"
-                    class="md:hidden p-2">
-                    <i data-lucide="menu" class="w-5 h-5" id="menu-icon"></i>
-                    <i data-lucide="x" class="w-5 h-5 hidden" id="close-icon"></i>
-                </button> --}}
+                        class="absolute -top-0.5 -right-0.5 bg-vibrant-pink text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold hidden shadow-md">0</span>
+                </button>
             </div>
         </div>
 
-        <!-- Main Header -->
-        <div class="flex items-center gap-4 py-4">
-            <div class="flex items-center gap-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-2 md:gap-3">
-                    <img src="{{ asset('images/logo.png') }}" alt="PujaKit Logo" class="h-8 md:h-12 w-auto">
-                    <span class="text-xl md:text-2xl font-bold text-vibrant-pink">Shree Samagri</span>
-                </a>
-            </div>
-
-
-
-            <!-- Search Bar -->
-            <div class="flex-1 max-w-md">
-                {{-- <div class="relative">
-                    <input type="text" placeholder="Search for puja items..."
-                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-pink focus:border-transparent">
-                    <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"></i>
-                </div> --}}
-            </div>
-
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex items-center gap-6">
-                <a href="{{ route('home') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="home" class="w-4 h-4"></i>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block py-3">
+            <div class="flex items-center justify-center gap-1">
+                <a href="{{ route('home') }}" 
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="home" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     Home
                 </a>
                 <a href="{{ route('products.index') }}"
-                    class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="box" class="w-4 h-4"></i>
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="box" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     Products
                 </a>
-
                 <a href="{{ route('puja-kits.index') }}"
-                    class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="shopping-bag" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     Puja Kits
                 </a>
                 <a href="{{ route('upcoming-pujas') }}"
-                    class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="calendar" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     Upcoming Pujas
                 </a>
-                {{-- <a href="{{ route('consult') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="user-check" class="w-4 h-4"></i>
-                    Consult
-                </a> --}}
-                <a href="{{ route('about') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="info" class="w-4 h-4"></i>
+                <a href="{{ route('about') }}" 
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="info" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     About
                 </a>
-                <a href="{{ route('contact') }}" class="text-gray-700 hover:text-vibrant-pink flex items-center gap-1">
-                    <i data-lucide="phone" class="w-4 h-4"></i>
+                <a href="{{ route('contact') }}" 
+                    class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-vibrant-pink hover:bg-pink-50 rounded-lg transition-all flex items-center gap-2 group">
+                    <i data-lucide="phone" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                     Contact
                 </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Bottom Navigation -->
+    <div id="mobile-nav"
+        class="md:hidden bg-white border-t border-gray-200 shadow-lg fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ease-in-out">
+        <nav class="safe-bottom">
+            <div class="flex justify-around items-center px-2 py-2">
+                <a href="{{ route('home') }}"
+                    class="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-vibrant-pink active:scale-95 transition-all min-w-[60px] group">
+                    <div class="relative">
+                        <i data-lucide="home" class="w-5 h-5 mb-1"></i>
+                    </div>
+                    <span class="text-[10px] font-medium">Home</span>
+                </a>
                 
-            </nav>
+                <a href="{{ route('products.index') }}"
+                    class="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-vibrant-pink active:scale-95 transition-all min-w-[60px] group">
+                    <div class="relative">
+                        <i data-lucide="box" class="w-5 h-5 mb-1"></i>
+                    </div>
+                    <span class="text-[10px] font-medium">Products</span>
+                </a>
+                
+                <a href="{{ route('puja-kits.index') }}"
+                    class="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-vibrant-pink active:scale-95 transition-all min-w-[60px] group">
+                    <div class="relative">
+                        <i data-lucide="shopping-bag" class="w-5 h-5 mb-1"></i>
+                    </div>
+                    <span class="text-[10px] font-medium">Puja Kits</span>
+                </a>
+                
+                <a href="{{ route('upcoming-pujas') }}"
+                    class="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-vibrant-pink active:scale-95 transition-all min-w-[60px] group">
+                    <div class="relative">
+                        <i data-lucide="calendar" class="w-5 h-5 mb-1"></i>
+                    </div>
+                    <span class="text-[10px] font-medium">Pujas</span>
+                </a>
+                
+                <button onclick="toggleMoreMenu()"
+                    class="flex flex-col items-center justify-center p-2 text-gray-600 hover:text-vibrant-pink active:scale-95 transition-all min-w-[60px] group">
+                    <div class="relative">
+                        <i data-lucide="menu" class="w-5 h-5 mb-1"></i>
+                    </div>
+                    <span class="text-[10px] font-medium">More</span>
+                </button>
+            </div>
+        </nav>
+    </div>
 
-        </div>
-
-        <!-- Mobile Menu -->
-        <!-- Mobile Menu - Hide/Show on scroll -->
-        <div id="mobile-nav"
-            class="md:hidden bg-white border-t border-gray-200 shadow-lg fixed bottom-0 left-0 right-0 z-40 transition-all duration-300 ease-in-out transform translate-y-0">
-            <nav class="py-2">
-                <div class="flex gap-1 overflow-x-auto px-2 scrollbar-hide">
-                    <a href="{{ route('home') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="home" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Home</span>
+    <!-- More Menu Modal (Mobile) -->
+    <div id="more-menu" class="hidden md:hidden fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity" onclick="toggleMoreMenu()">
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl animate-slide-up" onclick="event.stopPropagation()">
+            <div class="p-4">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4"></div>
+                <h3 class="text-lg font-bold text-gray-800 mb-4">More Options</h3>
+                
+                <div class="space-y-2">
+                    <a href="{{ route('about') }}" 
+                        class="flex items-center gap-3 p-3 hover:bg-pink-50 rounded-lg transition-all">
+                        <i data-lucide="info" class="w-5 h-5 text-vibrant-pink"></i>
+                        <span class="font-medium text-gray-700">About Us</span>
                     </a>
-                    <a href="{{ route('products.index') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="box" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Products</span>
+                    
+                    <a href="{{ route('contact') }}" 
+                        class="flex items-center gap-3 p-3 hover:bg-pink-50 rounded-lg transition-all">
+                        <i data-lucide="phone" class="w-5 h-5 text-vibrant-pink"></i>
+                        <span class="font-medium text-gray-700">Contact</span>
                     </a>
-                    <a href="{{ route('puja-kits.index') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Puja Kits</span>
-                    </a>
-                    <a href="{{ route('upcoming-pujas') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="calendar" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Pujas</span>
-                    </a>
-                    {{-- <a href="{{ route('consult') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="user-check" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Consult</span>
-                    </a> --}}
-                    <a href="{{ route('about') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="info" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">About</span>
-                    </a>
-                    <a href="{{ route('contact') }}"
-                        class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                        <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                            <i data-lucide="phone" class="w-4 h-4"></i>
-                        </div>
-                        <span class="text-xs font-medium">Contact</span>
-                    </a>
-
+                    
                     @auth
                         <a href="{{ route('dashboard') }}"
-                            class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                            <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                                <i data-lucide="user" class="w-4 h-4"></i>
-                            </div>
-                            <span class="text-xs font-medium">Dashboard</span>
+                            class="flex items-center gap-3 p-3 hover:bg-pink-50 rounded-lg transition-all">
+                            <i data-lucide="user" class="w-5 h-5 text-vibrant-pink"></i>
+                            <span class="font-medium text-gray-700">Dashboard</span>
                         </a>
                     @else
                         <a href="{{ route('login') }}"
-                            class="flex-shrink-0 flex flex-col items-center justify-center p-2 text-gray-700 hover:text-vibrant-pink rounded-lg min-w-[70px]">
-                            <div class="bg-gray-100 p-2 rounded-lg mb-1">
-                                <i data-lucide="user" class="w-4 h-4"></i>
-                            </div>
-                            <span class="text-xs font-medium">Login</span>
+                            class="flex items-center gap-3 p-3 hover:bg-pink-50 rounded-lg transition-all">
+                            <i data-lucide="user" class="w-5 h-5 text-vibrant-pink"></i>
+                            <span class="font-medium text-gray-700">Login</span>
                         </a>
                     @endauth
                 </div>
-            </nav>
+                
+                <button onclick="toggleMoreMenu()" 
+                    class="w-full mt-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-gray-700 transition-all">
+                    Close
+                </button>
+            </div>
         </div>
-
-
-
     </div>
 </header>
+
+<style>
+    @keyframes slide-up {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+    
+    .animate-slide-up {
+        animation: slide-up 0.3s ease-out;
+    }
+    
+    .safe-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -194,16 +202,11 @@
         function handleScroll() {
             const currentScrollY = window.scrollY;
 
-            // Show when at top
             if (currentScrollY <= 50) {
                 mobileNav.style.transform = 'translateY(0)';
-            }
-            // Hide when scrolling down
-            else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+            } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
                 mobileNav.style.transform = 'translateY(100%)';
-            }
-            // Show when scrolling up
-            else if (currentScrollY < lastScrollY) {
+            } else if (currentScrollY < lastScrollY) {
                 mobileNav.style.transform = 'translateY(0)';
             }
 
@@ -218,4 +221,9 @@
             }
         });
     });
+
+    function toggleMoreMenu() {
+        const moreMenu = document.getElementById('more-menu');
+        moreMenu.classList.toggle('hidden');
+    }
 </script>

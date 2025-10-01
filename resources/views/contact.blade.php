@@ -119,7 +119,7 @@
                             </div>
                             <div>
                                 <h3 class="font-semibold">Address</h3>
-                                <p class="text-gray-600">Flat 602 bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune,
+                                <p class="text-gray-600">Bhalchandra nagari, Ravet, Pimpri Chinchwad<br>Pune,
                                     Maharashtra 412101</p>
                             </div>
                         </div>

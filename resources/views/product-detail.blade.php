@@ -140,12 +140,13 @@
                             <span class="button-text">{{ $product->stock_quantity == 0 ? 'Out of Stock' : 'Add to Cart' }}</span>
                         </button>
                         
-                        <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
+                        {{-- <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
                             <i data-lucide="heart" class="w-5 h-5"></i>
-                        </button>
-                        <button class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
-                            <i data-lucide="share-2" class="w-5 h-5"></i>
-                        </button>
+                        </button> --}}
+                        <button onclick="shareCurrentPage()" class="p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
+    <i data-lucide="share-2" class="w-5 h-5"></i>
+</button>
+
                     </div>
 
                     <!-- Service Icons -->
@@ -349,4 +350,62 @@
             overflow: hidden;
         }
     </style>
+
+    <script>
+function shareCurrentPage() {
+    const currentUrl = window.location.href;
+    const pageTitle = document.title;
+    
+    // Check if Web Share API is supported
+    if (navigator.share) {
+        navigator.share({
+            title: pageTitle,
+            text: 'Check out this product',
+            url: currentUrl
+        })
+        .then(() => {
+            console.log('Page shared successfully');
+        })
+        .catch((error) => {
+            console.log('Error sharing:', error);
+            // Fallback to copy to clipboard
+            copyToClipboard(currentUrl);
+        });
+    } else {
+        // Fallback: Copy URL to clipboard
+        copyToClipboard(currentUrl);
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+        .then(() => {
+            // Show success message
+            alert('Link copied to clipboard!');
+            // Or use a toast notification if you have one
+        })
+        .catch((err) => {
+            console.error('Failed to copy:', err);
+            // Fallback for older browsers
+            fallbackCopyToClipboard(text);
+        });
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+        document.execCommand('copy');
+        alert('Link copied to clipboard!');
+    } catch (err) {
+        console.error('Fallback: Failed to copy', err);
+    }
+    document.body.removeChild(textArea);
+}
+</script>
+
 @endsection

@@ -243,7 +243,7 @@
                             <a href="{{ route('products.index', ['category' => $category->id]) }}"
                                 class="bg-white rounded-xl border border-gray-200 p-6 text-center hover:shadow-lg transition-all transform hover:-translate-y-1">
                                 @if ($category->image)
-                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}"
+                                    <img src="{{$category->getImageUrlAttribute() }}" alt="{{ $category->name }}"
                                         class="w-16 h-16 mx-auto mb-3 rounded-full object-cover">
                                 @else
                                     <div
