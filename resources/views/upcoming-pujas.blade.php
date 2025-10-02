@@ -1406,7 +1406,7 @@
     <script>
         // Global variables - declared once
         let festivals = [];
-        let currentDate = new Date(2025, 8, 1); // September 2025
+        let currentDate = new Date(2025, 9, 1); // September 2025
         let modalTimeout;
 
         const monthNames = ["January", "February", "March", "April", "May", "June",

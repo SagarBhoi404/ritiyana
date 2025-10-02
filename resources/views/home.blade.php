@@ -244,14 +244,14 @@
 
 
  <!-- Secondary Banners -->
-<section class="max-w-7xl mx-auto px-4 py-8">
+{{-- <section class="max-w-7xl mx-auto px-4 py-8">
     <div class="relative bg-yellow-100 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
         <a href="/all-kits?filter=diwali" class="block">
             <img src="{{ asset('images/SL-092921-45900-40.jpg') }}" alt="Diwali Collection"
                 class="w-full h-auto object-cover" style="aspect-ratio: 352/124; height: auto;">
         </a>
     </div>
-</section>
+</section> --}}
 
 
     <!-- Original Text-Only Secondary Banners (Alternative/Fallback) -->

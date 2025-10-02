@@ -29,7 +29,6 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-3">4. Pricing and Payment</h3>
             <ul class="list-disc pl-6 space-y-2">
                 <li>All prices are listed in Indian Rupees (INR) and are inclusive of applicable taxes</li>
-                <li>GST will be charged as per government regulations</li>
                 <li>Prices are subject to change without prior notice</li>
                 <li>Payment can be made through our secure payment gateway</li>
                 <li>We accept credit cards, debit cards, UPI, net banking, and wallets</li>
@@ -49,7 +48,7 @@
         <section>
             <h3 class="text-xl font-semibold text-gray-900 mb-3">6. Shipping and Delivery</h3>
             <ul class="list-disc pl-6 space-y-2">
-                <li>We ship across India through reputed courier partners</li>
+                <li>We ship across Maharashtra through reputed courier partners</li>
                 <li>Shipping charges are calculated based on weight and delivery location</li>
                 <li>Delivery address cannot be changed once the order is shipped</li>
                 <li>Please ensure someone is available to receive the package</li>
@@ -83,7 +82,7 @@
 
         <section>
             <h3 class="text-xl font-semibold text-gray-900 mb-3">11. Governing Law</h3>
-            <p>These Terms and Conditions are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in [Your City], India.</p>
+            <p>These Terms and Conditions are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in Pune, India.</p>
         </section>
 
         <section>

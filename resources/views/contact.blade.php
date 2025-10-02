@@ -55,7 +55,7 @@
                     <input type="tel" id="phone" name="phone" value="{{ old('phone') }}"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg" pattern="[6-9][0-9]{9}"
                         title="Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9"
-                        minlength="10" maxlength="10" placeholder="9876543210" required>
+                        minlength="10" maxlength="10" placeholder="" required>
                     @error('phone')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror

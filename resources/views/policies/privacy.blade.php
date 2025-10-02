@@ -108,8 +108,8 @@
             <p>If you have questions about this Privacy Policy or wish to exercise your rights, please contact us at:</p>
             <div class="mt-4 bg-gray-100 p-4 rounded-lg">
                 <p><strong>Email:</strong> support@shreesamagri.com</p>
-                <p><strong>Phone:</strong> +91 XXXXX XXXXX</p>
-                <p><strong>Address:</strong> [Your Business Address, City, State, PIN Code]</p>
+                {{-- <p><strong>Phone:</strong> +91 XXXXX XXXXX</p>
+                <p><strong>Address:</strong> [Your Business Address, City, State, PIN Code]</p> --}}
             </div>
         </section>
     </div>

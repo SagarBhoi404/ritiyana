@@ -154,16 +154,16 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-3">12. Contact for Returns & Refunds</h3>
             <p>For any queries or assistance regarding cancellations, returns, or refunds:</p>
             <p class="mt-2">
-                <strong>Email:</strong> [Your Email]<br>
-                <strong>Phone:</strong> [Your Phone Number]<br>
-                <strong>WhatsApp:</strong> [Your WhatsApp Number]<br>
+                <strong>Email:</strong> support@shreesamagri.com<br>
+                {{-- <strong>Phone:</strong> [Your Phone Number]<br>
+                <strong>WhatsApp:</strong> [Your WhatsApp Number]<br> --}}
                 <strong>Support Hours:</strong> Monday to Saturday, 10:00 AM - 6:00 PM IST
             </p>
         </section>
 
         <section>
             <h3 class="text-xl font-semibold text-gray-900 mb-3">13. Dispute Resolution</h3>
-            <p>In case of any disputes, we encourage customers to contact our support team first. We are committed to resolving issues amicably. All disputes are subject to the jurisdiction of courts in [Your City], India.</p>
+            <p>In case of any disputes, we encourage customers to contact our support team first. We are committed to resolving issues amicably. All disputes are subject to the jurisdiction of courts in Pune, India.</p>
         </section>
     </div>
 </div>

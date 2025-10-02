@@ -35,7 +35,6 @@
             <form method="POST" action="{{ route('auth.send-otp') }}">
                 @csrf
 
-                
                 <div class="mb-4">
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                     <input type="email" 
@@ -46,19 +45,34 @@
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-pink focus:border-transparent"
                            required>
                 </div>
-                <button type="submit" class="w-full bg-vibrant-pink hover:bg-vibrant-pink-dark text-white font-medium py-3 rounded-lg transition-colors">
+
+                <!-- Terms and Conditions Checkbox -->
+                <div class="mb-4">
+                    <div class="flex items-start">
+                        <input type="checkbox" 
+                               id="terms" 
+                               name="terms" 
+                               value="1"
+                               class="w-4 h-4 mt-1 text-vibrant-pink border-gray-300 rounded focus:ring-2 focus:ring-vibrant-pink cursor-pointer"
+                               onchange="toggleSubmitButton()"
+                               {{ old('terms') ? 'checked' : '' }}>
+                        <label for="terms" class="ml-2 text-sm text-gray-600 cursor-pointer">
+                            I agree to the 
+                            <a href="{{ route('terms') }}" target="_blank" class="text-vibrant-pink hover:underline font-medium">Terms of Service</a> 
+                            and 
+                            <a href="{{ route('privacy') }}" target="_blank" class="text-vibrant-pink hover:underline font-medium">Privacy Policy</a>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" 
+                        id="submitBtn"
+                        disabled
+                        class="w-full bg-gray-400 text-white font-medium py-3 rounded-lg transition-colors cursor-not-allowed">
                     Send OTP
                 </button>
             </form>
         </div>
-
-        <!-- Terms -->
-        <p class="text-xs text-gray-500 text-center mt-6">
-            By continuing, you agree to our 
-            <a href="#" class="text-vibrant-pink hover:underline">Terms of Service</a> 
-            and 
-            <a href="#" class="text-vibrant-pink hover:underline">Privacy Policy</a>
-        </p>
     </div>
 
     <!-- Benefits Section -->
@@ -92,4 +106,26 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleSubmitButton() {
+        const checkbox = document.getElementById('terms');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (checkbox.checked) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-vibrant-pink', 'hover:bg-vibrant-pink-dark', 'cursor-pointer');
+        } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('bg-vibrant-pink', 'hover:bg-vibrant-pink-dark', 'cursor-pointer');
+            submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+        }
+    }
+
+    // Initialize button state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleSubmitButton();
+    });
+</script>
 @endsection
