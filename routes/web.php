@@ -182,6 +182,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/ajax', [AddressController::class, 'getAddresses'])->name('ajax');
     });
 
+        // ===== ADMIN For file export without middleware =====
+    Route::get('admin/users/export', [UserController::class, 'export'])->name('admin.users.export');
+
     // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware(['auth', 'role:admin'])->name('admin.')->group(function () {
         // Dashboard
@@ -203,14 +206,14 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CategoryController::class);
 
 
-           // Admin Product Approval Routes
-       Route::patch('products/{id}/approve', [ProductController::class, 'approveVendorProduct'])->name('products.approve');
-Route::patch('products/{id}/reject', [ProductController::class, 'rejectVendorProduct'])->name('products.reject');
+        // Admin Product Approval Routes
+        Route::patch('products/{id}/approve', [ProductController::class, 'approveVendorProduct'])->name('products.approve');
+        Route::patch('products/{id}/reject', [ProductController::class, 'rejectVendorProduct'])->name('products.reject');
 
         // Product Management
         Route::get('/products/vendor-products', [ProductController::class, 'vendorProducts'])->name('products.vendor-products');
         Route::resource('products', ProductController::class);
-     
+
         // Puja Management
         Route::resource('pujas', PujaController::class);
 

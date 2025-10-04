@@ -7,6 +7,11 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+
+
 
 class UserController extends Controller
 {
@@ -59,46 +64,50 @@ class UserController extends Controller
         ));
     }
 
+    public function export()
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
 
     public function settings()
-{
-    $user = auth()->user();
-    return view('user.settings', compact('user'));
-}
-
-public function changePassword(Request $request)
-{
-    $user = auth()->user();
-
-    $validated = $request->validate([
-        'current_password' => 'required|string',
-        'password' => 'required|string|min:8|confirmed',
-        'password_confirmation' => 'required|string|min:8',
-    ], [
-        'current_password.required' => 'Current password is required.',
-        'password.required' => 'New password is required.',
-        'password.min' => 'New password must be at least 8 characters.',
-        'password.confirmed' => 'Password confirmation does not match.',
-    ]);
-
-    // Verify current password
-    if (!Hash::check($validated['current_password'], $user->password)) {
-        return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+    {
+        $user = auth()->user();
+        return view('user.settings', compact('user'));
     }
 
-    // Check if new password is different from current password
-    if (Hash::check($validated['password'], $user->password)) {
-        return redirect()->back()->withErrors(['password' => 'New password must be different from current password.']);
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required|string|min:8',
+        ], [
+            'current_password.required' => 'Current password is required.',
+            'password.required' => 'New password is required.',
+            'password.min' => 'New password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+        ]);
+
+        // Verify current password
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        // Check if new password is different from current password
+        if (Hash::check($validated['password'], $user->password)) {
+            return redirect()->back()->withErrors(['password' => 'New password must be different from current password.']);
+        }
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($validated['password']),
+            'password_changed_at' => now(), // Add this field to users table if needed
+        ]);
+
+        return redirect()->route('settings')->with('success', 'Password changed successfully.');
     }
-
-    // Update password
-    $user->update([
-        'password' => Hash::make($validated['password']),
-        'password_changed_at' => now(), // Add this field to users table if needed
-    ]);
-
-    return redirect()->route('settings')->with('success', 'Password changed successfully.');
-}
 
 
     public function create()
@@ -108,79 +117,84 @@ public function changePassword(Request $request)
     }
 
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'nullable|string|max:15',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,shopkeeper,user',
-            'status' => 'nullable|string|in:active,inactive,suspended',
-            'notes' => 'nullable|string|max:1000',
-            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'business_name' => 'required_if:role,shopkeeper|string|max:255',
-            'business_type' => 'nullable|in:individual,partnership,company,proprietorship',
-            'business_address' => 'nullable|string',
-            'business_phone' => 'nullable|string|max:15',
-            'commission_rate' => 'nullable|numeric|min:0|max:100',
-            'bank_name' => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
-            'ifsc_code' => 'nullable|string|max:11',
-            'account_holder_name' => 'nullable|string|max:255',
-        ]);
+   public function store(Request $request)
+{
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'phone' => 'nullable|string|max:15',
+        'date_of_birth' => 'nullable|date',
+        'gender' => 'nullable|in:male,female,other',
+        'password' => 'required|string|min:8|confirmed',
+        'role' => 'required|string|in:admin,shopkeeper,user',
+        'status' => 'nullable|string|in:active,inactive,suspended',
+        'notes' => 'nullable|string|max:1000',
+        'profile_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+        'business_email' => 'nullable|email', // ADD THIS MISSING FIELD
+        
+        // FIXED: Only validate business fields when role is shopkeeper
+        'business_name' => 'nullable|required_if:role,shopkeeper|string|max:255',
+        'business_type' => 'nullable|string|in:individual,partnership,company,proprietorship',
+        'business_address' => 'nullable|string',
+        'business_phone' => 'nullable|string|max:15',
+        'commission_rate' => 'nullable|numeric|min:0|max:100',
+        'bank_name' => 'nullable|string|max:255',
+        'account_number' => 'nullable|string|max:255',
+        'ifsc_code' => 'nullable|string|max:11',
+        'account_holder_name' => 'nullable|string|max:255',
+    ]);
 
-        // Handle profile image upload
-        $profileImagePath = null;
-        if ($request->hasFile('profile_image')) {
-            $file = $request->file('profile_image');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $profileImagePath = $file->storeAs('profile_images', $filename, 'public');
-        }
-
-        // Create user with safe field access
-        $user = User::create([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'email' => $validated['email'],
-            'phone' => $request->input('phone', null),
-            'date_of_birth' => $request->input('date_of_birth', null),
-            'gender' => $request->input('gender', null),
-            'password' => Hash::make($validated['password']),
-            'status' => $request->input('status', 'active'),
-            'profile_image' => $profileImagePath,
-            'email_verified_at' => $request->boolean('email_verified') ? now() : null,
-            'notes' => $request->input('notes', null),
-        ]);
-
-        // Assign role
-        if (method_exists($user, 'assignRole')) {
-            $user->assignRole($validated['role']);
-        }
-
-        // Create vendor profile if role is shopkeeper
-        if ($validated['role'] === 'shopkeeper') {
-            \App\Models\Vendor::create([
-                'user_id' => $user->id,
-                'business_name' => $validated['business_name'],
-                'business_type' => $validated['business_type'],
-                'business_address' => $validated['business_address'],
-                'business_phone' => $validated['business_phone'],
-                'commission_rate' => $validated['commission_rate'] ?? 8.00,
-                'bank_name' => $validated['bank_name'],
-                'account_number' => $validated['account_number'],
-                'ifsc_code' => $validated['ifsc_code'],
-                'account_holder_name' => $validated['account_holder_name'],
-                'status' => 'approved', // Admin creates, so auto-approve
-            ]);
-        }
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User created successfully');
+    // Handle profile image upload
+    $profileImagePath = null;
+    if ($request->hasFile('profile_image')) {
+        $file = $request->file('profile_image');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $profileImagePath = $file->storeAs('profile_images', $filename, 'public');
     }
+
+    // Create user
+    $user = User::create([
+        'first_name' => $validated['first_name'],
+        'last_name' => $validated['last_name'],
+        'email' => $validated['email'],
+        'phone' => $validated['phone'] ?? null,
+        'date_of_birth' => $validated['date_of_birth'] ?? null,
+        'gender' => $validated['gender'] ?? null,
+        'password' => Hash::make($validated['password']),
+        'status' => $validated['status'] ?? 'active',
+        'profile_image' => $profileImagePath,
+        'email_verified_at' => $request->boolean('email_verified') ? now() : null,
+        'notes' => $validated['notes'] ?? null,
+    ]);
+
+    // Assign role
+    if (method_exists($user, 'assignRole')) {
+        $user->assignRole($validated['role']);
+    }
+
+    // Create vendor profile only for shopkeepers
+    if ($validated['role'] === 'shopkeeper') {
+        \App\Models\Vendor::create([
+            'user_id' => $user->id,
+            'business_name' => $validated['business_name'],
+            'business_type' => $validated['business_type'] ?? null,
+            'business_address' => $validated['business_address'] ?? null,
+            'business_phone' => $validated['business_phone'] ?? null,
+            'business_email' => $validated['business_email'] ?? null, // ADD THIS
+            'commission_rate' => $validated['commission_rate'] ?? 8.00,
+            'bank_name' => $validated['bank_name'] ?? null,
+            'account_number' => $validated['account_number'] ?? null,
+            'ifsc_code' => $validated['ifsc_code'] ?? null,
+            'account_holder_name' => $validated['account_holder_name'] ?? null,
+            'status' => 'approved',
+        ]);
+    }
+
+    return redirect()->route('admin.users.index')
+        ->with('success', 'User created successfully');
+}
+
 
     public function show(User $user)
     {
@@ -195,87 +209,102 @@ public function changePassword(Request $request)
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
-    {
-        // Validate all fields including vendor fields
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'phone' => 'nullable|string|max:15',
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
-            'password' => 'nullable|string|min:8|confirmed',
-            'status' => 'required|in:active,inactive,suspended',
-            'role' => 'required|string|in:admin,shopkeeper,user',
+public function update(Request $request, User $user)
+{
+    // Validate all fields including vendor fields
+    $validated = $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+        'phone' => 'nullable|string|max:15',
+        'date_of_birth' => 'nullable|date',
+        'gender' => 'nullable|in:male,female,other',
+        'password' => 'nullable|string|min:8|confirmed',
+        'status' => 'required|in:active,inactive,suspended',
+        'role' => 'required|string|in:admin,shopkeeper,user',
+        'profile_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+        'notes' => 'nullable|string|max:1000',
+        // Vendor fields validation
+        'business_name' => 'nullable|string|max:255',
+        'business_type' => 'nullable|in:individual,partnership,company,proprietorship',
+        'business_address' => 'nullable|string',
+        'business_phone' => 'nullable|string|max:15',
+        'business_email' => 'nullable|email',
+        'commission_rate' => 'nullable|numeric|min:0|max:100',
+        'bank_name' => 'nullable|string|max:255',
+        'account_number' => 'nullable|string|max:255',
+        'ifsc_code' => 'nullable|string|max:11',
+        'account_holder_name' => 'nullable|string|max:255',
+    ]);
 
-            // Vendor fields validation
-            'business_name' => 'nullable|string|max:255',
-            'business_type' => 'nullable|in:individual,partnership,company,proprietorship',
-            'business_address' => 'nullable|string',
-            'business_phone' => 'nullable|string|max:15',
-            'business_email' => 'nullable|email',
-            'commission_rate' => 'nullable|numeric|min:0|max:100',
-            'bank_name' => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
-            'ifsc_code' => 'nullable|string|max:11',
-            'account_holder_name' => 'nullable|string|max:255',
-        ]);
+    // Update user basic info
+    $updateData = [
+        'first_name' => $validated['first_name'],
+        'last_name' => $validated['last_name'],
+        'email' => $validated['email'],
+        'phone' => $validated['phone'],
+        'date_of_birth' => $validated['date_of_birth'],
+        'gender' => $validated['gender'],
+        'status' => $validated['status'],
+        'notes' => $validated['notes'], // ADD THIS - Notes field
+    ];
 
-        // Update user basic info
-        $updateData = [
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'date_of_birth' => $validated['date_of_birth'],
-            'gender' => $validated['gender'],
-            'status' => $validated['status'],
+    // Handle profile image upload
+    if ($request->hasFile('profile_image')) {
+        // Delete old image if exists
+        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+            Storage::disk('public')->delete($user->profile_image);
+        }
+        
+        // Store new image in profile-images folder
+        $path = $request->file('profile_image')->store('profile-images', 'public');
+        $updateData['profile_image'] = $path; // ADD THIS - Profile image path
+    }
+
+    // Update password only if provided
+    if (!empty($validated['password'])) {
+        $updateData['password'] = Hash::make($validated['password']);
+    }
+
+    // Update the user with all data including notes and profile_image
+    $user->update($updateData);
+
+    // Update role
+    if (method_exists($user, 'roles')) {
+        $user->roles()->detach();
+        $user->roles()->attach(\App\Models\Role::where('name', $validated['role'])->first()->id);
+    }
+
+    // Update or create vendor profile if user is shopkeeper
+    if ($validated['role'] === 'shopkeeper' || $user->hasRole('shopkeeper')) {
+        $vendorData = [
+            'business_name' => $validated['business_name'],
+            'business_type' => $validated['business_type'],
+            'business_address' => $validated['business_address'],
+            'business_phone' => $validated['business_phone'],
+            'business_email' => $validated['business_email'],
+            'commission_rate' => $validated['commission_rate'] ?? 8.00,
+            'bank_name' => $validated['bank_name'],
+            'account_number' => $validated['account_number'],
+            'ifsc_code' => $validated['ifsc_code'],
+            'account_holder_name' => $validated['account_holder_name'],
         ];
 
-        // Update password only if provided
-        if (!empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
-        }
+        // Remove null values to avoid overwriting existing data with nulls
+        $vendorData = array_filter($vendorData, function ($value) {
+            return $value !== null && $value !== '';
+        });
 
-        $user->update($updateData);
-
-        // Update role
-        if (method_exists($user, 'roles')) {
-            $user->roles()->detach();
-            $user->roles()->attach(\App\Models\Role::where('name', $validated['role'])->first()->id);
-        }
-
-        // Update or create vendor profile if user is shopkeeper
-        if ($validated['role'] === 'shopkeeper' || $user->hasRole('shopkeeper')) {
-            $vendorData = [
-                'business_name' => $validated['business_name'],
-                'business_type' => $validated['business_type'],
-                'business_address' => $validated['business_address'],
-                'business_phone' => $validated['business_phone'],
-                'business_email' => $validated['business_email'],
-                'commission_rate' => $validated['commission_rate'] ?? 8.00,
-                'bank_name' => $validated['bank_name'],
-                'account_number' => $validated['account_number'],
-                'ifsc_code' => $validated['ifsc_code'],
-                'account_holder_name' => $validated['account_holder_name'],
-            ];
-
-            // Remove null values to avoid overwriting existing data with nulls
-            $vendorData = array_filter($vendorData, function ($value) {
-                return $value !== null && $value !== '';
-            });
-
-            // Use updateOrCreate to handle both update and create scenarios
-            $user->vendorProfile()->updateOrCreate(
-                ['user_id' => $user->id],
-                $vendorData
-            );
-        }
-
-        return redirect()->route('admin.users.index')
-            ->with('success', 'User updated successfully');
+        // Use updateOrCreate to handle both update and create scenarios
+        $user->vendorProfile()->updateOrCreate(
+            ['user_id' => $user->id],
+            $vendorData
+        );
     }
+
+    return redirect()->route('admin.users.index')
+        ->with('success', 'User updated successfully');
+}
 
 
     public function destroy(User $user)
@@ -291,35 +320,35 @@ public function changePassword(Request $request)
         return redirect()->route('admin.users.index')
             ->with('success', 'User deleted successfully');
     }
-public function profile()
-{
-    $user = auth()->user();
-    $user->load('roles', 'vendorProfile');
-    return view('user.profile', compact('user'));
-}
+    public function profile()
+    {
+        $user = auth()->user();
+        $user->load('roles', 'vendorProfile');
+        return view('user.profile', compact('user'));
+    }
 
-public function editProfile()
-{
-    $user = auth()->user();
-    return view('user.edit-profile', compact('user'));
-}
+    public function editProfile()
+    {
+        $user = auth()->user();
+        return view('user.edit-profile', compact('user'));
+    }
 
-public function updateProfile(Request $request)
-{
-    $user = auth()->user();
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
 
-    $validated = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'phone' => 'nullable|string|max:15',
-        'gender' => 'nullable|in:male,female,other',
-        'date_of_birth' => 'nullable|date',
-    ]);
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:15',
+            'gender' => 'nullable|in:male,female,other',
+            'date_of_birth' => 'nullable|date',
+        ]);
 
-    $user->update($validated);
+        $user->update($validated);
 
-    return redirect()->route('profile')->with('success', 'Profile updated successfully.');
-}
+        return redirect()->route('profile')->with('success', 'Profile updated successfully.');
+    }
 
     public function toggleStatus(User $user)
     {

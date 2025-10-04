@@ -196,47 +196,97 @@
                         </div>
 
                         <!-- Physical Properties -->
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                <i data-lucide="ruler" class="w-5 h-5 mr-2"></i>
-                                Physical Properties
-                            </h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Weight -->
-                                <div>
-                                    <label for="weight" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Weight (kg)
-                                    </label>
-                                    <input type="number" 
-                                           name="weight" 
-                                           id="weight" 
-                                           value="{{ old('weight', $product->weight) }}"
-                                           min="0"
-                                           step="0.01"
-                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                    @error('weight')
-                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                       <!-- Physical Properties (Add this after your Pricing section) -->
+<div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+        <i data-lucide="ruler" class="w-5 h-5 mr-2"></i>
+        Physical Properties
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Weight -->
+        <div>
+            <label for="weight" class="block text-sm font-medium text-gray-700 mb-2">
+                Weight (kg)
+            </label>
+            <input type="number" 
+                   name="weight" 
+                   id="weight" 
+                   value="{{ old('weight', $product->weight) }}"
+                   placeholder="0.000"
+                   min="0"
+                   step="0.001"
+                   class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+            @error('weight')
+                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+            @enderror
+        </div>
 
-                                <!-- Dimensions -->
-                                <div>
-                                    <label for="dimensions" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Dimensions
-                                    </label>
-                                    <input type="text" 
-                                           name="dimensions" 
-                                           id="dimensions" 
-                                           value="{{ old('dimensions', $product->dimensions) }}"
-                                           placeholder="L x W x H"
-                                           class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                                    @error('dimensions')
-                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
+        <!-- Dimensions - Separate L, W, H inputs -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                Dimensions (cm)
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+                <!-- Length -->
+                <div>
+                    <label for="length" class="block text-xs font-medium text-gray-500 mb-1">
+                        Length
+                    </label>
+                    <input type="number" 
+                           name="length" 
+                           id="length" 
+                           value="{{ old('length', $lengthValue ?? '') }}"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           class="block w-full px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+
+                <!-- Width -->
+                <div>
+                    <label for="width" class="block text-xs font-medium text-gray-500 mb-1">
+                        Width
+                    </label>
+                    <input type="number" 
+                           name="width" 
+                           id="width" 
+                           value="{{ old('width', $widthValue ?? '') }}"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           class="block w-full px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+
+                <!-- Height -->
+                <div>
+                    <label for="height" class="block text-xs font-medium text-gray-500 mb-1">
+                        Height
+                    </label>
+                    <input type="number" 
+                           name="height" 
+                           id="height" 
+                           value="{{ old('height', $heightValue ?? '') }}"
+                           min="0"
+                           step="0.01"
+                           placeholder="0.00"
+                           class="block w-full px-2 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Enter dimensions in centimeters (L × W × H)</p>
+            @error('length')
+                <p class="text-red-500 text-xs mt-1">Length: {{ $message }}</p>
+            @enderror
+            @error('width')
+                <p class="text-red-500 text-xs mt-1">Width: {{ $message }}</p>
+            @enderror
+            @error('height')
+                <p class="text-red-500 text-xs mt-1">Height: {{ $message }}</p>
+            @enderror
+        </div>
+    </div>
+</div>
+
                     </div>
 
                     <!-- Right Column -->

@@ -189,6 +189,8 @@
                         <!-- Right Column -->
                         <div class="space-y-6">
                             <!-- Security -->
+                            <div id="security-section" class="space-y-6">
+
                             <div class="bg-gray-50 rounded-lg p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                                     <i data-lucide="shield" class="w-5 h-5 mr-2"></i>
@@ -228,7 +230,9 @@
                                 </div>
 
                                 <!-- Role - Fixed field name -->
-                                <div>
+                               
+                            </div>
+                             <div>
                                     <label for="role" class="block text-sm font-medium text-gray-700 mb-2">
                                         User Role <span class="text-red-500">*</span>
                                     </label>
@@ -248,7 +252,7 @@
                                     @enderror
                                 </div>
                             </div>
-
+                            
                             <!-- Account Status -->
                             <div class="bg-gray-50 rounded-lg p-6">
                                 <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
@@ -648,41 +652,74 @@
         }
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const roleSelect = document.querySelector('select[name="role"]');
-            const vendorFields = document.getElementById('vendor-fields');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.querySelector('select[name="role"]');
+    const vendorFields = document.getElementById('vendor-fields');
+    const securitySection = document.getElementById('security-section');
 
-            function toggleVendorFields() {
-                if (roleSelect && vendorFields) {
-                    if (roleSelect.value === 'shopkeeper') {
-                        vendorFields.style.display = 'block';
-                        // Add smooth animation
-                        vendorFields.style.opacity = '0';
-                        vendorFields.style.transform = 'translateY(-10px)';
-                        setTimeout(() => {
-                            vendorFields.style.transition = 'all 0.3s ease-in-out';
-                            vendorFields.style.opacity = '1';
-                            vendorFields.style.transform = 'translateY(0)';
-                        }, 10);
-                    } else {
-                        vendorFields.style.display = 'none';
+    function toggleSections() {
+        if (!roleSelect) return;
+
+        // Vendor fields - show only for shopkeeper
+        if (roleSelect.value === 'shopkeeper') {
+            vendorFields.style.display = 'block';
+            vendorFields.style.opacity = '0';
+            vendorFields.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                vendorFields.style.transition = 'all 0.3s ease-in-out';
+                vendorFields.style.opacity = '1';
+                vendorFields.style.transform = 'translateY(0)';
+            }, 10);
+        } else {
+            vendorFields.style.display = 'none';
+        }
+
+        // FIXED: Hide password fields for regular users, show for admin/shopkeeper
+        if (securitySection) {
+            if (roleSelect.value === 'user') {
+                // Hide password fields for regular users
+                const passwordFields = securitySection.querySelectorAll('input[type="password"]');
+                const passwordLabels = securitySection.querySelectorAll('label[for="password"], label[for="password_confirmation"]');
+                
+                passwordFields.forEach(field => {
+                    field.closest('div').style.display = 'none';
+                    field.removeAttribute('required'); // Remove required attribute
+                });
+                
+                passwordLabels.forEach(label => {
+                    label.closest('div').style.display = 'none';
+                });
+            } else {
+                // Show password fields for admin/shopkeeper
+                const passwordFields = securitySection.querySelectorAll('input[type="password"]');
+                const passwordLabels = securitySection.querySelectorAll('label[for="password"], label[for="password_confirmation"]');
+                
+                passwordFields.forEach(field => {
+                    field.closest('div').style.display = 'block';
+                    if (field.name === 'password') {
+                        field.setAttribute('required', 'required'); // Add required back
                     }
-                }
-            }
-
-            if (roleSelect) {
-                roleSelect.addEventListener('change', toggleVendorFields);
-                toggleVendorFields(); // Check initial state
-            }
-
-            // Auto-uppercase IFSC code
-            const ifscInput = document.getElementById('ifsc_code');
-            if (ifscInput) {
-                ifscInput.addEventListener('input', function() {
-                    this.value = this.value.toUpperCase();
+                });
+                
+                passwordLabels.forEach(label => {
+                    label.closest('div').style.display = 'block';
                 });
             }
+        }
+    }
+
+    roleSelect.addEventListener('change', toggleSections);
+    toggleSections(); // Initial state
+
+    // Auto-uppercase IFSC code
+    const ifscInput = document.getElementById('ifsc_code');
+    if (ifscInput) {
+        ifscInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
         });
-    </script>
+    }
+});
+</script>
+
 @endsection

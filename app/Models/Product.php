@@ -62,6 +62,7 @@ class Product extends Model
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
+        'weight' => 'decimal:3', // Added weight casting
     ];
 
     // ===== EXISTING RELATIONSHIPS =====
@@ -130,6 +131,11 @@ class Product extends Model
     public function scopeLowStock($query)
     {
         return $query->where('stock_quantity', '<', 10);
+    }
+
+    public function scopeInStock($query)
+    {
+        return $query->where('stock_quantity', '>', 0);
     }
 
     // ===== NEW VENDOR SCOPES =====
@@ -237,6 +243,60 @@ class Product extends Model
         return $badges[$this->approval_status] ?? 'bg-gray-100 text-gray-800';
     }
 
+    // ===== DIMENSION HANDLING METHODS (ADDED) =====
+
+    /**
+     * Parse dimensions string back to separate L, W, H values
+     */
+    public function parseDimensions($dimensionsString = null)
+    {
+        $dimensionsString = $dimensionsString ?? $this->dimensions;
+        $defaults = ['length' => '', 'width' => '', 'height' => ''];
+        
+        if (!$dimensionsString) {
+            return $defaults;
+        }
+
+        // Remove "cm" and extra spaces, then split by "x"
+        $clean = trim(str_replace(['cm', 'CM'], '', $dimensionsString));
+        $parts = array_map('trim', explode('x', $clean));
+
+        return [
+            'length' => $parts[0] ?? '',
+            'width' => $parts[1] ?? '',
+            'height' => $parts[2] ?? '',
+        ];
+    }
+
+    /**
+     * Get individual dimension values as accessors
+     */
+    public function getLengthValueAttribute()
+    {
+        $dimensions = $this->parseDimensions();
+        return $dimensions['length'];
+    }
+
+    public function getWidthValueAttribute()
+    {
+        $dimensions = $this->parseDimensions();
+        return $dimensions['width'];
+    }
+
+    public function getHeightValueAttribute()
+    {
+        $dimensions = $this->parseDimensions();
+        return $dimensions['height'];
+    }
+
+    /**
+     * Get formatted dimensions for display
+     */
+    public function getFormattedDimensionsAttribute()
+    {
+        return $this->dimensions ?: 'Not specified';
+    }
+
     // ===== NEW VENDOR HELPER METHODS =====
 
     public function isVendorProduct(): bool
@@ -277,6 +337,29 @@ class Product extends Model
         return $this->vendor_commission_rate ?? $this->vendor?->vendorProfile?->commission_rate ?? 8.00;
     }
 
+    // ===== STOCK HELPER METHODS (ADDED) =====
+
+    public function isInStock($quantity = 1)
+    {
+        return $this->stock_quantity >= $quantity;
+    }
+
+    public function isLowStock()
+    {
+        return $this->stock_quantity <= ($this->low_stock_threshold ?? 10);
+    }
+
+    // ===== IMAGE HELPER METHODS (ADDED) =====
+
+    public function getGalleryImageUrl($imagePath)
+    {
+        if (app()->environment('production')) {
+            return url('public/storage/' . $imagePath);
+        } else {
+            return asset('storage/' . $imagePath);
+        }
+    }
+
     // ===== BOOT METHOD FOR AUTO-SETTING VENDOR FIELDS =====
 
     protected static function boot()
@@ -297,30 +380,4 @@ class Product extends Model
     {
         return 'slug';
     }
-
-
-    public function isInStock($quantity = 1)
-    {
-        return $this->stock_quantity >= $quantity;
-    }
-
-    public function isLowStock()
-    {
-        return $this->stock_quantity <= ($this->low_stock_threshold ?? 10);
-    }
-
-    public function scopeInStock($query)
-    {
-        return $query->where('stock_quantity', '>', 0);
-    }
-
-  // Add to Product.php model
-public function getGalleryImageUrl($imagePath)
-{
-    if (app()->environment('production')) {
-        return url('public/storage/' . $imagePath);
-    } else {
-        return asset('storage/' . $imagePath);
-    }
-}
 }

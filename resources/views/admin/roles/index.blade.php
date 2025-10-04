@@ -115,18 +115,38 @@
                             </span>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex items-center space-x-2">
-                                <a href="{{ route('admin.roles.edit', $role) }}" class="text-purple-600 hover:text-purple-900">
+                            <div class="flex items-center space-x-3">
+                                <!-- VIEW ICON ADDED -->
+                                <a href="{{ route('admin.roles.show', $role) }}" 
+                                   class="text-blue-600 hover:text-blue-900 transition-colors"
+                                   title="View Role">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                
+                                <!-- EDIT ICON -->
+                                <a href="{{ route('admin.roles.edit', $role) }}" 
+                                   class="text-purple-600 hover:text-purple-900 transition-colors"
+                                   title="Edit Role">
                                     <i data-lucide="edit" class="w-4 h-4"></i>
                                 </a>
+                                
+                                <!-- DELETE ICON (only if no users assigned) -->
                                 @if($role->users_count == 0)
                                     <form action="{{ route('admin.roles.destroy', $role) }}" method="POST" class="inline" onsubmit="return confirm('Delete this role?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                        <button type="submit" 
+                                                class="text-red-600 hover:text-red-900 transition-colors"
+                                                title="Delete Role">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </form>
+                                @else
+                                    <!-- Show disabled delete icon when users are assigned -->
+                                    <span class="text-gray-400 cursor-not-allowed" 
+                                          title="Cannot delete role with assigned users">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </span>
                                 @endif
                             </div>
                         </td>
@@ -134,7 +154,16 @@
                     @empty
                     <tr>
                         <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                            No roles found. Create your first role to get started.
+                            <div class="flex flex-col items-center">
+                                <i data-lucide="shield-off" class="w-12 h-12 text-gray-400 mb-4"></i>
+                                <p class="text-lg font-medium text-gray-900">No roles found</p>
+                                <p class="text-sm text-gray-500 mb-4">Create your first role to get started.</p>
+                                <a href="{{ route('admin.roles.create') }}" 
+                                   class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                    <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                    Add New Role
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @endforelse

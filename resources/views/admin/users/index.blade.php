@@ -14,11 +14,12 @@
                     <p class="mt-2 text-sm text-gray-700">Manage all users, roles and permissions across your platform</p>
                 </div>
                 <div class="mt-4 sm:mt-0 sm:flex sm:items-center sm:space-x-3">
-                    <button
+                    <a href="{{ route('admin.users.export') }}"
                         class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                         <i data-lucide="download" class="w-4 h-4 mr-2"></i>
                         Export
-                    </button>
+                    </a>
+
                     <a href="{{ route('admin.users.create') }}"
                         class="inline-flex items-center px-4 py-2 bg-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
                         <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
@@ -179,8 +180,7 @@
                                                     src="{{ asset('storage/' . $user->profile_image) }}"
                                                     alt="{{ $user->full_name }}">
                                             @else
-                                                <div
-                                                    class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                                <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
                                                     <span
                                                         class="text-purple-600 font-semibold text-sm">{{ substr($user->first_name, 0, 1) }}{{ substr($user->last_name, 0, 1) }}</span>
                                                 </div>
@@ -195,21 +195,19 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @foreach ($user->roles as $role)
-                                        <span
-                                            class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                    @if ($role->name == 'admin') bg-red-100 text-red-800
-                                    @elseif($role->name == 'shopkeeper') bg-green-100 text-green-800
-                                    @else bg-blue-100 text-blue-800 @endif">
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                            @if ($role->name == 'admin') bg-red-100 text-red-800
+                                                            @elseif($role->name == 'shopkeeper') bg-green-100 text-green-800
+                                                            @else bg-blue-100 text-blue-800 @endif">
                                             {{ ucfirst($role->name) }}
                                         </span>
                                     @endforeach
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                @if ($user->status == 'active') bg-green-100 text-green-800
-                                @elseif($user->status == 'inactive') bg-gray-100 text-gray-800
-                                @else bg-red-100 text-red-800 @endif">
+                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                @if ($user->status == 'active') bg-green-100 text-green-800
+                                                @elseif($user->status == 'inactive') bg-gray-100 text-gray-800
+                                                @else bg-red-100 text-red-800 @endif">
                                         {{ ucfirst($user->status) }}
                                     </span>
                                 </td>
@@ -221,33 +219,30 @@
                                             </div>
                                             <div class="flex items-center space-x-2">
                                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                    @if($user->vendorProfile->status === 'approved') bg-green-100 text-green-800
-                                                    @elseif($user->vendorProfile->status === 'pending') bg-yellow-100 text-yellow-800
-                                                    @elseif($user->vendorProfile->status === 'rejected') bg-red-100 text-red-800
-                                                    @elseif($user->vendorProfile->status === 'suspended') bg-gray-100 text-gray-800
-                                                    @endif">
+                                                                            @if($user->vendorProfile->status === 'approved') bg-green-100 text-green-800
+                                                                            @elseif($user->vendorProfile->status === 'pending') bg-yellow-100 text-yellow-800
+                                                                            @elseif($user->vendorProfile->status === 'rejected') bg-red-100 text-red-800
+                                                                            @elseif($user->vendorProfile->status === 'suspended') bg-gray-100 text-gray-800
+                                                                            @endif">
                                                     {{ ucfirst($user->vendorProfile->status) }}
                                                 </span>
-                                                
+
                                                 @if($user->vendorProfile->status === 'pending')
                                                     <div class="flex space-x-1">
-                                                        <button 
-                                                            onclick="openApprovalModal({{ $user->id }}, 'approve')"
+                                                        <button onclick="openApprovalModal({{ $user->id }}, 'approve')"
                                                             class="inline-flex items-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
                                                             title="Approve Vendor">
                                                             <i data-lucide="check" class="w-3 h-3"></i>
                                                         </button>
-                                                        <button 
-                                                            onclick="openApprovalModal({{ $user->id }}, 'reject')"
+                                                        <button onclick="openApprovalModal({{ $user->id }}, 'reject')"
                                                             class="inline-flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
                                                             title="Reject Vendor">
                                                             <i data-lucide="x" class="w-3 h-3"></i>
                                                         </button>
                                                     </div>
                                                 @elseif($user->vendorProfile->status === 'approved')
-                                                    <button 
-                                                        onclick="openApprovalModal({{ $user->id }}, 'suspend')"
-                                                        class="inline-flex items-center px-2 py-1 bg-gray-600 hover:bg-gray-700 text-white text-xs rounded transition-colors"
+                                                    <button onclick="openApprovalModal({{ $user->id }}, 'suspend')"
+                                                        class="inline-flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
                                                         title="Suspend Vendor">
                                                         <i data-lucide="ban" class="w-3 h-3"></i>
                                                     </button>
@@ -274,13 +269,11 @@
                                             <i data-lucide="edit" class="w-4 h-4"></i>
                                         </a>
                                         @if ($user->id !== auth()->id())
-                                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
-                                                class="inline"
+                                            <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline"
                                                 onsubmit="return confirm('Are you sure you want to delete this user?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 p-1"
-                                                    title="Delete">
+                                                <button type="submit" class="text-red-600 hover:text-red-900 p-1" title="Delete">
                                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                                                 </button>
                                             </form>
@@ -335,10 +328,11 @@
                 <form id="approvalForm" method="POST">
                     @csrf
                     @method('PATCH')
-                    
+
                     <div class="mb-4">
                         <p class="text-sm text-gray-600" id="modalMessage">
-                            Are you sure you want to approve this vendor? This will allow them to access the vendor dashboard and start selling products.
+                            Are you sure you want to approve this vendor? This will allow them to access the vendor
+                            dashboard and start selling products.
                         </p>
                     </div>
 
@@ -347,10 +341,7 @@
                         <label for="rejection_reason" class="block text-sm font-medium text-gray-700 mb-2">
                             Rejection Reason <span class="text-red-500">*</span>
                         </label>
-                        <textarea 
-                            name="rejection_reason" 
-                            id="rejection_reason" 
-                            rows="4" 
+                        <textarea name="rejection_reason" id="rejection_reason" rows="4"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
                             placeholder="Please provide a reason for rejection..."></textarea>
                     </div>
@@ -360,25 +351,18 @@
                         <label for="reason" class="block text-sm font-medium text-gray-700 mb-2">
                             Suspension Reason <span class="text-red-500">*</span>
                         </label>
-                        <textarea 
-                            name="reason" 
-                            id="reason" 
-                            rows="4" 
+                        <textarea name="reason" id="reason" rows="4"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
                             placeholder="Please provide a reason for suspension..."></textarea>
                     </div>
 
                     <!-- Modal Actions -->
                     <div class="flex justify-end space-x-3 mt-6">
-                        <button 
-                            type="button" 
-                            onclick="closeApprovalModal()" 
+                        <button type="button" onclick="closeApprovalModal()"
                             class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium">
                             Cancel
                         </button>
-                        <button 
-                            type="submit" 
-                            id="submitBtn"
+                        <button type="submit" id="submitBtn"
                             class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
                             Confirm Approval
                         </button>
@@ -455,14 +439,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('approvalModal')?.addEventListener('click', function(e) {
+        document.getElementById('approvalModal')?.addEventListener('click', function (e) {
             if (e.target === this) {
                 closeApprovalModal();
             }
         });
 
         // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
+        setTimeout(function () {
             const alerts = document.querySelectorAll('[class*="fixed top-4 right-4"]');
             alerts.forEach(alert => {
                 alert.style.transition = 'opacity 0.5s';
