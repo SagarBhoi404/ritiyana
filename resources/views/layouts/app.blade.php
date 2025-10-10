@@ -5,7 +5,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Shree Samagri' }}</title>
+    <title>{{ $title ?? 'Shree Samagri - Buy Authentic Puja Samagri Online | Pooja Items & Religious Products' }}
+    </title>
+
+    <meta name="description"
+        content="Shop authentic puja samagri online at Shree Samagri. Wide range of pooja items, religious products & spiritual goods. Fast delivery across Maharashtra. Order now!">
+    <meta name="keywords"
+        content="puja samagri, pooja items, religious products, spiritual goods, hindu puja items, pooja accessories, online puja store">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="Shree Samagri">
+    <meta name="copyright" content="Shree Samagri">
+
+
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
